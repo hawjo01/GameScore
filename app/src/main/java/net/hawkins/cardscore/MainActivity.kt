@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -51,12 +52,12 @@ fun CardScore(modifier: Modifier = Modifier) {
     var players by remember {
         mutableStateOf(
             arrayOf(
-                Player("Jen", arrayListOf<Int>()),
-                Player("Josh", arrayListOf<Int>())
+                Player("Jen"),
+                Player("Josh")
             )
         )
     }
-    Column() {
+    Column {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -90,7 +91,7 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth()
         )
         Text(
-            text = "Total Score: " + player.totalScore(),
+            text = stringResource(R.string.total_score) +  player.totalScore(),
             textAlign = TextAlign.Justify,
             fontSize = 22.sp
         )
@@ -109,13 +110,13 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
             )
             OutlinedButton(
                 onClick = {
-                    player.scores.add(newScore.toInt())
+                    player.addScore(newScore.toInt())
                     newScore = ""
                 },
                 modifier = Modifier.padding(start = 10.dp)
 
             ) {
-                Text("Add")
+                Text(text = stringResource(R.string.add))
             }
         }
         for (score in player.scores) {
@@ -131,16 +132,5 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
 fun CardScorePreview() {
     CardScoreTheme {
         CardScore()
-    }
-}
-
-data class Player(val name: String, val scores: ArrayList<Int> = arrayListOf()) {
-
-    fun totalScore(): Int {
-        var total = 0
-        for (score in this.scores) {
-            total += score
-        }
-        return total
     }
 }
