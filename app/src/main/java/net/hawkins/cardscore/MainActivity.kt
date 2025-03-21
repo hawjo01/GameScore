@@ -14,9 +14,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -95,11 +97,22 @@ fun CardScore(modifier: Modifier = Modifier) {
 
 @Composable
 fun NewGame(players: List<Player>) {
+    val showConfirm = remember {mutableStateOf(false)}
+    if (showConfirm.value) {
+        ConfirmNewGame(
+            onDismissRequest = { showConfirm.value = false},
+            onConfirmation = {
+                for (player in players) {
+                    player.resetScores()
+                }
+                showConfirm.value = false
+            }
+        )
+    }
+
     OutlinedButton(
         onClick = {
-            for (player in players) {
-                player.resetScores()
-            }
+            showConfirm.value = true
         },
         modifier = Modifier.padding(start = 10.dp)
     ) {
@@ -213,6 +226,42 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
     }
 }
 
+
+@Composable
+fun ConfirmNewGame(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit
+) {
+    AlertDialog(
+        title = {
+            Text(text = "New Game?")
+        },
+        text = {
+            Text(text = "All current scores will be lost if you start a new game!")
+        },
+        onDismissRequest = {
+            onDismissRequest()
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirmation()
+                }
+            ) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    onDismissRequest()
+                }
+            ) {
+                Text("Dismiss")
+            }
+        }
+    )
+}
 @Preview(showBackground = true)
 @Composable
 fun CardScorePreview() {
