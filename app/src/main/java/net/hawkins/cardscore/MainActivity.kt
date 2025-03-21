@@ -11,12 +11,14 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -25,8 +27,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -35,10 +37,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import net.hawkins.cardscore.ui.theme.CardScoreTheme
 
 class MainActivity : ComponentActivity() {
@@ -54,8 +52,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-
-
     }
 }
 
@@ -76,6 +72,13 @@ fun CardScore(modifier: Modifier = Modifier) {
                 .padding(top = 40.dp),
             horizontalArrangement = Arrangement.Center
         ) {
+            Winner(players, modifier)
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
             Players(players, modifier.weight(1f))
         }
         Row(
@@ -85,25 +88,53 @@ fun CardScore(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.Bottom
         ) {
-            OutlinedButton(
-                onClick = {
-                    for ((index, player) in players.withIndex()) {
-                        player.resetScores()
-                    }
-                },
-                modifier = Modifier.padding(start = 10.dp)
-
-            ) {
-                Text("New Game")
-            }
+            NewGame(players)
         }
     }
 }
 
 @Composable
+fun NewGame(players: List<Player>) {
+    OutlinedButton(
+        onClick = {
+            for (player in players) {
+                player.resetScores()
+            }
+        },
+        modifier = Modifier.padding(start = 10.dp)
+    ) {
+        Text("New Game")
+    }
+}
+
+@Composable
+fun Winner(players: List<Player>, modifier: Modifier = Modifier) {
+    val winner = findWinner(players)
+    if (winner != null) {
+        Text(
+            text = winner.name + " Wins!",
+            fontWeight = FontWeight.Bold,
+            fontSize = 40.sp,
+            textAlign = TextAlign.Center,
+            color = Color.Red
+        )
+    }
+}
+
+fun findWinner(players: List<Player>): Player? {
+    var handComplete = players.all { player -> player.scores.size == players[0].scores.size }
+    if (handComplete) {
+        val playerWithHighestScore = players.maxBy { it.totalScore() }
+        if (playerWithHighestScore.totalScore() >= 1500) {
+            return playerWithHighestScore
+        }
+    }
+    return null
+}
+
+@Composable
 fun Players(players: List<Player>, modifier: Modifier = Modifier) {
     for ((index, player) in players.withIndex()) {
-        //var p = remember {mutableStateOf (player) }
         Player(player = player, index = index, modifier)
     }
 }
@@ -112,6 +143,7 @@ fun Players(players: List<Player>, modifier: Modifier = Modifier) {
 fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
     var newScore by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
+    val hideKeyboard = { keyboardController?.hide() }
 
     Column(
         modifier = modifier
@@ -136,17 +168,27 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
         ) {
             TextField(
                 value = newScore,
-                onValueChange = { newScore = it },
+                onValueChange = {
+                    if (it == "" || it == "-" || it.toIntOrNull() != null) {
+                        newScore = it
+                    }
+                },
                 //label = { Text(text = "Enter Score")},
                 singleLine = true,
+                shape = RoundedCornerShape(8.dp),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        keyboardController?.hide()
+                        hideKeyboard.invoke()
                     }
+                ),
+                colors = TextFieldDefaults.colors(
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent
                 ),
                 modifier = modifier
             )
@@ -155,10 +197,10 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
                     if (newScore.toIntOrNull() != null) {
                         player.addScore(newScore.toInt())
                         newScore = ""
+                        hideKeyboard.invoke()
                     }
                 },
                 modifier = Modifier.padding(start = 10.dp)
-
             ) {
                 Text(text = stringResource(R.string.add))
             }
