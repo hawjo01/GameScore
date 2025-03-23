@@ -10,16 +10,22 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -66,12 +72,15 @@ fun CardScore(modifier: Modifier = Modifier) {
         )
     }
     Column(
-        modifier = Modifier.fillMaxHeight()
+        modifier = Modifier
+            .statusBarsPadding()
+            .navigationBarsPadding()
+            .fillMaxHeight()
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 40.dp),
+                .padding(top = 20.dp),
             horizontalArrangement = Arrangement.Center
         ) {
             Winner(players, modifier)
@@ -86,7 +95,7 @@ fun CardScore(modifier: Modifier = Modifier) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 40.dp),
+                .padding(bottom = 20.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.Bottom
         ) {
@@ -97,10 +106,10 @@ fun CardScore(modifier: Modifier = Modifier) {
 
 @Composable
 fun NewGame(players: List<Player>) {
-    val showConfirm = remember {mutableStateOf(false)}
+    val showConfirm = remember { mutableStateOf(false) }
     if (showConfirm.value) {
         ConfirmNewGame(
-            onDismissRequest = { showConfirm.value = false},
+            onDismissRequest = { showConfirm.value = false },
             onConfirmation = {
                 for (player in players) {
                     player.resetScores()
@@ -180,9 +189,10 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically
 
         ) {
-            TextField(
+            OutlinedTextField(
                 value = newScore,
                 onValueChange = { newScore = it },
+                label = { Text(text = stringResource(R.string.enter_score)) },
                 singleLine = true,
                 shape = RoundedCornerShape(8.dp),
                 keyboardOptions = KeyboardOptions(
@@ -199,20 +209,25 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent
                 ),
-                modifier = modifier
-            )
-            OutlinedButton(
-                onClick = {
-                    if (newScore.toIntOrNull() != null) {
-                        player.addScore(newScore.toInt())
-                        newScore = ""
-                        hideKeyboard.invoke()
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            if (newScore.toIntOrNull() != null) {
+                                player.addScore(newScore.toInt())
+                                newScore = ""
+                                hideKeyboard.invoke()
+                            }
+                        },
+                        enabled = newScore.toIntOrNull() != null
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = stringResource(R.string.add)
+                        )
                     }
                 },
-                modifier = Modifier.padding(start = 10.dp)
-            ) {
-                Text(text = "+" )
-            }
+                modifier = modifier.fillMaxWidth()
+            )
         }
         for (score in player.scores) {
             Text(
