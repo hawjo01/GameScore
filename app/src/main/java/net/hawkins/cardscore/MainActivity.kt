@@ -116,7 +116,7 @@ fun NewGame(players: List<Player>) {
         },
         modifier = Modifier.padding(start = 10.dp)
     ) {
-        Text("New Game")
+        Text(stringResource(R.string.new_game))
     }
 }
 
@@ -125,7 +125,7 @@ fun Winner(players: List<Player>, modifier: Modifier = Modifier) {
     val winner = findWinner(players)
     if (winner != null) {
         Text(
-            text = winner.name + " Wins!",
+            text = stringResource(R.string.winner, winner.name),
             fontWeight = FontWeight.Bold,
             fontSize = 40.sp,
             textAlign = TextAlign.Center,
@@ -170,8 +170,9 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth()
         )
         Text(
-            text = stringResource(R.string.total_score) + player.totalScore(),
-            textAlign = TextAlign.Justify,
+            text = player.totalScore().toString(),
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
             fontSize = 22.sp
         )
         Row(
@@ -181,12 +182,7 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
         ) {
             TextField(
                 value = newScore,
-                onValueChange = {
-                    if (it == "" || it == "-" || it.toIntOrNull() != null) {
-                        newScore = it
-                    }
-                },
-                //label = { Text(text = "Enter Score")},
+                onValueChange = { newScore = it },
                 singleLine = true,
                 shape = RoundedCornerShape(8.dp),
                 keyboardOptions = KeyboardOptions(
@@ -215,7 +211,7 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
                 },
                 modifier = Modifier.padding(start = 10.dp)
             ) {
-                Text(text = stringResource(R.string.add))
+                Text(text = "+" )
             }
         }
         for (score in player.scores) {
@@ -234,10 +230,10 @@ fun ConfirmNewGame(
 ) {
     AlertDialog(
         title = {
-            Text(text = "New Game?")
+            Text(text = stringResource(R.string.new_game_confirm_title))
         },
         text = {
-            Text(text = "All current scores will be lost if you start a new game!")
+            Text(text = stringResource(R.string.new_game_confirm_description))
         },
         onDismissRequest = {
             onDismissRequest()
@@ -248,7 +244,7 @@ fun ConfirmNewGame(
                     onConfirmation()
                 }
             ) {
-                Text("Confirm")
+                Text(stringResource(R.string.confirm))
             }
         },
         dismissButton = {
@@ -257,11 +253,12 @@ fun ConfirmNewGame(
                     onDismissRequest()
                 }
             ) {
-                Text("Dismiss")
+                Text(stringResource(R.string.dismiss))
             }
         }
     )
 }
+
 @Preview(showBackground = true)
 @Composable
 fun CardScorePreview() {
