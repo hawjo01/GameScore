@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -15,6 +14,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -67,7 +67,7 @@ fun CardScore(gameViewModel: GameViewModel = viewModel(), modifier: Modifier = M
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
-            Players(players, modifier.weight(1f))
+            Players(players, Modifier.weight(1f))
         }
         Row(
             modifier = Modifier
@@ -158,9 +158,9 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
             OutlinedTextField(
                 value = newScore,
                 onValueChange = { newScore = it },
-                label = { Text(text = stringResource(R.string.enter_score)) },
+                label = { Text(text = "")  },
                 singleLine = true,
-                shape = RoundedCornerShape(8.dp),
+                shape = shapes.small,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Done
@@ -173,7 +173,9 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent
+                    disabledIndicatorColor = Color.Transparent,
+                    focusedTextColor = if (isNegative(newScore)) Color.Red else Color.Unspecified,
+                    unfocusedTextColor = if (isNegative(newScore)) Color.Red else Color.Unspecified
                 ),
                 trailingIcon = {
                     IconButton(
@@ -203,6 +205,13 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
     }
 }
 
+fun isNegative(number: String): Boolean {
+    val n = number.toIntOrNull()
+    if (n != null) {
+        return n < 0
+    }
+    return false
+}
 
 @Composable
 fun ConfirmNewGame(

@@ -8,5 +8,4 @@
     <string name="new_game_confirm_description">All current scores will be lost if you start a new game!</string>
     <string name="new_game">New Game</string>
     <string name="winner">%1$s Wins!</string>
-    <string name="enter_score">Enter Score</string>
 </resources>
