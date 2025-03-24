@@ -1,5 +1,4 @@
-package net.hawkins.cardscore
-
+package net.hawkins.cardscore.data
 
 import androidx.compose.runtime.mutableStateListOf
 
