@@ -17,7 +17,15 @@ class GameViewModel :  ViewModel() {
     }
 
     fun findWinner(): Player? {
-        var handComplete = _uiState.value.players.all { player -> player.scores.size == _uiState.value.players[0].scores.size }
+        if (_uiState.value.players.size == 0) {
+            return null
+        }
+        var playerWithMaxNumberOfHands: Player? = _uiState.value.players.maxBy{ it.scores.size }
+        if (playerWithMaxNumberOfHands == null) {
+            return null
+        }
+        var maxNumberOfHands = playerWithMaxNumberOfHands.scores.size
+        var handComplete = _uiState.value.players.all { player -> player.scores.size == maxNumberOfHands}
         if (handComplete) {
             val playerWithHighestScore = _uiState.value.players.maxBy { it.totalScore() }
             if (playerWithHighestScore.totalScore() >= 1500) {
@@ -29,5 +37,18 @@ class GameViewModel :  ViewModel() {
 
     fun getPlayers(): List<Player> {
         return _uiState.value.players
+    }
+
+    fun setPlayers(playerNames: List<String>) {
+        val players = ArrayList<Player>()
+        for (playerName in playerNames) {
+            players.add(Player(playerName))
+        }
+        _uiState.value.players.addAll(players)
+    }
+
+    fun playersReady(): Boolean {
+        var ready = _uiState.value.players.size > 0
+        return ready
     }
 }

@@ -50,8 +50,6 @@ fun CardScore(gameViewModel: GameViewModel = viewModel(), modifier: Modifier = M
     val players = gameViewModel.getPlayers()
     Column(
         modifier = Modifier
-            .statusBarsPadding()
-            .navigationBarsPadding()
             .fillMaxHeight()
     ) {
         Row(
