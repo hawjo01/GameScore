@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -62,6 +63,7 @@ fun NewGame(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
                 shape = shapes.small,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Ascii,
+                    capitalization = KeyboardCapitalization.Words,
                     imeAction = ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(

@@ -2,11 +2,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,7 +50,7 @@ fun CardScore(gameViewModel: GameViewModel = viewModel(), modifier: Modifier = M
     val gameUiState by gameViewModel.uiState.collectAsState()
     val players = gameViewModel.getPlayers()
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxHeight()
     ) {
         Row(
@@ -62,14 +63,15 @@ fun CardScore(gameViewModel: GameViewModel = viewModel(), modifier: Modifier = M
         }
         Row(
             modifier = Modifier
+                .weight(1f)
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Center,
         ) {
             Players(players, Modifier.weight(1f))
         }
         Row(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(bottom = 20.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.Bottom
@@ -156,7 +158,7 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
             OutlinedTextField(
                 value = newScore,
                 onValueChange = { newScore = it },
-                label = { Text(text = "")  },
+                label = { Text(text = "") },
                 singleLine = true,
                 shape = shapes.small,
                 keyboardOptions = KeyboardOptions(
@@ -195,11 +197,22 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
                 modifier = modifier.fillMaxWidth()
             )
         }
-        for (score in player.scores) {
-            Text(
-                text = score.toString()
-            )
+        Row {
+            val scrollState = rememberLazyListState()
+            LaunchedEffect(player.scores.size) {
+                if (player.scores.isNotEmpty()) scrollState.scrollToItem(player.scores.size - 1)
+            }
+
+            LazyColumn(
+                state = scrollState,
+                modifier = Modifier
+                    .weight(weight = 1f, fill = false)
+                    .fillMaxWidth()
+            ) {
+                items(player.scores) { Text(text = it.toString()) }
+            }
         }
+
     }
 }
 
