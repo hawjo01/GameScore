@@ -15,7 +15,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.shapes
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -57,7 +56,8 @@ fun CardScore(gameViewModel: GameViewModel = viewModel(), modifier: Modifier = M
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 20.dp),
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Center,
+
         ) {
             Winner(gameViewModel, modifier)
         }
@@ -69,40 +69,6 @@ fun CardScore(gameViewModel: GameViewModel = viewModel(), modifier: Modifier = M
         ) {
             Players(players, Modifier.weight(1f))
         }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 20.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.Bottom
-        ) {
-            NewGame(players)
-        }
-    }
-}
-
-@Composable
-fun NewGame(players: List<Player>) {
-    val showConfirmDialog = remember { mutableStateOf(false) }
-    if (showConfirmDialog.value) {
-        ConfirmNewGame(
-            onDismissRequest = { showConfirmDialog.value = false },
-            onConfirmation = {
-                for (player in players) {
-                    player.resetScores()
-                }
-                showConfirmDialog.value = false
-            }
-        )
-    }
-
-    OutlinedButton(
-        onClick = {
-            showConfirmDialog.value = true
-        },
-        modifier = Modifier.padding(start = 10.dp)
-    ) {
-        Text(stringResource(R.string.new_game))
     }
 }
 
@@ -225,7 +191,29 @@ fun isNegative(number: String): Boolean {
 }
 
 @Composable
-fun ConfirmNewGame(
+fun ResetGame(gameViewModel: GameViewModel) {
+    val showConfirmDialog = remember { mutableStateOf(false) }
+    if (showConfirmDialog.value) {
+        ConfirmResetGame(
+            onDismissRequest = { showConfirmDialog.value = false },
+            onConfirmation = {
+                gameViewModel.resetGame()
+                showConfirmDialog.value = false
+            }
+        )
+    }
+
+    TextButton(
+        onClick = {
+            showConfirmDialog.value = true
+        },
+        ) {
+            Text(text = stringResource(R.string.new_game))
+    }
+}
+
+@Composable
+fun ConfirmResetGame(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit
 ) {

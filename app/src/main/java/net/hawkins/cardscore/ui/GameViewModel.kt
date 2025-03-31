@@ -51,4 +51,18 @@ class GameViewModel :  ViewModel() {
         var ready = _uiState.value.players.size > 0
         return ready
     }
+
+    fun addPlayerName(playerName: String) {
+        _uiState.value.playerNames.add(playerName);
+    }
+
+    fun getPlayerNames(): List<String> {
+        return _uiState.value.playerNames
+    }
+
+    fun startGame() {
+        val players = _uiState.value.playerNames.map{playerName -> Player(playerName)}
+        _uiState.value.playerNames.clear()
+        _uiState.value.players.addAll(players)
+    }
 }
