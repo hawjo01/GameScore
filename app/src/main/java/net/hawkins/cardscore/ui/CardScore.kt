@@ -31,21 +31,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.Typeface
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import net.hawkins.cardscore.R
 import net.hawkins.cardscore.data.Player
 import net.hawkins.cardscore.ui.GameViewModel
 import net.hawkins.cardscore.ui.theme.CardScoreTheme
 
 @Composable
-fun CardScore(gameViewModel: GameViewModel = viewModel(), modifier: Modifier = Modifier) {
+fun CardScore(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
     val gameUiState by gameViewModel.uiState.collectAsState()
     val players = gameViewModel.getPlayers()
     Column(
@@ -54,8 +55,7 @@ fun CardScore(gameViewModel: GameViewModel = viewModel(), modifier: Modifier = M
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp),
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
 
         ) {
@@ -171,11 +171,16 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
 
             LazyColumn(
                 state = scrollState,
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .weight(weight = 1f, fill = false)
                     .fillMaxWidth()
             ) {
-                items(player.scores) { Text(text = it.toString()) }
+                items(player.scores) { score -> Text(
+                    text = score.toString().padStart(5, ' '),
+                    textAlign = TextAlign.Right,
+                    fontFamily = FontFamily(Typeface(android.graphics.Typeface.MONOSPACE)),
+                )}
             }
         }
 
@@ -252,6 +257,6 @@ fun ConfirmResetGame(
 @Composable
 fun CardScorePreview() {
     CardScoreTheme {
-        CardScore()
+        CardScore(GameViewModel())
     }
 }
