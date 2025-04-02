@@ -208,7 +208,7 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
 }
 
 fun isValidScore(score: String): Boolean {
-    return (score.toIntOrNull() != null)
+    return (score.toIntOrNull() != null && score.toInt() % 5 == 0)
 }
 
 @Composable
