@@ -1,5 +1,6 @@
 package net.hawkins.cardscore.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +10,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -58,13 +60,36 @@ fun NewGame(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
             Text(
                 text = stringResource(R.string.players) + ":",
                 fontSize = 26.sp,
-                modifier = Modifier.padding(top = 10.dp)
+                modifier = Modifier
+                    .padding(top = 10.dp, end = 20.dp)
             )
-            Text(
-                text = gameViewModel.getPlayerNames().joinToString(", "),
-                fontSize = 26.sp,
-                modifier = Modifier.padding(start = 10.dp, top = 10.dp)
-            )
+
+            val i = gameViewModel.getPlayerNames().iterator()
+            while (i.hasNext()) {
+                val playerName = i.next()
+                var showConfirmRemovePlayer by remember { mutableStateOf(false) }
+
+                Text(
+                    text = playerName + if (i.hasNext()) ", " else "",
+                    fontSize = 26.sp,
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                        .clickable(
+                            onClick = {
+                                showConfirmRemovePlayer = true
+                            }
+                        )
+                )
+                if (showConfirmRemovePlayer) {
+                    ConfirmRemovePlayer(
+                        onDismissRequest = { showConfirmRemovePlayer = false },
+                        onConfirmation = {
+                            gameViewModel.removePlayerName(playerName)
+                            showConfirmRemovePlayer = false
+                        }
+                    )
+                }
+            }
         }
         Row(
             horizontalArrangement = Arrangement.Center,
@@ -119,6 +144,39 @@ fun NewGame(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
     }
 }
 
+@Composable
+fun ConfirmRemovePlayer(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit
+) {
+    AlertDialog(
+        title = {
+            Text(text = stringResource(R.string.remove_player))
+        },
+        onDismissRequest = {
+            onDismissRequest()
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirmation()
+                }
+            ) {
+                Text(stringResource(R.string.confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    onDismissRequest()
+                }
+            ) {
+                Text(stringResource(R.string.dismiss))
+            }
+        }
+    )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropDownMenu(
@@ -136,7 +194,7 @@ fun DropDownMenu(
     ) {
         TextField(
             readOnly = true,
-            value = stringResource(R.string.player_list),
+            value = stringResource(R.string.add_players),
             onValueChange = {},
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = ExposedDropdownMenuDefaults.textFieldColors(),
@@ -159,7 +217,6 @@ fun DropDownMenu(
         }
     }
 }
-
 
 @Composable
 fun StartGame(gameViewModel: GameViewModel) {

@@ -1,3 +1,4 @@
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -5,13 +6,15 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.shapes
@@ -40,6 +43,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import net.hawkins.cardscore.R
 import net.hawkins.cardscore.data.Player
 import net.hawkins.cardscore.ui.GameViewModel
@@ -58,7 +62,7 @@ fun CardScore(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
 
-        ) {
+            ) {
             Winner(gameViewModel, modifier)
         }
         Row(
@@ -146,13 +150,13 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
                 trailingIcon = {
                     IconButton(
                         onClick = {
-                            if (newScore.toIntOrNull() != null) {
+                            if (isValidScore(newScore)) {
                                 player.addScore(newScore.toInt())
                                 newScore = ""
                                 hideKeyboard.invoke()
                             }
                         },
-                        enabled = newScore.toIntOrNull() != null
+                        enabled = isValidScore(newScore)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Add,
@@ -163,7 +167,9 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
                 modifier = modifier.fillMaxWidth()
             )
         }
-        Row {
+        Row (
+            modifier = Modifier.padding(top = 8.dp)
+        ){
             val scrollState = rememberLazyListState()
             LaunchedEffect(player.scores.size) {
                 if (player.scores.isNotEmpty()) scrollState.scrollToItem(player.scores.size - 1)
@@ -176,14 +182,98 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
                     .weight(weight = 1f, fill = false)
                     .fillMaxWidth()
             ) {
-                items(player.scores) { score -> Text(
-                    text = score.toString().padStart(5, ' '),
-                    textAlign = TextAlign.Right,
-                    fontFamily = FontFamily(Typeface(android.graphics.Typeface.MONOSPACE)),
-                )}
+                itemsIndexed(player.scores) { index, score ->
+                    var showChangeScore by remember { mutableStateOf(false) }
+
+                    Text(
+                        text = score.toString().padStart(5, ' '),
+                        textAlign = TextAlign.Right,
+                        fontFamily = FontFamily(Typeface(android.graphics.Typeface.MONOSPACE)),
+                        fontSize = 20.sp,
+                        modifier = Modifier.clickable {
+                            showChangeScore = true
+                        }
+                    )
+                    if (showChangeScore) {
+                        ChangeScore(
+                            player = player,
+                            scoreIndex = index,
+                            onDismissRequest = { showChangeScore = false }
+                        )
+                    }
+                }
             }
         }
+    }
+}
 
+fun isValidScore(score: String): Boolean {
+    return (score.toIntOrNull() != null)
+}
+
+@Composable
+fun ChangeScore(player: Player, scoreIndex: Int, onDismissRequest: () -> Unit) {
+    Dialog(onDismissRequest = { onDismissRequest() }) {
+        Card(
+            modifier = Modifier
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            var newScore by remember { mutableStateOf(player.scores[scoreIndex].toString()) }
+            val keyboardController = LocalSoftwareKeyboardController.current
+            val hideKeyboard = { keyboardController?.hide() }
+
+            Row(
+                modifier = Modifier.padding(horizontal = 10.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                OutlinedTextField(
+                    value = newScore,
+                    onValueChange = { newScore = it },
+                    label = { Text(text = "Change Score") },
+                    singleLine = true,
+                    shape = shapes.small,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            hideKeyboard.invoke()
+                        }
+                    ),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = if (isNegative(newScore)) Color.Red else Color.Unspecified,
+                        unfocusedTextColor = if (isNegative(newScore)) Color.Red else Color.Unspecified
+                    ),
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                TextButton(
+                    onClick = { onDismissRequest() },
+                    modifier = Modifier.padding(8.dp),
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+                TextButton(
+                    onClick = {
+                        if (isValidScore(newScore)) {
+                            player.scores[scoreIndex] = newScore.toInt()
+                            onDismissRequest()
+                        }
+                    },
+                    enabled = isValidScore(newScore),
+                    modifier = Modifier.padding(8.dp),
+                ) {
+                    Text(stringResource(R.string.update))
+                }
+            }
+        }
     }
 }
 
@@ -212,8 +302,8 @@ fun ResetGame(gameViewModel: GameViewModel) {
         onClick = {
             showConfirmDialog.value = true
         },
-        ) {
-            Text(text = stringResource(R.string.new_game))
+    ) {
+        Text(text = stringResource(R.string.new_game))
     }
 }
 

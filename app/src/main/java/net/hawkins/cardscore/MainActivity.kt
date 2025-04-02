@@ -31,7 +31,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CardScoreTheme {
-                MainScaffold(viewModel(), modifier = Modifier)
+                val gameViewModel: GameViewModel = viewModel()
+                gameViewModel.loadPlayerNamesList(baseContext)
+                MainScaffold(gameViewModel, modifier = Modifier)
             }
         }
     }

@@ -11,6 +11,10 @@
     <string name="start_game">Start Game</string>
     <string name="player_name">Player Name</string>
     <string name="players">Players</string>
-    <string name="player_list">Player List</string>
-    <string name="add_player">Add Player</string>
+    <string name="add_players">Add Player Names</string>
+    <string name="add_player">Add Player Name</string>
+    <string name="remove">Remove</string>
+    <string name="remove_player">Remove Player?</string>
+    <string name="update">Update</string>
+    <string name="cancel">Cancel</string>
 </resources>
