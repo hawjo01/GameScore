@@ -1,61 +1,47 @@
 package net.hawkins.cardscore.ui
 
-import android.content.Context
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import net.hawkins.cardscore.data.Player
-import java.io.BufferedReader
-import java.io.InputStreamReader
+import net.hawkins.cardscore.game.BasicScore
+import net.hawkins.cardscore.game.GameType
+import net.hawkins.cardscore.game.Rummy
 
 class GameViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(GameUiState())
     val uiState: StateFlow<GameUiState> = _uiState.asStateFlow()
-    val savedPlayerLists = mutableListOf<List<String>>()
+    private val _savedPlayerLists = mutableListOf<List<String>>()
+    private val _gameTypes = listOf(
+        Rummy(),
+        BasicScore()
+    )
+    private var _gameType = mutableStateOf(_gameTypes[0])
+    private var _winner = mutableStateOf<Player?>(null)
 
-    fun loadPlayerNamesList(context: Context) {
-        try {
-            val inputStream = context.assets.open("players.json")
-            val bufferedReader = BufferedReader(InputStreamReader(inputStream))
-            val gson = Gson()
-            val listType = object : TypeToken<ArrayList<ArrayList<String>>>() {}.type
-            val playerNameLists =
-                gson.fromJson<ArrayList<ArrayList<String>>>(bufferedReader, listType)
-            playerNameLists.forEach { savedPlayerLists.add(it) }
-        } catch (e: Exception) {
-            println("An unexpected error occurred: ${e.message}")
-        }
-    }
 
     fun resetGame() {
+        _winner.value = null
         _uiState.value.players.forEach { player -> player.resetScores() }
     }
 
-    fun findWinner(): Player? {
-        if (_uiState.value.players.size == 0) {
-            return null
-        }
+    fun getWinner(): Player? {
+        return _winner.value
+    }
 
-        var playerWithMaxNumberOfHands: Player? = _uiState.value.players.maxBy { it.scores.size }
-        if (playerWithMaxNumberOfHands == null) {
-            return null
-        }
+    fun determineWinner(): Player? {
+        _winner.value = _gameType.value.findWinner(_uiState.value.players)
+        return _winner.value
+    }
 
-        var maxNumberOfHands = playerWithMaxNumberOfHands.scores.size
-        var handComplete = _uiState.value.players.all { player -> player.scores.size == maxNumberOfHands }
-        if (!handComplete) {
-            return null
-        }
+    fun isValidScore(score: String): Boolean {
+        return _gameType.value.isValidScore(score)
+    }
 
-        val playerWithHighestScore = _uiState.value.players.maxBy { it.totalScore() }
-        if (playerWithHighestScore.totalScore() >= 1500) {
-            return playerWithHighestScore
-        } else {
-            return null
-        }
+    fun hasWinningThreshold(): Boolean {
+        return _gameType.value.hasWinningThreshold()
     }
 
     fun getPlayers(): List<Player> {
@@ -89,6 +75,22 @@ class GameViewModel : ViewModel() {
     }
 
     fun getSavedPlayerNameLists(): List<List<String>> {
-        return savedPlayerLists
+        return _savedPlayerLists
+    }
+
+    fun setSavedPlayerNameLists(savedLists: List<List<String>>) {
+        savedLists.forEach { _savedPlayerLists.add(it) }
+    }
+
+    fun getGameTypes(): List<GameType> {
+        return _gameTypes
+    }
+
+    fun getGameType(): GameType {
+        return _gameType.value
+    }
+
+    fun setGameType(gameType: GameType) {
+        _gameType.value = gameType
     }
 }

@@ -1,7 +1,8 @@
 package net.hawkins.cardscore
 
-import CardScore
-import ResetGame
+import android.content.Context
+import net.hawkins.cardscore.ui.GamePlay
+import net.hawkins.cardscore.ui.ResetGame
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,10 +20,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import net.hawkins.cardscore.ui.GameViewModel
-import net.hawkins.cardscore.ui.NewGame
+import net.hawkins.cardscore.ui.GameSetup
 import net.hawkins.cardscore.ui.StartGame
 import net.hawkins.cardscore.ui.theme.CardScoreTheme
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import kotlin.collections.mutableListOf
 
 class MainActivity : ComponentActivity() {
 
@@ -32,10 +38,28 @@ class MainActivity : ComponentActivity() {
         setContent {
             CardScoreTheme {
                 val gameViewModel: GameViewModel = viewModel()
-                gameViewModel.loadPlayerNamesList(baseContext)
+                val savedPlayerLists = getSavedPlayerLists(baseContext)
+                gameViewModel.setSavedPlayerNameLists(savedPlayerLists)
                 MainScaffold(gameViewModel, modifier = Modifier)
             }
         }
+    }
+
+    fun getSavedPlayerLists(context: Context): List<List<String>> {
+        val savedPlayerLists = mutableListOf<List<String>>()
+        try {
+            val inputStream = context.assets.open("players.json")
+            val bufferedReader = BufferedReader(InputStreamReader(inputStream))
+            val gson = Gson()
+            val listType = object : TypeToken<ArrayList<ArrayList<String>>>() {}.type
+            val playerNameLists =
+                gson.fromJson<ArrayList<ArrayList<String>>>(bufferedReader, listType)
+
+            playerNameLists.forEach { savedPlayerLists.add(it) }
+        } catch (e: Exception) {
+            println("An unexpected error occurred: ${e.message}")
+        }
+        return savedPlayerLists
     }
 }
 
@@ -47,26 +71,31 @@ fun MainScaffold(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxSize(),
         topBar = {
-                TopAppBar(
-                    title = {
-                        Text(
-                            "",
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    },
-                    actions = {
-                        if (gameViewModel.playersReady()) {
-                            ResetGame(gameViewModel)
-                        } else {
-                            StartGame(gameViewModel)
-                        }
-                    },
-                    scrollBehavior = scrollBehavior
-                )
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "",
+//                            if (gameViewModel.playersReady()) {
+//                            stringResource(gameViewModel.getGameType().getNameId())
+//                        } else {
+//                            ""
+//                        },
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
+                actions = {
+                    if (gameViewModel.playersReady()) {
+                        ResetGame(gameViewModel)
+                    } else {
+                        StartGame(gameViewModel)
+                    }
+                },
+                scrollBehavior = scrollBehavior
+            )
         },
     ) { innerPadding ->
-        Game(
+        net.hawkins.cardscore.Game(
             gameViewModel = gameViewModel,
             modifier = Modifier.padding(innerPadding)
         )
@@ -80,9 +109,9 @@ fun Game(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
             .fillMaxSize()
     ) {
         if (!gameViewModel.playersReady()) {
-            NewGame(gameViewModel)
+            GameSetup(gameViewModel)
         } else {
-            CardScore(gameViewModel)
+            GamePlay(gameViewModel)
         }
     }
 }

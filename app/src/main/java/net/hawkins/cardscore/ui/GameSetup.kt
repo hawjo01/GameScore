@@ -44,7 +44,7 @@ import net.hawkins.cardscore.ui.theme.CardScoreTheme
 
 
 @Composable
-fun NewGame(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
+fun GameSetup(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
     var newPlayerName by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     val hideKeyboard = { keyboardController?.hide() }
@@ -54,6 +54,19 @@ fun NewGame(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
             .fillMaxWidth()
     )
     {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(10.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.game) + ":",
+                fontSize = 26.sp,
+                modifier = Modifier
+                    .padding(top = 10.dp, end = 20.dp)
+            )
+            GameTypeDropdownMenu(gameViewModel)
+        }
+
         Row(
             modifier = Modifier.padding(10.dp)
         ) {
@@ -179,6 +192,48 @@ fun ConfirmRemovePlayer(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun GameTypeDropdownMenu(
+    gameViewModel: GameViewModel
+) {
+    var expanded by remember {
+        mutableStateOf(false)
+    }
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+        Modifier
+            .padding(vertical = 8.dp)
+    ) {
+        TextField(
+            readOnly = true,
+            value = stringResource(gameViewModel.getGameType().getNameId()),
+            onValueChange = {},
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable)
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+        ) {
+            gameViewModel.getGameTypes().forEach {
+                gameType ->
+                DropdownMenuItem(
+                    text = { Text(text = stringResource(gameType.getNameId())) },
+                    onClick = {
+                        gameViewModel.setGameType(gameType)
+                        expanded = false
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                )
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun DropDownMenu(
     optionSelected: (option: List<String>) -> Unit,
     options: List<List<String>>,
@@ -233,6 +288,6 @@ fun StartGame(gameViewModel: GameViewModel) {
 @Composable
 fun NewGamePreview() {
     CardScoreTheme {
-        NewGame(viewModel())
+        GameSetup(viewModel())
     }
 }

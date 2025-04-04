@@ -1,3 +1,5 @@
+package net.hawkins.cardscore.ui
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,7 +26,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,17 +45,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import net.hawkins.cardscore.R
-import net.hawkins.cardscore.Rummy
 import net.hawkins.cardscore.Utils
 import net.hawkins.cardscore.data.Player
-import net.hawkins.cardscore.ui.GameViewModel
 import net.hawkins.cardscore.ui.theme.CardScoreTheme
 
 @Composable
-fun CardScore(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
-    val gameUiState by gameViewModel.uiState.collectAsState()
-    val players = gameViewModel.getPlayers()
+fun GamePlay(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
+//    val gameUiState by gameViewModel.uiState.collectAsState()
+//    val players = gameViewModel.getPlayers()
     Column(
         modifier = modifier
             .fillMaxHeight()
@@ -65,7 +65,7 @@ fun CardScore(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.Center,
 
             ) {
-            Winner(gameViewModel, modifier)
+            Winner(gameViewModel)
         }
         Row(
             modifier = Modifier
@@ -73,34 +73,74 @@ fun CardScore(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
         ) {
-            Players(players, Modifier.weight(1f))
+            Players(gameViewModel, Modifier.weight(1f))
         }
     }
 }
 
 @Composable
-fun Winner(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
-    val winner = gameViewModel.findWinner()
+fun Winner(gameViewModel: GameViewModel) {
+    if (gameViewModel.hasWinningThreshold()) {
+        gameViewModel.determineWinner()
+    }
+    val winner = gameViewModel.getWinner()
     if (winner != null) {
-        Text(
-            text = stringResource(R.string.winner, winner.name),
-            fontWeight = FontWeight.Bold,
-            fontSize = 40.sp,
-            textAlign = TextAlign.Center,
-            color = Color.Red
-        )
+        Winner(winner)
+    }
+//
+//        if (winner != null) {
+//            Winner(winner)
+//        }
+//    } else {
+//        if (gameViewModel.)
+//    }
+//    else {
+//        var gameOver by remember { mutableStateOf(false) }
+//        var winner by remember { mutableStateOf<Player?>(null) }
+//
+//        if (gameOver && winner != null) {
+//            val winner = gameViewModel.findWinner()
+//            if (winner != null) {
+//                Winner(winner)
+//            }
+//        } else {
+//            TextButton(
+//                onClick = {
+//                    gameOver = true
+//                    winner = gameViewModel.findWinner()
+//                }
+//            ) {
+//                Text(text = stringResource(R.string.show_winner))
+//            }
+//        }
+//    }
+}
+
+@Composable
+fun Winner(winner: Player) {
+    Text(
+        text = stringResource(R.string.player_wins, winner.name),
+        fontWeight = FontWeight.Bold,
+        fontSize = 40.sp,
+        textAlign = TextAlign.Center,
+        color = Color.Red
+    )
+}
+
+@Composable
+fun Players(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
+    for ((index, player) in gameViewModel.getPlayers().withIndex()) {
+        Player(gameViewModel = gameViewModel, player = player, index = index, modifier)
     }
 }
 
 @Composable
-fun Players(players: List<Player>, modifier: Modifier = Modifier) {
-    for ((index, player) in players.withIndex()) {
-        Player(player = player, index = index, modifier)
-    }
-}
-
-@Composable
-fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
+fun Player(
+    gameViewModel: GameViewModel,
+    player: Player,
+    index: Int,
+    modifier: Modifier = Modifier
+) {
     var newScore by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     val hideKeyboard = { keyboardController?.hide() }
@@ -152,13 +192,13 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
                 trailingIcon = {
                     IconButton(
                         onClick = {
-                            if (Rummy.isValidScore(newScore)) {
+                            if (gameViewModel.isValidScore(newScore)) {
                                 player.addScore(newScore.toInt())
                                 newScore = ""
                                 hideKeyboard.invoke()
                             }
                         },
-                        enabled = Rummy.isValidScore(newScore)
+                        enabled = gameViewModel.isValidScore(newScore)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Add,
@@ -169,9 +209,9 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
                 modifier = modifier.fillMaxWidth()
             )
         }
-        Row (
+        Row(
             modifier = Modifier.padding(top = 8.dp)
-        ){
+        ) {
             val scrollState = rememberLazyListState()
             LaunchedEffect(player.scores.size) {
                 if (player.scores.isNotEmpty()) scrollState.scrollToItem(player.scores.size - 1)
@@ -198,6 +238,7 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
                     )
                     if (showChangeScore) {
                         ChangeScore(
+                            gameViewModel = gameViewModel,
                             player = player,
                             scoreIndex = index,
                             onDismissRequest = { showChangeScore = false }
@@ -210,7 +251,12 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ChangeScore(player: Player, scoreIndex: Int, onDismissRequest: () -> Unit) {
+fun ChangeScore(
+    gameViewModel: GameViewModel,
+    player: Player,
+    scoreIndex: Int,
+    onDismissRequest: () -> Unit
+) {
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
             modifier = Modifier
@@ -260,12 +306,12 @@ fun ChangeScore(player: Player, scoreIndex: Int, onDismissRequest: () -> Unit) {
                 }
                 TextButton(
                     onClick = {
-                        if (Rummy.isValidScore(newScore)) {
+                        if (gameViewModel.isValidScore(newScore)) {
                             player.changeScore(newScore = newScore.toInt(), scoreIndex = scoreIndex)
                             onDismissRequest()
                         }
                     },
-                    enabled = Rummy.isValidScore(newScore),
+                    enabled = gameViewModel.isValidScore(newScore),
                     modifier = Modifier.padding(8.dp),
                 ) {
                     Text(stringResource(R.string.update))
@@ -286,6 +332,14 @@ fun ResetGame(gameViewModel: GameViewModel) {
                 showConfirmDialog.value = false
             }
         )
+    }
+
+    if (!gameViewModel.hasWinningThreshold()) {
+        TextButton(
+            onClick = { gameViewModel.determineWinner() }
+        ) {
+            Text(text = "Find Winner")
+        }
     }
 
     TextButton(
@@ -337,6 +391,6 @@ fun ConfirmResetGame(
 @Composable
 fun CardScorePreview() {
     CardScoreTheme {
-        CardScore(GameViewModel())
+        GamePlay(viewModel())
     }
 }
