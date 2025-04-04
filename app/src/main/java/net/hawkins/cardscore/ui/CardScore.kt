@@ -45,6 +45,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import net.hawkins.cardscore.R
+import net.hawkins.cardscore.Rummy
+import net.hawkins.cardscore.Utils
 import net.hawkins.cardscore.data.Player
 import net.hawkins.cardscore.ui.GameViewModel
 import net.hawkins.cardscore.ui.theme.CardScoreTheme
@@ -144,19 +146,19 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent,
-                    focusedTextColor = if (isNegative(newScore)) Color.Red else Color.Unspecified,
-                    unfocusedTextColor = if (isNegative(newScore)) Color.Red else Color.Unspecified
+                    focusedTextColor = if (Utils.isNegativeInt(newScore)) Color.Red else Color.Unspecified,
+                    unfocusedTextColor = if (Utils.isNegativeInt(newScore)) Color.Red else Color.Unspecified
                 ),
                 trailingIcon = {
                     IconButton(
                         onClick = {
-                            if (isValidScore(newScore)) {
+                            if (Rummy.isValidScore(newScore)) {
                                 player.addScore(newScore.toInt())
                                 newScore = ""
                                 hideKeyboard.invoke()
                             }
                         },
-                        enabled = isValidScore(newScore)
+                        enabled = Rummy.isValidScore(newScore)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Add,
@@ -207,10 +209,6 @@ fun Player(player: Player, index: Int, modifier: Modifier = Modifier) {
     }
 }
 
-fun isValidScore(score: String): Boolean {
-    return (score.toIntOrNull() != null && score.toInt() % 5 == 0)
-}
-
 @Composable
 fun ChangeScore(player: Player, scoreIndex: Int, onDismissRequest: () -> Unit) {
     Dialog(onDismissRequest = { onDismissRequest() }) {
@@ -243,8 +241,8 @@ fun ChangeScore(player: Player, scoreIndex: Int, onDismissRequest: () -> Unit) {
                         }
                     ),
                     colors = TextFieldDefaults.colors(
-                        focusedTextColor = if (isNegative(newScore)) Color.Red else Color.Unspecified,
-                        unfocusedTextColor = if (isNegative(newScore)) Color.Red else Color.Unspecified
+                        focusedTextColor = if (Utils.isNegativeInt(newScore)) Color.Red else Color.Unspecified,
+                        unfocusedTextColor = if (Utils.isNegativeInt(newScore)) Color.Red else Color.Unspecified
                     ),
                     modifier = Modifier.padding(top = 10.dp)
                 )
@@ -262,12 +260,12 @@ fun ChangeScore(player: Player, scoreIndex: Int, onDismissRequest: () -> Unit) {
                 }
                 TextButton(
                     onClick = {
-                        if (isValidScore(newScore)) {
-                            player.scores[scoreIndex] = newScore.toInt()
+                        if (Rummy.isValidScore(newScore)) {
+                            player.changeScore(newScore = newScore.toInt(), scoreIndex = scoreIndex)
                             onDismissRequest()
                         }
                     },
-                    enabled = isValidScore(newScore),
+                    enabled = Rummy.isValidScore(newScore),
                     modifier = Modifier.padding(8.dp),
                 ) {
                     Text(stringResource(R.string.update))
@@ -275,14 +273,6 @@ fun ChangeScore(player: Player, scoreIndex: Int, onDismissRequest: () -> Unit) {
             }
         }
     }
-}
-
-fun isNegative(number: String): Boolean {
-    val n = number.toIntOrNull()
-    if (n != null) {
-        return n < 0
-    }
-    return false
 }
 
 @Composable
