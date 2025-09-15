@@ -1,4 +1,4 @@
-package net.hawkins.cardscore
+package net.hawkins.gamescore
 
 object Utils {
     fun isNegativeInt(string: String): Boolean {

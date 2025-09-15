@@ -1,9 +1,9 @@
-package net.hawkins.cardscore.game
+package net.hawkins.gamescore.game
 
 import androidx.compose.ui.graphics.Color
-import net.hawkins.cardscore.R
-import net.hawkins.cardscore.Utils
-import net.hawkins.cardscore.data.Player
+import net.hawkins.gamescore.R
+import net.hawkins.gamescore.Utils
+import net.hawkins.gamescore.data.Player
 
 class TwentyFiveHundred : GameType {
 

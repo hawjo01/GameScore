@@ -1,1 +1,1 @@
-Android app to track and calculate card game scores
+Android app to track and calculate game scores

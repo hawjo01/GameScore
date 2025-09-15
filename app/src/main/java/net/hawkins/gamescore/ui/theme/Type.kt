@@ -1,4 +1,4 @@
-package net.hawkins.cardscore.ui.theme
+package net.hawkins.gamescore.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

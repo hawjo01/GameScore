@@ -1,4 +1,4 @@
-package net.hawkins.cardscore.ui
+package net.hawkins.gamescore.ui
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -7,10 +7,10 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import net.hawkins.cardscore.data.Player
-import net.hawkins.cardscore.game.BasicScore
-import net.hawkins.cardscore.game.GameType
-import net.hawkins.cardscore.game.TwentyFiveHundred
+import net.hawkins.gamescore.data.Player
+import net.hawkins.gamescore.game.BasicScore
+import net.hawkins.gamescore.game.GameType
+import net.hawkins.gamescore.game.TwentyFiveHundred
 
 class GameViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(GameUiState())

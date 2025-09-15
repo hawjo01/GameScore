@@ -1,12 +1,9 @@
-package net.hawkins.cardscore.ui
+package net.hawkins.gamescore.ui
 
-import android.content.ClipData
 import android.content.ClipDescription
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.draganddrop.dragAndDropSource
 import androidx.compose.foundation.draganddrop.dragAndDropTarget
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,7 +38,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draganddrop.DragAndDropEvent
 import androidx.compose.ui.draganddrop.DragAndDropTarget
-import androidx.compose.ui.draganddrop.DragAndDropTransferData
 import androidx.compose.ui.draganddrop.mimeTypes
 import androidx.compose.ui.draganddrop.toAndroidDragEvent
 import androidx.compose.ui.graphics.Color
@@ -58,10 +54,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
-import net.hawkins.cardscore.R
-import net.hawkins.cardscore.Utils
-import net.hawkins.cardscore.data.Player
-import net.hawkins.cardscore.ui.theme.CardScoreTheme
+import net.hawkins.gamescore.R
+import net.hawkins.gamescore.Utils
+import net.hawkins.gamescore.data.Player
+import net.hawkins.gamescore.ui.theme.GameScoreTheme
 
 @Composable
 fun GamePlay(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
@@ -423,8 +419,8 @@ fun ConfirmResetGame(
 
 @Preview(showBackground = true)
 @Composable
-fun CardScorePreview() {
-    CardScoreTheme {
+fun GamePlayPreview() {
+    GameScoreTheme {
         GamePlay(viewModel())
     }
 }

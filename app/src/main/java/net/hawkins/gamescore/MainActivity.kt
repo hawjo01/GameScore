@@ -1,8 +1,8 @@
-package net.hawkins.cardscore
+package net.hawkins.gamescore
 
 import android.content.Context
-import net.hawkins.cardscore.ui.GamePlay
-import net.hawkins.cardscore.ui.ResetGame
+import net.hawkins.gamescore.ui.GamePlay
+import net.hawkins.gamescore.ui.ResetGame
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -22,10 +22,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import net.hawkins.cardscore.ui.GameViewModel
-import net.hawkins.cardscore.ui.GameSetup
-import net.hawkins.cardscore.ui.StartGame
-import net.hawkins.cardscore.ui.theme.CardScoreTheme
+import net.hawkins.gamescore.ui.GameViewModel
+import net.hawkins.gamescore.ui.GameSetup
+import net.hawkins.gamescore.ui.StartGame
+import net.hawkins.gamescore.ui.theme.GameScoreTheme
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import kotlin.collections.mutableListOf
@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            CardScoreTheme {
+            GameScoreTheme {
                 val gameViewModel: GameViewModel = viewModel()
                 val savedPlayerLists = getSavedPlayerLists(baseContext)
                 gameViewModel.setSavedPlayerNameLists(savedPlayerLists)

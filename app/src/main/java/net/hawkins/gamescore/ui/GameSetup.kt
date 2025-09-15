@@ -1,4 +1,4 @@
-package net.hawkins.cardscore.ui
+package net.hawkins.gamescore.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -39,8 +39,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import net.hawkins.cardscore.R
-import net.hawkins.cardscore.ui.theme.CardScoreTheme
+import net.hawkins.gamescore.R
+import net.hawkins.gamescore.ui.theme.GameScoreTheme
 
 
 @Composable
@@ -286,7 +286,7 @@ fun StartGame(gameViewModel: GameViewModel) {
 @Preview(showBackground = true)
 @Composable
 fun NewGamePreview() {
-    CardScoreTheme {
+    GameScoreTheme {
         GameSetup(viewModel())
     }
 }

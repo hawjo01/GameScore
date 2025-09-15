@@ -1,4 +1,4 @@
-package net.hawkins.cardscore
+package net.hawkins.gamescore
 
 import org.junit.Assert
 import org.junit.Test

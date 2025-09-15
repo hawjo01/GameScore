@@ -1,4 +1,4 @@
-package net.hawkins.cardscore.ui.theme
+package net.hawkins.gamescore.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -33,7 +33,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun CardScoreTheme(
+fun GameScoreTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,

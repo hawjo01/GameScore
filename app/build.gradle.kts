@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "net.hawkins.cardscore"
+    namespace = "net.hawkins.gamescore"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "net.hawkins.cardscore"
+        applicationId = "net.hawkins.gamescore"
         minSdk = 26
         targetSdk = 35
         versionCode = 1

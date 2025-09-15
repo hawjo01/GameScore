@@ -1,6 +1,6 @@
-package net.hawkins.cardscore.game
+package net.hawkins.gamescore.game
 
-import net.hawkins.cardscore.data.Player
+import net.hawkins.gamescore.data.Player
 import org.junit.Assert.*
 import org.junit.Test
 
