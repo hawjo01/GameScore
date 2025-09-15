@@ -9,7 +9,7 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    types: [ opened, edited, reopened, review_requested ]
+    types: [ opened, edited, reopened, review_requested, synchronize ]
     branches: [ main ]
 
   # Allows you to run this workflow manually from the Actions tab
