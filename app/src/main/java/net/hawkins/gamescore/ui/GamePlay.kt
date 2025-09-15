@@ -158,7 +158,9 @@ fun Player(
         modifier = modifier
             .padding(start = if (index > 0) 10.dp else 0.dp)
             .dragAndDropTarget(
-                shouldStartDragAndDrop = { event -> event.mimeTypes().contains(ClipDescription.MIMETYPE_TEXT_PLAIN) },
+                shouldStartDragAndDrop = { event ->
+                    event.mimeTypes().contains(ClipDescription.MIMETYPE_TEXT_PLAIN)
+                },
                 target = callback
             ),
     ) {
@@ -298,13 +300,15 @@ fun ChangeScore(
             val hideKeyboard = { keyboardController?.hide() }
 
             Row(
-                modifier = Modifier.padding(horizontal = 10.dp),
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
                 OutlinedTextField(
                     value = newScore,
                     onValueChange = { newScore = it },
-                    label = { Text(text = "Change Score") },
+                    label = { Text(text = stringResource(R.string.change_score)) },
                     singleLine = true,
                     shape = shapes.small,
                     keyboardOptions = KeyboardOptions(
