@@ -4,11 +4,11 @@ import net.hawkins.cardscore.data.Player
 import org.junit.Assert.*
 import org.junit.Test
 
-class RummyTest {
+class TwentyFiveHundredTest {
 
     @Test
     fun isValidScore_true() {
-        val rummy = Rummy()
+        val rummy = TwentyFiveHundred()
         assertTrue(rummy.isValidScore("0"))
         assertTrue(rummy.isValidScore("5"))
         assertTrue(rummy.isValidScore("-5"))
@@ -16,7 +16,7 @@ class RummyTest {
 
     @Test
     fun isValidScore_false() {
-        val rummy = Rummy()
+        val rummy = TwentyFiveHundred()
         assertFalse(rummy.isValidScore(""))
         assertFalse(rummy.isValidScore("1"))
         assertFalse(rummy.isValidScore("-1"))
@@ -25,14 +25,14 @@ class RummyTest {
 
     @Test
     fun hasWinningThreshold() {
-        val rummy = Rummy()
+        val rummy = TwentyFiveHundred()
         assertTrue(rummy.hasWinningThreshold())
     }
 
     @Test
     fun findWinner_zeroPlayers() {
-        val rummy = Rummy()
-        val players: List<Player> = mutableListOf<Player>()
+        val rummy = TwentyFiveHundred()
+        val players: List<Player> = mutableListOf()
         assertNull(rummy.findWinner(players))
     }
 
@@ -44,7 +44,7 @@ class RummyTest {
         val player2 = Player("bar")
 
         val players: List<Player> = listOf(player1, player2)
-        val rummy = Rummy()
+        val rummy = TwentyFiveHundred()
 
         assertNull(rummy.findWinner(players))
     }
@@ -58,7 +58,7 @@ class RummyTest {
         player2.addScore(50)
 
         val players: List<Player> = listOf(player1, player2)
-        val rummy = Rummy()
+        val rummy = TwentyFiveHundred()
 
         assertNull(rummy.findWinner(players))
     }
@@ -69,10 +69,10 @@ class RummyTest {
         player1.addScore(20)
 
         val player2 = Player("bar")
-        player2.addScore(1500)
+        player2.addScore(2500)
 
         val players: List<Player> = listOf(player1, player2)
-        val rummy = Rummy()
+        val rummy = TwentyFiveHundred()
 
         val winner = rummy.findWinner(players)
         assertEquals(player2, winner)
@@ -81,13 +81,13 @@ class RummyTest {
     @Test
     fun findWinner_ThresholdExceeded() {
         val player1 = Player("foo")
-        player1.addScore(1600)
+        player1.addScore(2600)
 
         val player2 = Player("bar")
-        player2.addScore(1505)
+        player2.addScore(2505)
 
         val players: List<Player> = listOf(player1, player2)
-        val rummy = Rummy()
+        val rummy = TwentyFiveHundred()
 
         val winner = rummy.findWinner(players)
         assertEquals(player1, winner)

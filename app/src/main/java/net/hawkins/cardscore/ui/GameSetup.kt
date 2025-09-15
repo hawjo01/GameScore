@@ -77,13 +77,12 @@ fun GameSetup(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
                     .padding(top = 10.dp, end = 20.dp)
             )
 
-            val i = gameViewModel.getPlayerNames().iterator()
-            while (i.hasNext()) {
-                val playerName = i.next()
-                var showConfirmRemovePlayer by remember { mutableStateOf(false) }
+            gameViewModel.getPlayerNames().forEachIndexed {
+                index, playerName ->
+                 var showConfirmRemovePlayer by remember { mutableStateOf(false) }
 
                 Text(
-                    text = playerName + if (i.hasNext()) ", " else "",
+                    text = playerName + if (index + 1 < gameViewModel.getPlayerNames().size ) ", " else "",
                     fontSize = 26.sp,
                     modifier = Modifier
                         .padding(top = 10.dp)

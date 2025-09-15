@@ -8,4 +8,11 @@ object Utils {
         }
         return false
     }
+
+    fun isNegativeInt(int: Int): Boolean {
+        if (int < 0) {
+            return true
+        }
+        return false
+    }
 }

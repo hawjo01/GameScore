@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "net.hawkins.cardscore"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "net.hawkins.cardscore"

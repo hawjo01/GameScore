@@ -95,7 +95,7 @@ fun MainScaffold(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
             )
         },
     ) { innerPadding ->
-        net.hawkins.cardscore.Game(
+        Game(
             gameViewModel = gameViewModel,
             modifier = Modifier.padding(innerPadding)
         )

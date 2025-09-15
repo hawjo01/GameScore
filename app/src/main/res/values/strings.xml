@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">CardScore</string>
-    <string name="total_score">"Total Score: "</string>
     <string name="add">Add</string>
     <string name="confirm">Confirm</string>
     <string name="dismiss">Dismiss</string>
@@ -8,17 +7,15 @@
     <string name="new_game_confirm_description">All current scores will be lost if you start a new game!</string>
     <string name="new_game">New Game</string>
     <string name="player_wins">%1$s Wins!</string>
-    <string name="show_winner">Show Winner</string>
+    <string name="find_winner">Find Winner</string>
     <string name="start_game">Start Game</string>
-    <string name="player_name">Player Name</string>
     <string name="players">Players</string>
     <string name="add_players">Add Player Names</string>
     <string name="add_player">Add Player Name</string>
-    <string name="remove">Remove</string>
     <string name="remove_player">Remove Player?</string>
     <string name="update">Update</string>
     <string name="cancel">Cancel</string>
     <string name="basic_scoring">Basic Scoring</string>
-    <string name="rummy">Rummy</string>
+    <string name="twenty_five_hundred">2500</string>
     <string name="game">Game</string>
 </resources>

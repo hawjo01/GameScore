@@ -12,17 +12,17 @@ class BasicScore: GameType {
     }
 
     override fun findWinner(players: List<Player>): Player? {
-        if (players.size == 0) {
+        if (players.isEmpty()) {
             return null
         }
 
         val playerWithHighestScore = players.maxBy { player -> player.totalScore() }
         val highestScore = playerWithHighestScore.totalScore()
         val count = players.count{ player -> player.totalScore() == highestScore }
-        if (count == 1) {
-            return playerWithHighestScore
+        return if (count == 1) {
+            playerWithHighestScore
         } else {
-            return null
+            null
         }
     }
 }

@@ -32,7 +32,7 @@ class BasicScoreTest {
     @Test
     fun findWinner_zeroPlayers() {
         val gameType = BasicScore()
-        val players: List<Player> = mutableListOf<Player>()
+        val players: List<Player> = mutableListOf()
         assertNull(gameType.findWinner(players))
     }
 

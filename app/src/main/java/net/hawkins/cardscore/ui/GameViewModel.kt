@@ -1,6 +1,8 @@
 package net.hawkins.cardscore.ui
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -8,14 +10,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import net.hawkins.cardscore.data.Player
 import net.hawkins.cardscore.game.BasicScore
 import net.hawkins.cardscore.game.GameType
-import net.hawkins.cardscore.game.Rummy
+import net.hawkins.cardscore.game.TwentyFiveHundred
 
 class GameViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(GameUiState())
     val uiState: StateFlow<GameUiState> = _uiState.asStateFlow()
     private val _savedPlayerLists = mutableListOf<List<String>>()
     private val _gameTypes = listOf(
-        Rummy(),
+        TwentyFiveHundred(),
         BasicScore()
     )
     private var _gameType = mutableStateOf(_gameTypes[0])
@@ -40,11 +42,15 @@ class GameViewModel : ViewModel() {
         return _gameType.value.isValidScore(score)
     }
 
+    fun getScoreColor(score: Int): Color {
+        return _gameType.value.getScoreColor(score)
+    }
+
     fun hasWinningThreshold(): Boolean {
         return _gameType.value.hasWinningThreshold()
     }
 
-    fun getPlayers(): List<Player> {
+    fun getPlayers(): SnapshotStateList<Player> {
         return _uiState.value.players
     }
 
@@ -92,5 +98,14 @@ class GameViewModel : ViewModel() {
 
     fun setGameType(gameType: GameType) {
         _gameType.value = gameType
+    }
+
+    fun movePlayer(fromIndex: Int, toIndex: Int) {
+        _uiState.value.players.apply { add(toIndex,_uiState.value.players.removeAt(fromIndex) ) }
+//        val playerToMove = _uiState.value.players.get(fromIndex)
+//        _uiState.value.players.removeAt(fromIndex)
+//        _uiState.value.players.add(toIndex, playerToMove)
+        val p = _uiState.value.players
+        p.forEachIndexed { i, player -> println("Player " + i + " = " + player.name) }
     }
 }
