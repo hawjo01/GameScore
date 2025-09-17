@@ -16,12 +16,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -210,33 +206,22 @@ fun Player(
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        hideKeyboard.invoke()
+                        if (gameViewModel.isValidScore(newScore)) {
+                            player.addScore(newScore.toInt())
+                            newScore = ""
+                            hideKeyboard.invoke()
+                        } else if (newScore == "") {
+                            hideKeyboard.invoke()
+                        }
                     }
                 ),
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent,
-                    focusedTextColor = if (Utils.isNegativeInt(newScore)) Color.Red else Color.Unspecified,
-                    unfocusedTextColor = if (Utils.isNegativeInt(newScore)) Color.Red else Color.Unspecified
+                    focusedTextColor = if (Utils.isNegativeInt(newScore) || newScore == "-") Color.Red else Color.Unspecified,
+                    unfocusedTextColor = if (Utils.isNegativeInt(newScore) || newScore == "-") Color.Red else Color.Unspecified
                 ),
-                trailingIcon = {
-                    IconButton(
-                        onClick = {
-                            if (gameViewModel.isValidScore(newScore)) {
-                                player.addScore(newScore.toInt())
-                                newScore = ""
-                                hideKeyboard.invoke()
-                            }
-                        },
-                        enabled = gameViewModel.isValidScore(newScore)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = stringResource(R.string.add)
-                        )
-                    }
-                },
                 modifier = modifier.fillMaxWidth()
             )
         }
@@ -321,8 +306,8 @@ fun ChangeScore(
                         }
                     ),
                     colors = TextFieldDefaults.colors(
-                        focusedTextColor = if (Utils.isNegativeInt(newScore)) Color.Red else Color.Unspecified,
-                        unfocusedTextColor = if (Utils.isNegativeInt(newScore)) Color.Red else Color.Unspecified
+                        focusedTextColor = if (Utils.isNegativeInt(newScore) || newScore == "-") Color.Red else Color.Unspecified,
+                        unfocusedTextColor = if (Utils.isNegativeInt(newScore) || newScore == "-") Color.Red else Color.Unspecified
                     ),
                     modifier = Modifier.padding(top = 10.dp)
                 )
