@@ -99,13 +99,4 @@ class GameViewModel : ViewModel() {
     fun setGameType(gameType: GameType) {
         _gameType.value = gameType
     }
-
-    fun movePlayer(fromIndex: Int, toIndex: Int) {
-        _uiState.value.players.apply { add(toIndex,_uiState.value.players.removeAt(fromIndex) ) }
-//        val playerToMove = _uiState.value.players.get(fromIndex)
-//        _uiState.value.players.removeAt(fromIndex)
-//        _uiState.value.players.add(toIndex, playerToMove)
-        val p = _uiState.value.players
-        p.forEachIndexed { i, player -> println("Player " + i + " = " + player.name) }
-    }
 }
