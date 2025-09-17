@@ -75,11 +75,6 @@ fun MainScaffold(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
                 title = {
                     Text(
                         text = "",
-//                            if (gameViewModel.playersReady()) {
-//                            stringResource(gameViewModel.getGameType().getNameId())
-//                        } else {
-//                            ""
-//                        },
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
