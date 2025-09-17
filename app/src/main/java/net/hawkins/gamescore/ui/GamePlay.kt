@@ -117,13 +117,15 @@ fun Player(
     var newScore by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     val hideKeyboard = { keyboardController?.hide() }
+    var showInvalidScoreDialog by remember { mutableStateOf(false) }
+    InvalidScoreDialog( showDialog = showInvalidScoreDialog,
+        onDismiss = { showInvalidScoreDialog = false})
 
     Column(
         modifier = modifier
             .padding(start = if (index > 0) 10.dp else 0.dp)
     ) {
         val playerName = player.name
-        println("Composing for player = " + playerName)
         Text(
             text = playerName,
             textAlign = TextAlign.Center,
@@ -159,6 +161,8 @@ fun Player(
                             hideKeyboard.invoke()
                         } else if (newScore == "") {
                             hideKeyboard.invoke()
+                        } else {
+                            showInvalidScoreDialog = true
                         }
                     }
                 ),
@@ -213,6 +217,29 @@ fun Player(
         }
     }
 }
+
+@Composable
+fun InvalidScoreDialog(showDialog: Boolean, onDismiss: () -> Unit)
+{
+    if (showDialog) {
+        AlertDialog(
+            title = {
+                Text(stringResource(R.string.invalid_score))
+            },
+            text = {
+                Text(text = stringResource(R.string.not_a_valid_score))
+            },
+            onDismissRequest = onDismiss,
+            confirmButton = {
+                TextButton(onClick = onDismiss ) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {}
+        )
+    }
+}
+
 
 @Composable
 fun ChangeScore(
