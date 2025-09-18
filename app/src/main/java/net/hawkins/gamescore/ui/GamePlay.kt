@@ -101,7 +101,7 @@ fun Winner(winner: Player) {
 
 @Composable
 fun Players(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
-    val players by remember { mutableStateOf( gameViewModel.getPlayers()) }
+    val players by remember { mutableStateOf(gameViewModel.getPlayers()) }
     for ((index, player) in gameViewModel.getPlayers().withIndex()) {
         key(player.name) {
             Player(gameViewModel = gameViewModel, player = player, index = index, modifier)
@@ -121,13 +121,14 @@ fun Player(
         modifier = modifier
             .padding(start = if (index > 0) 10.dp else 0.dp)
     ) {
-        var showNewScoreDialog by remember {mutableStateOf(false)}
+        var showNewScoreDialog by remember { mutableStateOf(false) }
         Text(
             text = player.name,
             textAlign = TextAlign.Center,
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .clickable {
                     showNewScoreDialog = true
                 }
@@ -147,7 +148,9 @@ fun Player(
             modifier = Modifier.fillMaxWidth()
         )
         HorizontalDivider(
-            modifier = Modifier.fillMaxWidth(.9f).padding(4.dp),
+            modifier = Modifier
+                .fillMaxWidth(.9f)
+                .padding(4.dp),
             color = Color.Gray,
             thickness = 5.dp
         )
@@ -193,27 +196,6 @@ fun Player(
     }
 }
 
-@Composable
-fun InvalidScoreDialog(showDialog: Boolean, onDismiss: () -> Unit)
-{
-    if (showDialog) {
-        AlertDialog(
-            title = {
-                Text(stringResource(R.string.invalid_score))
-            },
-            text = {
-                Text(text = stringResource(R.string.not_a_valid_score))
-            },
-            onDismissRequest = onDismiss,
-            confirmButton = {
-                TextButton(onClick = onDismiss ) {
-                    Text("OK")
-                }
-            },
-            dismissButton = {}
-        )
-    }
-}
 
 @Composable
 fun NewScoreDialog(
@@ -224,11 +206,8 @@ fun NewScoreDialog(
     var newScore by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     val hideKeyboard = { keyboardController?.hide() }
-    var showInvalidScoreDialog by remember { mutableStateOf(false) }
-    InvalidScoreDialog(
-        showDialog = showInvalidScoreDialog,
-        onDismiss = { showInvalidScoreDialog = false })
     val focusRequester = remember { FocusRequester() }
+    var warnInvalidScore by remember { mutableStateOf(false) }
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
@@ -236,50 +215,70 @@ fun NewScoreDialog(
                 .padding(16.dp),
             shape = RoundedCornerShape(16.dp),
         ) {
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 10.dp),
-                    //.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                OutlinedTextField(
-                    value = newScore,
-                    onValueChange = { newScore = it },
-                    label = { Text(text = "Score for " + player.name) },
-                    textStyle = TextStyle(textAlign = TextAlign.Center),
-                    singleLine = true,
-                    shape = shapes.small,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            if (gameViewModel.isValidScore(newScore)) {
-                                player.addScore(newScore.toInt())
-                                newScore = ""
-                                hideKeyboard.invoke()
-                                onDismissRequest()
-                            } else if (newScore == "") {
-                                hideKeyboard.invoke()
-                                onDismissRequest()
-                            } else {
-                                showInvalidScoreDialog = true
-                            }
-                        }
-                    ),
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = if (Utils.isNegativeInt(newScore) || newScore == "-") Color.Red else Color.Unspecified,
-                        unfocusedTextColor = if (Utils.isNegativeInt(newScore) || newScore == "-") Color.Red else Color.Unspecified
-                    ),
+                if (warnInvalidScore) {
+                    Row(
+                        modifier = Modifier
+                            .padding(horizontal = 10.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.not_a_valid_score),
+                            color = Color.Red,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                }
+
+                Row(
                     modifier = Modifier
-                        .focusRequester(focusRequester)
-                        .padding(vertical = 20.dp)
-                )
+                        .padding(horizontal = 10.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    OutlinedTextField(
+                        value = newScore,
+                        onValueChange = {
+                            newScore = it
+                            if (gameViewModel.isValidScore(newScore)) warnInvalidScore = false
+                        },
+                        label = { Text(text = "Score for " + player.name) },
+                        textStyle = TextStyle(textAlign = TextAlign.Center),
+                        singleLine = true,
+                        shape = shapes.small,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                if (gameViewModel.isValidScore(newScore)) {
+                                    player.addScore(newScore.toInt())
+                                    newScore = ""
+                                    hideKeyboard.invoke()
+                                    onDismissRequest()
+                                } else if (newScore == "") {
+                                    hideKeyboard.invoke()
+                                    onDismissRequest()
+                                } else {
+                                    warnInvalidScore = true
+                                }
+                            }
+                        ),
+                        colors = TextFieldDefaults.colors(
+                            focusedTextColor = if (Utils.isNegativeInt(newScore) || newScore == "-") Color.Red else Color.Unspecified,
+                            unfocusedTextColor = if (Utils.isNegativeInt(newScore) || newScore == "-") Color.Red else Color.Unspecified
+                        ),
+                        modifier = Modifier
+                            .focusRequester(focusRequester)
+                            .padding(vertical = 20.dp)
+                    )
+                }
             }
-        }
-        LaunchedEffect(Unit) {
-            focusRequester.requestFocus()
+            LaunchedEffect(Unit) {
+                focusRequester.requestFocus()
+            }
         }
     }
 }
