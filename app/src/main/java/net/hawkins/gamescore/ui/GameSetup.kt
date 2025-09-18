@@ -44,7 +44,7 @@ import net.hawkins.gamescore.ui.theme.GameScoreTheme
 
 
 @Composable
-fun GameSetup(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
+fun GameSetup(gameViewModel: GameViewModel) {
     var newPlayerName by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     val hideKeyboard = { keyboardController?.hide() }
