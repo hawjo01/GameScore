@@ -1,7 +1,8 @@
 package net.hawkins.gamescore.game
 
+import androidx.compose.ui.graphics.Color
 import net.hawkins.gamescore.data.Player
-import org.junit.Assert.*
+import org.junit.Assert
 import org.junit.Test
 
 class BasicScoreTest {
@@ -9,31 +10,31 @@ class BasicScoreTest {
     @Test
     fun isValidScore_true() {
         val gameType = BasicScore()
-        assertTrue(gameType.isValidScore("0"))
-        assertTrue(gameType.isValidScore("5"))
-        assertTrue(gameType.isValidScore("-5"))
-        assertTrue(gameType.isValidScore("1"))
-        assertTrue(gameType.isValidScore("-1"))
+        Assert.assertTrue(gameType.isValidScore("0"))
+        Assert.assertTrue(gameType.isValidScore("5"))
+        Assert.assertTrue(gameType.isValidScore("-5"))
+        Assert.assertTrue(gameType.isValidScore("1"))
+        Assert.assertTrue(gameType.isValidScore("-1"))
     }
 
     @Test
     fun isValidScore_false() {
         val gameType = BasicScore()
-        assertFalse(gameType.isValidScore(""))
-        assertFalse(gameType.isValidScore(".5"))
+        Assert.assertFalse(gameType.isValidScore(""))
+        Assert.assertFalse(gameType.isValidScore(".5"))
     }
 
     @Test
     fun hasWinningThreshold() {
         val gameType = BasicScore()
-        assertFalse(gameType.hasWinningThreshold())
+        Assert.assertFalse(gameType.hasWinningThreshold())
     }
 
     @Test
     fun findWinner_zeroPlayers() {
         val gameType = BasicScore()
         val players: List<Player> = mutableListOf()
-        assertNull(gameType.findWinner(players))
+        Assert.assertNull(gameType.findWinner(players))
     }
 
     @Test
@@ -47,7 +48,7 @@ class BasicScoreTest {
         val gameType = BasicScore()
 
         val winner = gameType.findWinner(players)
-        assertEquals(player1, winner)
+        Assert.assertEquals(player1, winner)
     }
 
     @Test
@@ -62,7 +63,7 @@ class BasicScoreTest {
         val gameType = BasicScore()
 
         val winner = gameType.findWinner(players)
-        assertEquals(player2, winner)
+        Assert.assertEquals(player2, winner)
     }
 
     @Test
@@ -77,6 +78,14 @@ class BasicScoreTest {
         val gameType = BasicScore()
 
         val winner = gameType.findWinner(players)
-        assertNull(winner)
+        Assert.assertNull(winner)
+    }
+
+    @Test
+    fun getScoreColor() {
+        val game = BasicScore()
+        Assert.assertEquals(Color.Unspecified, game.getScoreColor(-10))
+        Assert.assertEquals(Color.Unspecified, game.getScoreColor(0))
+        Assert.assertEquals(Color.Unspecified, game.getScoreColor(10))
     }
 }
