@@ -1,4 +1,4 @@
-package net.hawkins.cardscore
+package net.hawkins.gamescore
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("net.hawkins.cardscore", appContext.packageName)
+        assertEquals("net.hawkins.gamescore", appContext.packageName)
     }
 }
