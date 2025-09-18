@@ -19,6 +19,5 @@
     <string name="twenty_five_hundred">2500</string>
     <string name="game">Game</string>
     <string name="change_score">Change Score</string>
-    <string name="invalid_score">Invalid Score</string>
     <string name="not_a_valid_score">Not a valid score</string>
 </resources>
