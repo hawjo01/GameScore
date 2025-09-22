@@ -1,6 +1,5 @@
 package net.hawkins.gamescore.game
 
-import androidx.compose.ui.graphics.Color
 import net.hawkins.gamescore.data.Player
 import org.junit.Assert
 import org.junit.Test
@@ -97,8 +96,6 @@ class TwentyFiveHundredTest {
     @Test
     fun getScoreColor() {
         val game = TwentyFiveHundred()
-        Assert.assertEquals(Color.Companion.Red, game.getScoreColor(-10))
-        Assert.assertEquals(Color.Companion.Unspecified, game.getScoreColor(0))
-        Assert.assertEquals(Color.Companion.Unspecified, game.getScoreColor(10))
+        Assert.assertTrue(game.highlightNegativeScore())
     }
 }

@@ -25,4 +25,8 @@ class BasicScore: GameType {
             null
         }
     }
+
+    override fun highlightNegativeScore(): Boolean {
+        return false
+    }
 }
