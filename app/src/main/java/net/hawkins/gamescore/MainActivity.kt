@@ -38,28 +38,27 @@ class MainActivity : ComponentActivity() {
         setContent {
             GameScoreTheme {
                 val gameViewModel: GameViewModel = viewModel()
-                val savedPlayerLists = getSavedPlayerLists(baseContext)
-                gameViewModel.setSavedPlayerNameLists(savedPlayerLists)
+                val savedPlayers = getSavedPlayerLists(baseContext)
+                gameViewModel.setSavedPlayerNames(savedPlayers)
                 MainScaffold(gameViewModel, modifier = Modifier)
             }
         }
     }
 
-    fun getSavedPlayerLists(context: Context): List<List<String>> {
-        val savedPlayerLists = mutableListOf<List<String>>()
+    fun getSavedPlayerLists(context: Context): List<String> {
+        val savedPlayers = mutableListOf<String>()
         try {
             val inputStream = context.assets.open("players.json")
             val bufferedReader = BufferedReader(InputStreamReader(inputStream))
             val gson = Gson()
-            val listType = object : TypeToken<ArrayList<ArrayList<String>>>() {}.type
-            val playerNameLists =
-                gson.fromJson<ArrayList<ArrayList<String>>>(bufferedReader, listType)
-
-            playerNameLists.forEach { savedPlayerLists.add(it) }
+            val listType = object : TypeToken<ArrayList<String>>() {}.type
+            val playerList =
+                gson.fromJson<ArrayList<String>>(bufferedReader, listType)
+            playerList.forEach { savedPlayers.add(it) }
         } catch (e: Exception) {
             println("An unexpected error occurred: ${e.message}")
         }
-        return savedPlayerLists
+        return savedPlayers
     }
 }
 

@@ -11,7 +11,7 @@ import net.hawkins.gamescore.game.TwentyFiveHundred
 
 class GameViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(GameUiState())
-    private val _savedPlayerLists = mutableListOf<List<String>>()
+    private val _savedPlayerNames = mutableListOf<String>()
     private val _gameTypes = listOf(
         TwentyFiveHundred(),
         BasicScore()
@@ -62,10 +62,6 @@ class GameViewModel : ViewModel() {
         _uiState.value.playerNames.remove(playerName)
     }
 
-    fun addPlayerNames(playerNames: List<String>) {
-        _uiState.value.playerNames.addAll(playerNames)
-    }
-
     fun getPlayerNames(): List<String> {
         return _uiState.value.playerNames
     }
@@ -76,12 +72,12 @@ class GameViewModel : ViewModel() {
         _uiState.value.players.addAll(players)
     }
 
-    fun getSavedPlayerNameLists(): List<List<String>> {
-        return _savedPlayerLists
+    fun getSavedPlayerNames(): List<String> {
+        return _savedPlayerNames
     }
 
-    fun setSavedPlayerNameLists(savedLists: List<List<String>>) {
-        savedLists.forEach { _savedPlayerLists.add(it) }
+    fun setSavedPlayerNames(savedPlayerNames: List<String>) {
+        savedPlayerNames.forEach { _savedPlayerNames.add(it) }
     }
 
     fun getGameTypes(): List<GameType> {

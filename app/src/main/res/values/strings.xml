@@ -10,8 +10,7 @@
     <string name="find_winner">Find Winner</string>
     <string name="start_game">Start Game</string>
     <string name="players">Players</string>
-    <string name="add_players">Add Player Names</string>
-    <string name="add_player">Add Player Name</string>
+    <string name="player_name">Player Name</string>
     <string name="remove_player">Remove Player?</string>
     <string name="update">Update</string>
     <string name="cancel">Cancel</string>
