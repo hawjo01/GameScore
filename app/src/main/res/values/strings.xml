@@ -20,4 +20,5 @@
     <string name="game">Game</string>
     <string name="change_score">Change Score</string>
     <string name="not_a_valid_score">Not a valid score</string>
+    <string name="score_for">Score for %1$s</string>
 </resources>
