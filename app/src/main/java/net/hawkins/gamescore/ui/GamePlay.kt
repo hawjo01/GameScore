@@ -242,7 +242,7 @@ fun NewScoreDialog(
                             newScore = it
                             if (gameViewModel.isValidScore(newScore)) warnInvalidScore = false
                         },
-                        label = { Text(text = "Score for " + player.name) },
+                        label = { Text(text = stringResource(R.string.score_for, player.name)) },
                         textStyle = TextStyle(textAlign = TextAlign.Center),
                         singleLine = true,
                         shape = shapes.small,
