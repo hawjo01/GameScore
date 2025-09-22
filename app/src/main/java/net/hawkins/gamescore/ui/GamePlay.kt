@@ -101,7 +101,6 @@ fun Winner(winner: Player) {
 
 @Composable
 fun Players(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
-    val players by remember { mutableStateOf(gameViewModel.getPlayers()) }
     for ((index, player) in gameViewModel.getPlayers().withIndex()) {
         key(player.name) {
             Player(gameViewModel = gameViewModel, player = player, index = index, modifier)
