@@ -176,7 +176,7 @@ fun Player(
                         textAlign = TextAlign.Right,
                         fontFamily = FontFamily(Typeface(android.graphics.Typeface.MONOSPACE)),
                         fontSize = 20.sp,
-                        color = gameViewModel.getScoreColor(score),
+                        color = if (Utils.isNegativeInt(score) && gameViewModel.highlightNegativeScore()) Color.Red else Color.Unspecified,
                         modifier = Modifier.clickable {
                             showChangeScoreDialog = true
                         }

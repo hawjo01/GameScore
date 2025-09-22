@@ -2,7 +2,6 @@ package net.hawkins.gamescore.ui
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import net.hawkins.gamescore.data.Player
@@ -39,8 +38,8 @@ class GameViewModel : ViewModel() {
         return _gameType.value.isValidScore(score)
     }
 
-    fun getScoreColor(score: Int): Color {
-        return _gameType.value.getScoreColor(score)
+    fun highlightNegativeScore(): Boolean {
+        return _gameType.value.highlightNegativeScore()
     }
 
     fun hasWinningThreshold(): Boolean {

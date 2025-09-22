@@ -1,13 +1,15 @@
 package net.hawkins.gamescore.game
 
-import androidx.compose.ui.graphics.Color
 import net.hawkins.gamescore.R
-import net.hawkins.gamescore.Utils
 import net.hawkins.gamescore.data.Player
 
 class TwentyFiveHundred : GameType {
 
     override fun hasWinningThreshold(): Boolean {
+        return true
+    }
+
+    override fun highlightNegativeScore(): Boolean {
         return true
     }
 
@@ -18,11 +20,6 @@ class TwentyFiveHundred : GameType {
     override fun isValidScore(score: String): Boolean {
         return (score.toIntOrNull() != null && score.toInt() % 5 == 0)
     }
-
-    override fun getScoreColor(score: Int): Color {
-        return if (Utils.isNegativeInt(score)) Color.Red else Color.Unspecified
-    }
-
 
     override fun findWinner(players: List<Player>): Player? {
         val playerWithMaxNumberOfHands: Player? =
