@@ -253,11 +253,13 @@ fun NewScoreDialog(
                         keyboardActions = KeyboardActions(
                             onDone = {
                                 if (gameViewModel.isValidScore(newScore)) {
+                                    warnInvalidScore = false
                                     player.addScore(newScore.toInt())
                                     newScore = ""
                                     hideKeyboard.invoke()
                                     onDismissRequest()
                                 } else if (newScore == "") {
+                                    warnInvalidScore = false
                                     hideKeyboard.invoke()
                                     onDismissRequest()
                                 } else {

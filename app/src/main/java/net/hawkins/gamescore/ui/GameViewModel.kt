@@ -19,7 +19,6 @@ class GameViewModel : ViewModel() {
     private var _gameType = mutableStateOf(_gameTypes[0])
     private var _winner = mutableStateOf<Player?>(null)
 
-
     fun resetGame() {
         _winner.value = null
         _uiState.value.players.forEach { player -> player.resetScores() }
@@ -50,26 +49,16 @@ class GameViewModel : ViewModel() {
         return _uiState.value.players
     }
 
-    fun playersReady(): Boolean {
-        return _uiState.value.players.isNotEmpty()
+    fun addPlayer(playerName: String) {
+        _uiState.value.players.add(Player(playerName))
     }
 
-    fun addPlayerName(playerName: String) {
-        _uiState.value.playerNames.add(playerName)
-    }
-
-    fun removePlayerName(playerName: String) {
-        _uiState.value.playerNames.remove(playerName)
-    }
-
-    fun getPlayerNames(): List<String> {
-        return _uiState.value.playerNames
+    fun removePlayer(index: Int) {
+        _uiState.value.players.removeAt(index)
     }
 
     fun startGame() {
-        val players = _uiState.value.playerNames.map { playerName -> Player(playerName) }
-        _uiState.value.playerNames.clear()
-        _uiState.value.players.addAll(players)
+        _uiState.value.gameState.value = GameState.PLAY
     }
 
     fun getSavedPlayerNames(): List<String> {
@@ -90,5 +79,13 @@ class GameViewModel : ViewModel() {
 
     fun setGameType(gameType: GameType) {
         _gameType.value = gameType
+    }
+
+    fun isGameSetup(): Boolean {
+        return _uiState.value.gameState.value == GameState.SETUP
+    }
+
+    fun isGamePlay(): Boolean {
+        return _uiState.value.gameState.value == GameState.PLAY
     }
 }

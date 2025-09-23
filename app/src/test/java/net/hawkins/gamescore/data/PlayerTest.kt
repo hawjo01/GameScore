@@ -7,7 +7,7 @@ class PlayerTest {
 
     @Test
     fun totalScore() {
-        val player = Player("Foo")
+        val player = Player("Raj")
         assertEquals(0, player.totalScore())
 
         player.addScore(10)
@@ -22,7 +22,7 @@ class PlayerTest {
 
     @Test
     fun resetScores() {
-        val player = Player("Foo")
+        val player = Player("Sheldon")
         assertTrue(player.scores.isEmpty())
         player.addScore(1)
         player.addScore(2)
@@ -35,7 +35,7 @@ class PlayerTest {
 
     @Test
     fun addScore() {
-        val player = Player("Foo")
+        val player = Player("Leonard")
         assertTrue(player.scores.isEmpty())
         player.addScore(1)
         assertEquals(1, player.scores.size)
@@ -45,7 +45,7 @@ class PlayerTest {
 
     @Test
     fun changeScore() {
-        val player = Player("foo")
+        val player = Player("Howard")
         player.addScore(1)
         assertEquals(1, player.scores[0])
         player.changeScore(scoreIndex = 0, newScore = 2)
