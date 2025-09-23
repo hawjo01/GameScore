@@ -79,7 +79,7 @@ fun MainScaffold(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
                     )
                 },
                 actions = {
-                    if (gameViewModel.playersReady()) {
+                    if (gameViewModel.isGamePlay()) {
                         ResetGame(gameViewModel)
                     } else {
                         StartGame(gameViewModel)
@@ -102,7 +102,7 @@ fun Game(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxSize()
     ) {
-        if (!gameViewModel.playersReady()) {
+        if (gameViewModel.isGameSetup()) {
             GameSetup(gameViewModel)
         } else {
             GamePlay(gameViewModel)

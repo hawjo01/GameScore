@@ -80,11 +80,11 @@ fun GameSetup(gameViewModel: GameViewModel) {
                     .padding(top = 10.dp, end = 20.dp)
             )
 
-            gameViewModel.getPlayerNames().forEachIndexed { index, playerName ->
+            gameViewModel.getPlayers().forEachIndexed { index, player ->
                 var showConfirmRemovePlayer by remember { mutableStateOf(false) }
 
                 Text(
-                    text = playerName + if (index + 1 < gameViewModel.getPlayerNames().size) ", " else "",
+                    text = player.name + if (index + 1 < gameViewModel.getPlayers().size) ", " else "",
                     fontSize = 26.sp,
                     modifier = Modifier
                         .padding(top = 10.dp)
@@ -98,7 +98,7 @@ fun GameSetup(gameViewModel: GameViewModel) {
                     ConfirmRemovePlayer(
                         onDismissRequest = { showConfirmRemovePlayer = false },
                         onConfirmation = {
-                            gameViewModel.removePlayerName(playerName)
+                            gameViewModel.removePlayer(index)
                             showConfirmRemovePlayer = false
                         }
                     )
@@ -120,7 +120,7 @@ fun GameSetup(gameViewModel: GameViewModel) {
             ) {
                 OutlinedIconButton(
                     onClick = {
-                        gameViewModel.addPlayerName(name)
+                        gameViewModel.addPlayer(name)
                     })
                 {
                     Icon(
@@ -159,7 +159,7 @@ fun GameSetup(gameViewModel: GameViewModel) {
                     IconButton(
                         onClick = {
                             hideKeyboard.invoke()
-                            gameViewModel.addPlayerName(newPlayerName.trim())
+                            gameViewModel.addPlayer(newPlayerName.trim())
                             newPlayerName = ""
                         },
                         enabled = newPlayerName.isNotBlank()

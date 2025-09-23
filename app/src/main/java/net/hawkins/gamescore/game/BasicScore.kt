@@ -3,9 +3,15 @@ package net.hawkins.gamescore.game
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.data.Player
 
-class BasicScore: GameType {
+class BasicScore : GameType {
 
-    override fun getNameId(): Int { return R.string.basic_scoring }
+    override fun getNameId(): Int {
+        return R.string.basic_scoring
+    }
+
+    override fun hasWinningThreshold(): Boolean {
+        return false
+    }
 
     override fun isValidScore(score: String): Boolean {
         return (score.toIntOrNull() != null)
@@ -18,7 +24,7 @@ class BasicScore: GameType {
 
         val playerWithHighestScore = players.maxBy { player -> player.totalScore() }
         val highestScore = playerWithHighestScore.totalScore()
-        val count = players.count{ player -> player.totalScore() == highestScore }
+        val count = players.count { player -> player.totalScore() == highestScore }
         return if (count == 1) {
             playerWithHighestScore
         } else {
