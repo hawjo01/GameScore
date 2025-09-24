@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -64,8 +65,7 @@ fun GameSetup(gameViewModel: GameViewModel) {
             Text(
                 text = stringResource(R.string.game) + ":",
                 style = MaterialTheme.typography.labelMedium,
-                modifier = Modifier
-                    .padding(top = 10.dp, end = 20.dp)
+                modifier = Modifier.padding(end = 20.dp)
             )
             GameTypeDropdownMenu(gameViewModel)
         }
@@ -213,21 +213,24 @@ fun ConfirmRemovePlayer(
 fun GameTypeDropdownMenu(
     gameViewModel: GameViewModel
 ) {
-    var expanded by remember {
-        mutableStateOf(false)
+    var expanded by remember { mutableStateOf(false)
     }
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
-        Modifier
-            .padding(vertical = 8.dp)
+        Modifier.padding(vertical = 8.dp)
     ) {
         TextField(
-            readOnly = true,
             value = stringResource(gameViewModel.getGameType().getNameId()),
             onValueChange = {},
+            readOnly = true,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+            colors = ExposedDropdownMenuDefaults.textFieldColors(
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent
+            ),
+            shape = RoundedCornerShape(12.dp),
             modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable)
         )
         ExposedDropdownMenu(
