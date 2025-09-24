@@ -60,7 +60,7 @@ fun GameSetup(gameViewModel: GameViewModel) {
     {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(10.dp)
+            modifier = Modifier.padding(start = 10.dp)
         ) {
             Text(
                 text = stringResource(R.string.game) + ":",
@@ -71,7 +71,7 @@ fun GameSetup(gameViewModel: GameViewModel) {
         }
 
         Row(
-            modifier = Modifier.padding(10.dp)
+            modifier = Modifier.padding(start = 10.dp)
         ) {
             Text(
                 text = stringResource(R.string.players) + ":",
@@ -105,13 +105,17 @@ fun GameSetup(gameViewModel: GameViewModel) {
                 }
             }
         }
-        HorizontalDivider(
-            modifier = Modifier
-                .fillMaxWidth(.9f)
-                .padding(4.dp, bottom = 10.dp),
-            color = Color.Gray,
-            thickness = 5.dp
-        )
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            HorizontalDivider(
+                modifier = Modifier
+                    .padding(all = 10.dp),
+                color = Color.Gray,
+                thickness = 5.dp
+            )
+        }
         gameViewModel.getSavedPlayerNames().forEach { name ->
             Row(
                 modifier = Modifier.padding(horizontal = 10.dp),
@@ -213,7 +217,8 @@ fun ConfirmRemovePlayer(
 fun GameTypeDropdownMenu(
     gameViewModel: GameViewModel
 ) {
-    var expanded by remember { mutableStateOf(false)
+    var expanded by remember {
+        mutableStateOf(false)
     }
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -226,9 +231,9 @@ fun GameTypeDropdownMenu(
             readOnly = true,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = ExposedDropdownMenuDefaults.textFieldColors(
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
             ),
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable)
