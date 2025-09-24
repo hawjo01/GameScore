@@ -16,6 +16,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -36,15 +37,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.Typeface
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import net.hawkins.gamescore.R
@@ -92,10 +89,8 @@ fun Winner(gameViewModel: GameViewModel) {
 fun Winner(winner: Player) {
     Text(
         text = stringResource(R.string.player_wins, winner.name),
-        fontWeight = FontWeight.Bold,
-        fontSize = 40.sp,
-        textAlign = TextAlign.Center,
-        color = Color.Red
+        color = Color.Red,
+        style = MaterialTheme.typography.headlineLarge
     )
 }
 
@@ -123,9 +118,7 @@ fun Player(
         var showNewScoreDialog by remember { mutableStateOf(false) }
         Text(
             text = player.name,
-            textAlign = TextAlign.Center,
-            fontSize = 30.sp,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
@@ -141,9 +134,7 @@ fun Player(
         }
         Text(
             text = player.totalScore().toString(),
-            textAlign = TextAlign.Center,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.fillMaxWidth()
         )
         HorizontalDivider(
@@ -173,9 +164,7 @@ fun Player(
 
                     Text(
                         text = score.toString().padStart(5, ' '),
-                        textAlign = TextAlign.Right,
-                        fontFamily = FontFamily(Typeface(android.graphics.Typeface.MONOSPACE)),
-                        fontSize = 20.sp,
+                        style = MaterialTheme.typography.displayMedium,
                         color = if (Utils.isNegativeInt(score) && gameViewModel.highlightNegativeScore()) Color.Red else Color.Unspecified,
                         modifier = Modifier.clickable {
                             showChangeScoreDialog = true

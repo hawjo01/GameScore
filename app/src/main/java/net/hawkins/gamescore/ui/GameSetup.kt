@@ -18,6 +18,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedIconButton
@@ -40,7 +41,6 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.ui.theme.GameScoreTheme
@@ -63,7 +63,7 @@ fun GameSetup(gameViewModel: GameViewModel) {
         ) {
             Text(
                 text = stringResource(R.string.game) + ":",
-                fontSize = 26.sp,
+                style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier
                     .padding(top = 10.dp, end = 20.dp)
             )
@@ -75,7 +75,7 @@ fun GameSetup(gameViewModel: GameViewModel) {
         ) {
             Text(
                 text = stringResource(R.string.players) + ":",
-                fontSize = 26.sp,
+                style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier
                     .padding(top = 10.dp, end = 20.dp)
             )
@@ -85,7 +85,7 @@ fun GameSetup(gameViewModel: GameViewModel) {
 
                 Text(
                     text = player.name + if (index + 1 < gameViewModel.getPlayers().size) ", " else "",
-                    fontSize = 26.sp,
+                    style = MaterialTheme.typography.labelMedium,
                     modifier = Modifier
                         .padding(top = 10.dp)
                         .clickable(
