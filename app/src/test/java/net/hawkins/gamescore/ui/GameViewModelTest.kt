@@ -27,10 +27,10 @@ class GameViewModelTest {
         val gameViewModel = GameViewModel()
         Assert.assertEquals(R.string.twenty_five_hundred, gameViewModel.getGameType().getNameId())
 
-        val notTwentyFiveHundered =
+        val notTwentyFiveHundred =
             gameViewModel.getGameTypes().first { it.getNameId() != R.string.twenty_five_hundred }
-        gameViewModel.setGameType(notTwentyFiveHundered)
-        Assert.assertEquals(notTwentyFiveHundered, gameViewModel.getGameType())
+        gameViewModel.setGameType(notTwentyFiveHundred)
+        Assert.assertEquals(notTwentyFiveHundred, gameViewModel.getGameType())
     }
 
     @Test
