@@ -14,7 +14,6 @@ class GameViewModelTest {
         Assert.assertTrue(gameViewModel.isGameSetup())
         Assert.assertFalse(gameViewModel.isGamePlay())
         Assert.assertEquals(0, gameViewModel.getPlayers().size)
-        Assert.assertEquals(0, gameViewModel.getSavedPlayerNames().size)
         // 2500 is used the most often so it should be first.
         Assert.assertEquals(R.string.twenty_five_hundred, gameViewModel.getGameType().getNameId())
         // Currently only 2 game types are supported
@@ -42,18 +41,6 @@ class GameViewModelTest {
         gameViewModel.startGame()
         Assert.assertFalse(gameViewModel.isGameSetup())
         Assert.assertTrue(gameViewModel.isGamePlay())
-    }
-
-    @Test
-    fun savedPlayerNames() {
-        val gameViewModel = GameViewModel()
-        Assert.assertEquals(0, gameViewModel.getSavedPlayerNames().size)
-
-        val playerNames = listOf("Sheldon", "Leonard")
-        gameViewModel.setSavedPlayerNames(playerNames)
-        Assert.assertEquals(2, gameViewModel.getSavedPlayerNames().size)
-        Assert.assertEquals("Sheldon", gameViewModel.getSavedPlayerNames()[0])
-        Assert.assertEquals("Leonard", gameViewModel.getSavedPlayerNames()[1])
     }
 
     @Test

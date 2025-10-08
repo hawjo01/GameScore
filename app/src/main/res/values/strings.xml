@@ -20,4 +20,7 @@
     <string name="change_score">Change Score</string>
     <string name="not_a_valid_score">Not a valid score</string>
     <string name="score_for">Score for %1$s</string>
+    <string name="save_player">Save Player?</string>
+    <string name="save">Save</string>
+    <string name="delete_saved_player">Delete %1$s from saved players?</string>
 </resources>

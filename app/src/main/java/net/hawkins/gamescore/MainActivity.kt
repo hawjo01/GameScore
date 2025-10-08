@@ -1,6 +1,5 @@
 package net.hawkins.gamescore
 
-import android.content.Context
 import net.hawkins.gamescore.ui.GamePlay
 import net.hawkins.gamescore.ui.ResetGame
 import android.os.Bundle
@@ -20,15 +19,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import net.hawkins.gamescore.ui.GameViewModel
 import net.hawkins.gamescore.ui.GameSetup
 import net.hawkins.gamescore.ui.StartGame
 import net.hawkins.gamescore.ui.theme.GameScoreTheme
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import kotlin.collections.mutableListOf
 
 class MainActivity : ComponentActivity() {
 
@@ -38,27 +32,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             GameScoreTheme {
                 val gameViewModel: GameViewModel = viewModel()
-                val savedPlayers = getSavedPlayerLists(baseContext)
-                gameViewModel.setSavedPlayerNames(savedPlayers)
+                gameViewModel.loadSavedUsers(baseContext.getFileStreamPath("players.json"))
                 MainScaffold(gameViewModel, modifier = Modifier)
             }
         }
-    }
-
-    fun getSavedPlayerLists(context: Context): List<String> {
-        val savedPlayers = mutableListOf<String>()
-        try {
-            val inputStream = context.assets.open("players.json")
-            val bufferedReader = BufferedReader(InputStreamReader(inputStream))
-            val gson = Gson()
-            val listType = object : TypeToken<ArrayList<String>>() {}.type
-            val playerList =
-                gson.fromJson<ArrayList<String>>(bufferedReader, listType)
-            playerList.forEach { savedPlayers.add(it) }
-        } catch (e: Exception) {
-            println("An unexpected error occurred: ${e.message}")
-        }
-        return savedPlayers
     }
 }
 
