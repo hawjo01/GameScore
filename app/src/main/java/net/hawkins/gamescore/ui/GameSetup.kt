@@ -1,6 +1,7 @@
 package net.hawkins.gamescore.ui
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -52,6 +54,7 @@ fun GameSetup(gameViewModel: GameViewModel) {
     var newPlayerName by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     val hideKeyboard = { keyboardController?.hide() }
+    val savedPlayerNames = gameViewModel.getSavedPlayerNames()
 
     Column(
         modifier = Modifier
@@ -82,6 +85,7 @@ fun GameSetup(gameViewModel: GameViewModel) {
 
             gameViewModel.getPlayers().forEachIndexed { index, player ->
                 var showConfirmRemovePlayer by remember { mutableStateOf(false) }
+                var showSavePlayerName by remember { mutableStateOf(false) }
 
                 Text(
                     text = player.name + if (index + 1 < gameViewModel.getPlayers().size) ", " else "",
@@ -94,6 +98,17 @@ fun GameSetup(gameViewModel: GameViewModel) {
                             }
                         )
                 )
+
+                if (showSavePlayerName) {
+                    ConfirmSavePlayer(
+                        onDismissRequest = { showSavePlayerName = false },
+                        onConfirmation = {
+                            gameViewModel.savePlayerName(player.name)
+                            showSavePlayerName = false
+                        }
+                    )
+                }
+
                 if (showConfirmRemovePlayer) {
                     ConfirmRemovePlayer(
                         onDismissRequest = { showConfirmRemovePlayer = false },
@@ -116,7 +131,8 @@ fun GameSetup(gameViewModel: GameViewModel) {
                 thickness = 5.dp
             )
         }
-        gameViewModel.getSavedPlayerNames().forEach { name ->
+        savedPlayerNames.sorted().forEach { name ->
+            var showDeleteSavedPlayer by remember { mutableStateOf(false) }
             Row(
                 modifier = Modifier.padding(horizontal = 10.dp),
                 horizontalArrangement = Arrangement.Center,
@@ -133,9 +149,27 @@ fun GameSetup(gameViewModel: GameViewModel) {
                     )
                 }
                 Text(
-                    modifier = Modifier.padding(start = 10.dp),
-                    text = name
+                    text = name,
+                    modifier = Modifier
+                        .padding(start = 10.dp)
+                        .combinedClickable(
+                            onLongClick = {
+                                showDeleteSavedPlayer = true
+                            },
+                            onClick = {}
+                        )
                 )
+
+                if (showDeleteSavedPlayer) {
+                    ConfirmDeleteSavedPlayer(
+                        name = name,
+                        onDismissRequest = { showDeleteSavedPlayer = false },
+                        onConfirmation = {
+                            gameViewModel.removeSavedPlayerName(name)
+                            showDeleteSavedPlayer = false
+                        }
+                    )
+                }
             }
         }
         Row(
@@ -160,18 +194,34 @@ fun GameSetup(gameViewModel: GameViewModel) {
                     }
                 ),
                 trailingIcon = {
-                    IconButton(
-                        onClick = {
-                            hideKeyboard.invoke()
-                            gameViewModel.addPlayer(newPlayerName.trim())
-                            newPlayerName = ""
-                        },
-                        enabled = newPlayerName.isNotBlank()
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = stringResource(R.string.add)
-                        )
+                    Row {
+                        IconButton(
+                            onClick = {
+                                hideKeyboard.invoke()
+                                gameViewModel.addPlayer(newPlayerName.trim())
+                                newPlayerName = ""
+                            },
+                            enabled = newPlayerName.isNotBlank()
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Add,
+                                contentDescription = stringResource(R.string.add)
+                            )
+                        }
+                        IconButton(
+                            onClick = {
+                                hideKeyboard.invoke()
+                                gameViewModel.savePlayerName(newPlayerName.trim())
+                                newPlayerName = ""
+                            },
+                            enabled = newPlayerName.isNotBlank()
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Save,
+                                contentDescription = stringResource(R.string.save)
+                            )
+                        }
+
                     }
                 }
             )
@@ -187,6 +237,73 @@ fun ConfirmRemovePlayer(
     AlertDialog(
         title = {
             Text(text = stringResource(R.string.remove_player))
+        },
+        onDismissRequest = {
+            onDismissRequest()
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirmation()
+                }
+            ) {
+                Text(stringResource(R.string.confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    onDismissRequest()
+                }
+            ) {
+                Text(stringResource(R.string.dismiss))
+            }
+        }
+    )
+}
+
+@Composable
+fun ConfirmSavePlayer(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit
+) {
+    AlertDialog(
+        title = {
+            Text(text = stringResource(R.string.save_player))
+        },
+        onDismissRequest = {
+            onDismissRequest()
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirmation()
+                }
+            ) {
+                Text(stringResource(R.string.confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    onDismissRequest()
+                }
+            ) {
+                Text(stringResource(R.string.dismiss))
+            }
+        }
+    )
+}
+
+@Composable
+fun ConfirmDeleteSavedPlayer(
+    name: String,
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit
+) {
+    AlertDialog(
+        title = {
+            Text(text = stringResource(R.string.delete_saved_player, name))
         },
         onDismissRequest = {
             onDismissRequest()

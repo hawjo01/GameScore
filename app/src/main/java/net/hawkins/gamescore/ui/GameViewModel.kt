@@ -5,13 +5,17 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import net.hawkins.gamescore.data.Player
+import net.hawkins.gamescore.data.SavedPlayers
 import net.hawkins.gamescore.game.BasicScore
 import net.hawkins.gamescore.game.GameType
 import net.hawkins.gamescore.game.TwentyFiveHundred
+import java.io.File
 
 class GameViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(GameUiState())
-    private val _savedPlayerNames = mutableListOf<String>()
+
+    private var _savedPlayers = SavedPlayers()
+
     private val _gameTypes = listOf(
         TwentyFiveHundred(),
         BasicScore()
@@ -61,12 +65,20 @@ class GameViewModel : ViewModel() {
         _uiState.value.gameState.value = GameState.PLAY
     }
 
-    fun getSavedPlayerNames(): List<String> {
-        return _savedPlayerNames
+    fun loadSavedUsers(file: File) {
+        _savedPlayers.loadFromFile(file)
     }
 
-    fun setSavedPlayerNames(savedPlayerNames: List<String>) {
-        savedPlayerNames.forEach { _savedPlayerNames.add(it) }
+    fun savePlayerName(name: String) {
+        _savedPlayers.addPlayer(name)
+    }
+
+    fun removeSavedPlayerName(name: String) {
+        _savedPlayers.removePlayer(name)
+    }
+
+    fun getSavedPlayerNames():  SnapshotStateList<String> {
+        return _savedPlayers.getPlayers()
     }
 
     fun getGameTypes(): List<GameType> {
