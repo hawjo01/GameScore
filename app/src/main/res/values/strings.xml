@@ -23,4 +23,6 @@
     <string name="save_player">Save Player?</string>
     <string name="save">Save</string>
     <string name="delete_saved_player">Delete %1$s from saved players?</string>
+    <string name="favorite">Favorite</string>
+    <string name="manual">Manual</string>
 </resources>

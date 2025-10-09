@@ -15,7 +15,7 @@ class SavedPlayers() {
     private var _players = mutableStateListOf<String>()
     private var _file : File? = null
 
-    fun loadFromFile(file: File) {
+    fun load(file: File) {
         _file = file
 
         println("Initializing SavedPlayers from " + file.absolutePath)

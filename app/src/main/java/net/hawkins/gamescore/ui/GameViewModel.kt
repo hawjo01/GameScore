@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import net.hawkins.gamescore.data.Favorites
 import net.hawkins.gamescore.data.Player
 import net.hawkins.gamescore.data.SavedPlayers
 import net.hawkins.gamescore.game.BasicScore
@@ -80,7 +81,7 @@ class GameViewModel : ViewModel() {
     }
 
     fun loadSavedUsers(file: File) {
-        _savedPlayers.loadFromFile(file)
+        _savedPlayers.load(file)
     }
 
     fun savePlayerName(name: String) {
@@ -113,5 +114,14 @@ class GameViewModel : ViewModel() {
 
     fun isGamePlay(): Boolean {
         return _uiState.value.gameState.value == GameState.PLAY
+    }
+
+    fun getFavorites(): Favorites {
+        return Favorites()
+    }
+
+    fun getGameTypeById(id: Int): GameType {
+        // TODO: Handle missing type
+        return _gameTypes.first { gameType ->  gameType.getNameId() == id }
     }
 }

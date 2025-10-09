@@ -5,8 +5,10 @@ import net.hawkins.gamescore.data.Player
 
 class BasicScore : GameType {
 
+    private val GAME_ID = R.string.basic_scoring
+
     override fun getNameId(): Int {
-        return R.string.basic_scoring
+        return GAME_ID
     }
 
     override fun hasWinningThreshold(): Boolean {

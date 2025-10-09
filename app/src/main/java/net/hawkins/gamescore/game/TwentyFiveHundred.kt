@@ -5,6 +5,8 @@ import net.hawkins.gamescore.data.Player
 
 class TwentyFiveHundred : GameType {
 
+    private val GAME_ID = R.string.twenty_five_hundred
+
     override fun hasWinningThreshold(): Boolean {
         return true
     }
@@ -14,7 +16,7 @@ class TwentyFiveHundred : GameType {
     }
 
     override fun getNameId(): Int {
-        return R.string.twenty_five_hundred
+        return GAME_ID
     }
 
     override fun isValidScore(score: String): Boolean {
