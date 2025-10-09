@@ -13,8 +13,14 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.OutlinedTextField
@@ -39,21 +45,24 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.viewmodel.compose.viewModel
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.Utils
+import net.hawkins.gamescore.data.FavoriteGame
+import net.hawkins.gamescore.data.FavoriteGames
 import net.hawkins.gamescore.data.Player
 import net.hawkins.gamescore.ui.component.ConfirmAction
-import net.hawkins.gamescore.ui.theme.GameScoreTheme
 
 @Composable
-fun GamePlayScreen(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
+fun GamePlayScreen(
+    gameViewModel: GameViewModel,
+    favoriteGames: FavoriteGames,
+    modifier: Modifier = Modifier
+) {
     LaunchedEffect(Unit) {
         gameViewModel.updateAppBarActions {
-            GamePlayAppBarActions(gameViewModel)
+            GamePlayAppBarActions(gameViewModel, favoriteGames)
         }
     }
 
@@ -367,7 +376,12 @@ fun ConfirmResetGame(
 }
 
 @Composable
-fun GamePlayAppBarActions(gameViewModel: GameViewModel) {
+fun GamePlayAppBarActions(gameViewModel: GameViewModel, favoriteGames: FavoriteGames) {
+
+    var dropdownMenuExpanded by remember { mutableStateOf(false) }
+    var showSaveFavoriteGame by remember { mutableStateOf(false) }
+    var showResetGameDialog by remember { mutableStateOf(false) }
+
     if (!gameViewModel.hasWinningThreshold()) {
         TextButton(
             onClick = { gameViewModel.determineWinner() }
@@ -376,31 +390,197 @@ fun GamePlayAppBarActions(gameViewModel: GameViewModel) {
         }
     }
 
-    val showConfirmDialog = remember { mutableStateOf(false) }
-    TextButton(
-        onClick = {
-            showConfirmDialog.value = true
-        },
-    ) {
-        Text(text = stringResource(R.string.new_game))
+    IconButton(onClick = { dropdownMenuExpanded = true }) {
+        Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "More options")
     }
-
-    if (showConfirmDialog.value) {
-        ConfirmResetGame(
-            onDismissRequest = { showConfirmDialog.value = false },
-            onConfirmation = {
-                gameViewModel.resetGame()
-                showConfirmDialog.value = false
+    DropdownMenu(
+        expanded = dropdownMenuExpanded,
+        onDismissRequest = { dropdownMenuExpanded = false }
+    ) {
+        DropdownMenuItem(
+            text = { Text("Favorite Game") },
+            onClick = {
+                showSaveFavoriteGame = true
+                dropdownMenuExpanded = false
+            }
+        )
+        DropdownMenuItem(
+            text = { Text(text = stringResource(R.string.reset_game)) },
+            onClick = {
+                showResetGameDialog = true
+                dropdownMenuExpanded = false
             }
         )
     }
 
+    if (showResetGameDialog) {
+        ConfirmResetGame(
+            onDismissRequest = { showResetGameDialog = false },
+            onConfirmation = {
+                gameViewModel.resetGame()
+                showResetGameDialog = false
+            }
+        )
+    }
+
+    if (showSaveFavoriteGame) {
+        SaveFavoriteGame(
+            gameViewModel,
+            onDismissRequest = { showSaveFavoriteGame = false },
+            onConfirmation = { name ->
+                favoriteGames.add(
+                    FavoriteGame(
+                        name = name.trim(),
+                        playerNames = gameViewModel.getPlayers().map { player -> player.name },
+                        gameId = gameViewModel.getGameType().getTypeId()
+                    )
+                )
+                showSaveFavoriteGame = false
+            }
+        )
+    }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun GamePlayPreview() {
-    GameScoreTheme {
-        GamePlayScreen(viewModel())
+fun SaveFavoriteGame(
+    gameViewModel: GameViewModel,
+    onDismissRequest: () -> Unit,
+    onConfirmation: (String) -> Unit
+) {
+    Dialog(onDismissRequest = { onDismissRequest() }) {
+        Card(
+            modifier = Modifier
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            var favoriteName by remember { mutableStateOf("") }
+            val keyboardController = LocalSoftwareKeyboardController.current
+            val hideKeyboard = { keyboardController?.hide() }
+
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(text = "Save Favorite Game?")
+            }
+
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                OutlinedTextField(
+                    value = favoriteName,
+                    onValueChange = { favoriteName = it },
+                    label = { Text(text = stringResource(R.string.name)) },
+                    singleLine = true,
+                    shape = shapes.small,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Ascii,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            hideKeyboard.invoke()
+                        }
+                    ),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = Color.Unspecified,
+                        unfocusedTextColor = Color.Unspecified
+                    ),
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                val text = remember {
+                    mutableStateOf(
+                        gameViewModel.getPlayers()
+                            .joinToString(separator = ", ") { player -> player.name })
+                }
+                OutlinedTextField(
+                    value = text.value,
+                    onValueChange = { newText -> text.value = newText },
+                    label = { Text(text = stringResource(R.string.players)) },
+                    singleLine = true,
+                    readOnly = true,
+                    shape = shapes.small,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            hideKeyboard.invoke()
+                        }
+                    ),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = Color.Unspecified,
+                        unfocusedTextColor = Color.Unspecified
+                    ),
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                OutlinedTextField(
+                    value = stringResource(gameViewModel.getGameType().getNameResourceId()),
+                    onValueChange = {},
+                    label = { Text(text = stringResource(R.string.game)) },
+                    singleLine = true,
+                    readOnly = true,
+                    shape = shapes.small,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            hideKeyboard.invoke()
+                        }
+                    ),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = Color.Unspecified,
+                        unfocusedTextColor = Color.Unspecified
+                    ),
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                TextButton(
+                    onClick = { onDismissRequest() },
+                    modifier = Modifier.padding(8.dp),
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+                TextButton(
+                    onClick = {
+                        onConfirmation(favoriteName)
+                    },
+                    enabled = favoriteName.isNotBlank(),
+                    modifier = Modifier.padding(8.dp),
+                ) {
+                    Text(stringResource(R.string.save))
+                }
+            }
+        }
     }
 }

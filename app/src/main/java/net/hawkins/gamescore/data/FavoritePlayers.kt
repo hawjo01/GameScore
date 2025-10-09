@@ -45,16 +45,16 @@ class FavoritePlayers(val file: File) {
         }
 
         _names.add(name)
-        saveNames()
+        save()
 
     }
 
     fun removeName(player: String) {
         _names.remove(player)
-        saveNames()
+        save()
     }
 
-    private fun saveNames() {
+    private fun save() {
         try {
             val gson = GsonBuilder().setPrettyPrinting().create()
             FileWriter(file).use { writer ->

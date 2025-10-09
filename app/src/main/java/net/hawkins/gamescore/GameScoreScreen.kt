@@ -17,6 +17,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import net.hawkins.gamescore.data.FavoriteGames
 import net.hawkins.gamescore.data.FavoritePlayers
 import net.hawkins.gamescore.ui.GamePlayScreen
 import net.hawkins.gamescore.ui.GameSetupScreen
@@ -45,7 +46,8 @@ fun GameScoreAppBar(
                 overflow = TextOverflow.Ellipsis
             )
         },
-        actions = { appBarActions.actions?.invoke(this)
+        actions = {
+            appBarActions.actions?.invoke(this)
         },
         scrollBehavior = scrollBehavior,
         modifier = modifier,
@@ -57,6 +59,7 @@ fun GameScoreApp(
     viewModel: GameViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
+    val context = LocalContext.current
     Scaffold(
         topBar = {
             GameScoreAppBar(
@@ -69,20 +72,32 @@ fun GameScoreApp(
             startDestination = GameScoreScreen.Setup.name,
             modifier = Modifier.padding(innerPadding)
         ) {
+            val favoriteGames = FavoriteGames(File(context.filesDir, "favorite-games.json"))
+
             composable(route = GameScoreScreen.Setup.name) {
-                val context = LocalContext.current
 
                 GameSetupScreen(
                     gameViewModel = viewModel,
-                    favoritePlayers = FavoritePlayers(File(context.filesDir, "players.json")),
-                    onNextButtonClicked = {
+                    favoritePlayers = FavoritePlayers(
+                        File(
+                            context.filesDir,
+                            "favorite-players.json"
+                        )
+                    ),
+                    favoriteGames = favoriteGames,
+                    onNextButtonClicked = { gameTypeId, players ->
+                        viewModel.setGameType(gameTypeId)
+                        viewModel.setPlayers(players)
                         navController.navigate(GameScoreScreen.Play.name)
                     }
                 )
             }
 
             composable(route = GameScoreScreen.Play.name) {
-                GamePlayScreen(viewModel)
+                GamePlayScreen(
+                    gameViewModel = viewModel,
+                    favoriteGames = favoriteGames
+                )
             }
         }
     }

@@ -13,55 +13,27 @@ class GameViewModelTest {
         val gameViewModel = GameViewModel()
         Assert.assertEquals(0, gameViewModel.getPlayers().size)
         // 2500 is used the most often so it should be first.
-        Assert.assertEquals(R.string.twenty_five_hundred, gameViewModel.getGameType().getNameId())
+        Assert.assertEquals(R.string.twenty_five_hundred, gameViewModel.getGameType().getNameResourceId())
         // Currently only 2 game types are supported
-        Assert.assertEquals(2, gameViewModel.getGameTypes().size)
+        Assert.assertEquals(2, gameViewModel.gameTypes.size)
     }
 
 
     @Test
     fun getGameType() {
         val gameViewModel = GameViewModel()
-        Assert.assertEquals(R.string.twenty_five_hundred, gameViewModel.getGameType().getNameId())
+        Assert.assertEquals(R.string.twenty_five_hundred, gameViewModel.getGameType().getNameResourceId())
 
         val notTwentyFiveHundred =
-            gameViewModel.getGameTypes().first { it.getNameId() != R.string.twenty_five_hundred }
+            gameViewModel.gameTypes.first { it.getNameResourceId() != R.string.twenty_five_hundred }
         gameViewModel.setGameType(notTwentyFiveHundred)
         Assert.assertEquals(notTwentyFiveHundred, gameViewModel.getGameType())
     }
 
     @Test
-    fun players() {
-        val gameViewModel = GameViewModel()
-        Assert.assertEquals(0, gameViewModel.getPlayers().size)
-
-        gameViewModel.addPlayer("Howard")
-        Assert.assertEquals(1, gameViewModel.getPlayers().size)
-        Assert.assertEquals("Howard", gameViewModel.getPlayers()[0].name)
-
-        gameViewModel.addPlayer("Raj")
-        Assert.assertEquals(2, gameViewModel.getPlayers().size)
-        Assert.assertEquals("Howard", gameViewModel.getPlayers()[0].name)
-        Assert.assertEquals("Raj", gameViewModel.getPlayers()[1].name)
-
-        // Duplicate player names are allowed
-        gameViewModel.addPlayer("Howard")
-        Assert.assertEquals(3, gameViewModel.getPlayers().size)
-        Assert.assertEquals("Howard", gameViewModel.getPlayers()[0].name)
-        Assert.assertEquals("Raj", gameViewModel.getPlayers()[1].name)
-        Assert.assertEquals("Howard", gameViewModel.getPlayers()[2].name)
-
-        // Remove the 1st Howard,
-        gameViewModel.removePlayer(0)
-        Assert.assertEquals(2, gameViewModel.getPlayers().size)
-        Assert.assertEquals("Raj", gameViewModel.getPlayers()[0].name)
-        Assert.assertEquals("Howard", gameViewModel.getPlayers()[1].name)
-    }
-
-    @Test
     fun resetGame() {
         val gameViewModel = GameViewModel()
-        val expectedGameType = gameViewModel.getGameTypes()[1]
+        val expectedGameType = gameViewModel.gameTypes[1]
         gameViewModel.setGameType(expectedGameType)
         Assert.assertEquals(expectedGameType, gameViewModel.getGameType())
 
@@ -70,11 +42,10 @@ class GameViewModelTest {
         gameViewModel.resetGame()
         Assert.assertEquals(0, gameViewModel.getPlayers().size)
 
-        gameViewModel.addPlayer("Sheldon")
+        gameViewModel.setPlayers(listOf("Sheldon", "Penny"))
         gameViewModel.getPlayers()[0].addScore(20)
         gameViewModel.getPlayers()[0].addScore(50)
 
-        gameViewModel.addPlayer("Penny")
         gameViewModel.getPlayers()[1].addScore(100)
         gameViewModel.getPlayers()[1].addScore(200)
 
@@ -101,7 +72,12 @@ class GameViewModelTest {
     @Test
     fun gameType() {
         class Seven : GameType {
-            override fun getNameId(): Int {
+
+            override fun getTypeId(): Int {
+                return -1
+            }
+
+            override fun getNameResourceId(): Int {
                 return 7
             }
 
@@ -124,16 +100,15 @@ class GameViewModelTest {
 
         val gameViewModel = GameViewModel()
         gameViewModel.setGameType(Seven())
-        Assert.assertEquals(7, gameViewModel.getGameType().getNameId())
+        Assert.assertEquals(7, gameViewModel.getGameType().getNameResourceId())
         Assert.assertFalse(gameViewModel.highlightNegativeScore())
         Assert.assertTrue(gameViewModel.hasWinningThreshold())
 
         Assert.assertTrue(gameViewModel.isValidScore("7"))
         Assert.assertFalse(gameViewModel.isValidScore("1"))
-        gameViewModel.addPlayer("Penny")
+        gameViewModel.setPlayers(listOf("Penny", "Bernadette"))
         gameViewModel.getPlayers()[0].addScore(7)
 
-        gameViewModel.addPlayer("Bernadette")
         gameViewModel.getPlayers()[1].addScore(14)
 
         Assert.assertNull(gameViewModel.determineWinner())

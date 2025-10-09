@@ -4,8 +4,14 @@ import net.hawkins.gamescore.R
 import net.hawkins.gamescore.data.Player
 
 class BasicScore : GameType {
+    companion object {
+        const val GAME_ID = 0
+    }
 
-    override fun getNameId(): Int {
+    override fun getTypeId(): Int {
+        return GAME_ID
+    }
+    override fun getNameResourceId(): Int {
         return R.string.basic_scoring
     }
 
