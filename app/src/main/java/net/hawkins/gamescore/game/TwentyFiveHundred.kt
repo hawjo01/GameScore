@@ -34,9 +34,14 @@ class TwentyFiveHundred : GameType {
             return null
         }
 
-        val playerWithHighestScore = players.maxBy { it.totalScore() }
-        return if (playerWithHighestScore.totalScore() >= 2500) {
-            playerWithHighestScore
+        val highestScore = players.maxOf { player -> player.totalScore() }
+        val playersWithHighScore = players.filter { player -> player.totalScore() == highestScore }
+        if (playersWithHighScore.size > 1) {
+            return null
+        }
+
+        return if (playersWithHighScore[0].totalScore() >= 2500) {
+            playersWithHighScore[0]
         } else {
             null
         }
