@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -47,6 +46,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.Utils
 import net.hawkins.gamescore.data.Player
+import net.hawkins.gamescore.ui.component.ConfirmAction
 import net.hawkins.gamescore.ui.theme.GameScoreTheme
 
 @Composable
@@ -382,34 +382,11 @@ fun ConfirmResetGame(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit
 ) {
-    AlertDialog(
-        title = {
-            Text(text = stringResource(R.string.new_game_confirm_title))
-        },
-        text = {
-            Text(text = stringResource(R.string.new_game_confirm_description))
-        },
-        onDismissRequest = {
-            onDismissRequest()
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirmation()
-                }
-            ) {
-                Text(stringResource(R.string.confirm))
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onDismissRequest()
-                }
-            ) {
-                Text(stringResource(R.string.dismiss))
-            }
-        }
+    ConfirmAction(
+        title = stringResource(R.string.new_game_confirm_title),
+        description = stringResource(R.string.new_game_confirm_description),
+        onConfirmation = onConfirmation,
+        onDismissRequest = onDismissRequest
     )
 }
 

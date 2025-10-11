@@ -13,7 +13,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -46,6 +45,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import net.hawkins.gamescore.R
+import net.hawkins.gamescore.ui.component.ConfirmAction
 import net.hawkins.gamescore.ui.theme.GameScoreTheme
 
 
@@ -234,31 +234,10 @@ fun ConfirmRemovePlayer(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit
 ) {
-    AlertDialog(
-        title = {
-            Text(text = stringResource(R.string.remove_player))
-        },
-        onDismissRequest = {
-            onDismissRequest()
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirmation()
-                }
-            ) {
-                Text(stringResource(R.string.confirm))
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onDismissRequest()
-                }
-            ) {
-                Text(stringResource(R.string.dismiss))
-            }
-        }
+    ConfirmAction(
+        title = stringResource(R.string.remove_player),
+        onConfirmation = onConfirmation,
+        onDismissRequest = onDismissRequest
     )
 }
 
@@ -267,31 +246,10 @@ fun ConfirmSavePlayer(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit
 ) {
-    AlertDialog(
-        title = {
-            Text(text = stringResource(R.string.save_player))
-        },
-        onDismissRequest = {
-            onDismissRequest()
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirmation()
-                }
-            ) {
-                Text(stringResource(R.string.confirm))
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onDismissRequest()
-                }
-            ) {
-                Text(stringResource(R.string.dismiss))
-            }
-        }
+    ConfirmAction(
+        title = stringResource(R.string.save_player),
+        onConfirmation = onConfirmation,
+        onDismissRequest = onDismissRequest
     )
 }
 
@@ -301,31 +259,10 @@ fun ConfirmDeleteSavedPlayer(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit
 ) {
-    AlertDialog(
-        title = {
-            Text(text = stringResource(R.string.delete_saved_player, name))
-        },
-        onDismissRequest = {
-            onDismissRequest()
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirmation()
-                }
-            ) {
-                Text(stringResource(R.string.confirm))
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onDismissRequest()
-                }
-            ) {
-                Text(stringResource(R.string.dismiss))
-            }
-        }
+    ConfirmAction(
+        title = stringResource(R.string.delete_saved_player, name),
+        onConfirmation = onConfirmation,
+        onDismissRequest = onDismissRequest
     )
 }
 
