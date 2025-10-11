@@ -94,6 +94,21 @@ class TwentyFiveHundredTest {
     }
 
     @Test
+    fun findWinner_ThresholdMet_EqualsScores() {
+        val player1 = Player("foo")
+        player1.addScore(2600)
+
+        val player2 = Player("bar")
+        player2.addScore(2600)
+
+        val players = listOf(player1, player2)
+        val game = TwentyFiveHundred()
+
+        val winner = game.findWinner(players)
+        Assert.assertNull(winner)
+    }
+
+    @Test
     fun getScoreColor() {
         val game = TwentyFiveHundred()
         Assert.assertTrue(game.highlightNegativeScore())
