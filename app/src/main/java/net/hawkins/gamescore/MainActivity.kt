@@ -1,7 +1,5 @@
 package net.hawkins.gamescore
 
-import net.hawkins.gamescore.ui.GamePlay
-import net.hawkins.gamescore.ui.ResetGame
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,12 +14,13 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
-import net.hawkins.gamescore.ui.GameViewModel
+import net.hawkins.gamescore.ui.GamePlay
 import net.hawkins.gamescore.ui.GameSetup
-import net.hawkins.gamescore.ui.StartGame
+import net.hawkins.gamescore.ui.GameViewModel
 import net.hawkins.gamescore.ui.theme.GameScoreTheme
 
 class MainActivity : ComponentActivity() {
@@ -42,35 +41,40 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScaffold(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     Scaffold(
         modifier = modifier
             .fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "",
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                },
-                actions = {
-                    if (gameViewModel.isGamePlay()) {
-                        ResetGame(gameViewModel)
-                    } else {
-                        StartGame(gameViewModel)
-                    }
-                },
-                scrollBehavior = scrollBehavior
-            )
-        },
+        topBar = { GameScoreAppBar(gameViewModel, Modifier) }
     ) { innerPadding ->
         Game(
             gameViewModel = gameViewModel,
             modifier = Modifier.padding(innerPadding)
         )
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun GameScoreAppBar(
+    gameViewModel: GameViewModel,
+    modifier: Modifier = Modifier
+) {
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val appBarActions by gameViewModel.appBarActions
+
+    TopAppBar(
+        title = {
+            Text(
+                text = "",
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        },
+        actions = { appBarActions.actions?.invoke(this)
+        },
+        scrollBehavior = scrollBehavior,
+        modifier = modifier,
+    )
 }
 
 @Composable

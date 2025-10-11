@@ -1,5 +1,8 @@
 package net.hawkins.gamescore.ui
 
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
@@ -10,6 +13,10 @@ import net.hawkins.gamescore.game.BasicScore
 import net.hawkins.gamescore.game.GameType
 import net.hawkins.gamescore.game.TwentyFiveHundred
 import java.io.File
+
+data class AppBarActions(
+    val actions: @Composable (RowScope.() -> Unit)? = null
+)
 
 class GameViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(GameUiState())
@@ -22,6 +29,13 @@ class GameViewModel : ViewModel() {
     )
     private var _gameType = mutableStateOf(_gameTypes[0])
     private var _winner = mutableStateOf<Player?>(null)
+
+    private val _appBarActions = mutableStateOf(AppBarActions())
+    val appBarActions: State<AppBarActions> = _appBarActions
+
+    fun updateAppBarActions(newActions: @Composable (RowScope.() -> Unit)?) {
+        _appBarActions.value = AppBarActions(newActions)
+    }
 
     fun resetGame() {
         _winner.value = null

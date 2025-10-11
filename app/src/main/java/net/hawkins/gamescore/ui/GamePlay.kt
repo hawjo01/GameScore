@@ -51,6 +51,14 @@ import net.hawkins.gamescore.ui.theme.GameScoreTheme
 
 @Composable
 fun GamePlay(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
+
+    LaunchedEffect(Unit) {
+        gameViewModel.updateAppBarActions {
+            GamePlayAppBarActions(gameViewModel)
+        }
+    }
+
+
     Column(
         modifier = modifier
             .fillMaxHeight()
@@ -348,36 +356,6 @@ fun ChangeScore(
 }
 
 @Composable
-fun ResetGame(gameViewModel: GameViewModel) {
-    val showConfirmDialog = remember { mutableStateOf(false) }
-    if (showConfirmDialog.value) {
-        ConfirmResetGame(
-            onDismissRequest = { showConfirmDialog.value = false },
-            onConfirmation = {
-                gameViewModel.resetGame()
-                showConfirmDialog.value = false
-            }
-        )
-    }
-
-    if (!gameViewModel.hasWinningThreshold()) {
-        TextButton(
-            onClick = { gameViewModel.determineWinner() }
-        ) {
-            Text(text = stringResource(R.string.find_winner))
-        }
-    }
-
-    TextButton(
-        onClick = {
-            showConfirmDialog.value = true
-        },
-    ) {
-        Text(text = stringResource(R.string.new_game))
-    }
-}
-
-@Composable
 fun ConfirmResetGame(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit
@@ -388,6 +366,37 @@ fun ConfirmResetGame(
         onConfirmation = onConfirmation,
         onDismissRequest = onDismissRequest
     )
+}
+
+@Composable
+fun GamePlayAppBarActions(gameViewModel: GameViewModel) {
+    if (!gameViewModel.hasWinningThreshold()) {
+        TextButton(
+            onClick = { gameViewModel.determineWinner() }
+        ) {
+            Text(text = stringResource(R.string.find_winner))
+        }
+    }
+
+    val showConfirmDialog = remember { mutableStateOf(false) }
+    TextButton(
+        onClick = {
+            showConfirmDialog.value = true
+        },
+    ) {
+        Text(text = stringResource(R.string.new_game))
+    }
+
+    if (showConfirmDialog.value) {
+        ConfirmResetGame(
+            onDismissRequest = { showConfirmDialog.value = false },
+            onConfirmation = {
+                gameViewModel.resetGame()
+                showConfirmDialog.value = false
+            }
+        )
+    }
+
 }
 
 @Preview(showBackground = true)

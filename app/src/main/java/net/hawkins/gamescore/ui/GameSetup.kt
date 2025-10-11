@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,6 +52,12 @@ import net.hawkins.gamescore.ui.theme.GameScoreTheme
 
 @Composable
 fun GameSetup(gameViewModel: GameViewModel) {
+    LaunchedEffect(Unit) {
+        gameViewModel.updateAppBarActions {
+            GameSetupAppBarActions(gameViewModel)
+        }
+    }
+
     var newPlayerName by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     val hideKeyboard = { keyboardController?.hide() }
@@ -311,7 +318,7 @@ fun GameTypeDropdownMenu(
 }
 
 @Composable
-fun StartGame(gameViewModel: GameViewModel) {
+fun GameSetupAppBarActions(gameViewModel: GameViewModel) {
     TextButton(
         onClick = {
             gameViewModel.startGame()
