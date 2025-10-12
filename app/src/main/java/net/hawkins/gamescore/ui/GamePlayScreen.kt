@@ -50,7 +50,7 @@ import net.hawkins.gamescore.ui.component.ConfirmAction
 import net.hawkins.gamescore.ui.theme.GameScoreTheme
 
 @Composable
-fun GamePlay(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
+fun GamePlayScreen(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
     LaunchedEffect(Unit) {
         gameViewModel.updateAppBarActions {
             GamePlayAppBarActions(gameViewModel)
@@ -401,6 +401,6 @@ fun GamePlayAppBarActions(gameViewModel: GameViewModel) {
 @Composable
 fun GamePlayPreview() {
     GameScoreTheme {
-        GamePlay(viewModel())
+        GamePlayScreen(viewModel())
     }
 }

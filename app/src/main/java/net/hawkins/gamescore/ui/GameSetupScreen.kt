@@ -42,26 +42,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import net.hawkins.gamescore.R
+import net.hawkins.gamescore.data.FavoritePlayers
 import net.hawkins.gamescore.ui.component.ConfirmAction
-import net.hawkins.gamescore.ui.theme.GameScoreTheme
 
 
 @Composable
-fun GameSetup(gameViewModel: GameViewModel) {
+fun GameSetupScreen(gameViewModel: GameViewModel,
+                    favoritePlayers: FavoritePlayers,
+                    onNextButtonClicked: () -> Unit) {
     LaunchedEffect(Unit) {
         gameViewModel.updateAppBarActions {
-            GameSetupAppBarActions(gameViewModel)
+            GameSetupAppBarActions(onNextButtonClicked)
         }
     }
 
     var newPlayerName by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     val hideKeyboard = { keyboardController?.hide() }
-    val savedPlayerNames = gameViewModel.getSavedPlayerNames()
 
     Column(
         modifier = Modifier
@@ -92,7 +91,6 @@ fun GameSetup(gameViewModel: GameViewModel) {
 
             gameViewModel.getPlayers().forEachIndexed { index, player ->
                 var showConfirmRemovePlayer by remember { mutableStateOf(false) }
-                var showSavePlayerName by remember { mutableStateOf(false) }
 
                 Text(
                     text = player.name + if (index + 1 < gameViewModel.getPlayers().size) ", " else "",
@@ -105,16 +103,6 @@ fun GameSetup(gameViewModel: GameViewModel) {
                             }
                         )
                 )
-
-                if (showSavePlayerName) {
-                    ConfirmSavePlayer(
-                        onDismissRequest = { showSavePlayerName = false },
-                        onConfirmation = {
-                            gameViewModel.savePlayerName(player.name)
-                            showSavePlayerName = false
-                        }
-                    )
-                }
 
                 if (showConfirmRemovePlayer) {
                     ConfirmRemovePlayer(
@@ -138,7 +126,7 @@ fun GameSetup(gameViewModel: GameViewModel) {
                 thickness = 5.dp
             )
         }
-        savedPlayerNames.sorted().forEach { name ->
+        favoritePlayers.getNames().sorted().forEach { name ->
             var showDeleteSavedPlayer by remember { mutableStateOf(false) }
             Row(
                 modifier = Modifier.padding(horizontal = 10.dp),
@@ -172,7 +160,7 @@ fun GameSetup(gameViewModel: GameViewModel) {
                         name = name,
                         onDismissRequest = { showDeleteSavedPlayer = false },
                         onConfirmation = {
-                            gameViewModel.removeSavedPlayerName(name)
+                            favoritePlayers.removeName(name)
                             showDeleteSavedPlayer = false
                         }
                     )
@@ -218,7 +206,7 @@ fun GameSetup(gameViewModel: GameViewModel) {
                         IconButton(
                             onClick = {
                                 hideKeyboard.invoke()
-                                gameViewModel.savePlayerName(newPlayerName.trim())
+                                favoritePlayers.addName(newPlayerName.trim())
                                 newPlayerName = ""
                             },
                             enabled = newPlayerName.isNotBlank()
@@ -243,18 +231,6 @@ fun ConfirmRemovePlayer(
 ) {
     ConfirmAction(
         title = stringResource(R.string.remove_player),
-        onConfirmation = onConfirmation,
-        onDismissRequest = onDismissRequest
-    )
-}
-
-@Composable
-fun ConfirmSavePlayer(
-    onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit
-) {
-    ConfirmAction(
-        title = stringResource(R.string.save_player),
         onConfirmation = onConfirmation,
         onDismissRequest = onDismissRequest
     )
@@ -318,20 +294,12 @@ fun GameTypeDropdownMenu(
 }
 
 @Composable
-fun GameSetupAppBarActions(gameViewModel: GameViewModel) {
+fun GameSetupAppBarActions( onNextButtonClicked: () -> Unit) {
     TextButton(
         onClick = {
-            gameViewModel.startGame()
+            onNextButtonClicked()
         },
     ) {
         Text(text = stringResource(R.string.start_game))
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun NewGamePreview() {
-    GameScoreTheme {
-        GameSetup(viewModel())
     }
 }
