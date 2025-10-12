@@ -24,7 +24,6 @@ class GameViewModel : ViewModel() {
         BasicScore()
     )
     private var _gameType = mutableStateOf(_gameTypes[0])
-    private var _winner = mutableStateOf<Player?>(null)
 
     private val _appBarActions = mutableStateOf(AppBarActions())
     val appBarActions: State<AppBarActions> = _appBarActions
@@ -34,17 +33,17 @@ class GameViewModel : ViewModel() {
     }
 
     fun resetGame() {
-        _winner.value = null
+        _uiState.value.winner.value = null
         _uiState.value.players.forEach { player -> player.resetScores() }
     }
 
     fun getWinner(): Player? {
-        return _winner.value
+        return _uiState.value.winner.value
     }
 
     fun determineWinner(): Player? {
-        _winner.value = _gameType.value.findWinner(_uiState.value.players)
-        return _winner.value
+        _uiState.value.winner.value = _gameType.value.findWinner(_uiState.value.players)
+        return _uiState.value.winner.value
     }
 
     fun isValidScore(score: String): Boolean {
