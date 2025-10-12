@@ -19,11 +19,11 @@ data class AppBarActions(
 class GameViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(GameUiState())
 
-    private val _gameTypes = listOf(
+    val gameTypes = listOf(
         TwentyFiveHundred(),
         BasicScore()
     )
-    private var _gameType = mutableStateOf(_gameTypes[0])
+    private var _gameType = mutableStateOf(gameTypes[0])
 
     private val _appBarActions = mutableStateOf(AppBarActions())
     val appBarActions: State<AppBarActions> = _appBarActions
@@ -58,27 +58,23 @@ class GameViewModel : ViewModel() {
         return _gameType.value.hasWinningThreshold()
     }
 
-    fun getPlayers(): SnapshotStateList<Player> {
-        return _uiState.value.players
-    }
-
-    fun addPlayer(playerName: String) {
-        _uiState.value.players.add(Player(playerName))
-    }
-
-    fun removePlayer(index: Int) {
-        _uiState.value.players.removeAt(index)
-    }
-
-    fun getGameTypes(): List<GameType> {
-        return _gameTypes
-    }
-
     fun getGameType(): GameType {
         return _gameType.value
     }
 
     fun setGameType(gameType: GameType) {
         _gameType.value = gameType
+    }
+
+    fun setGameType(id: Int) {
+        _gameType.value = gameTypes.first { gameType -> gameType.getTypeId() == id }
+    }
+
+    fun setPlayers(names: List<String>) {
+        names.forEach { name -> _uiState.value.players.add(Player(name)) }
+    }
+
+    fun getPlayers(): SnapshotStateList<Player> {
+        return _uiState.value.players
     }
 }

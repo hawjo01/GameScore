@@ -5,6 +5,14 @@ import net.hawkins.gamescore.data.Player
 
 class TwentyFiveHundred : GameType {
 
+    companion object {
+        const val GAME_ID = 1
+    }
+
+    override fun getTypeId(): Int {
+        return GAME_ID
+    }
+
     override fun hasWinningThreshold(): Boolean {
         return true
     }
@@ -13,7 +21,7 @@ class TwentyFiveHundred : GameType {
         return true
     }
 
-    override fun getNameId(): Int {
+    override fun getNameResourceId(): Int {
         return R.string.twenty_five_hundred
     }
 
