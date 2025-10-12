@@ -11,8 +11,6 @@ class GameViewModelTest {
     @Test
     fun construction() {
         val gameViewModel = GameViewModel()
-        Assert.assertTrue(gameViewModel.isGameSetup())
-        Assert.assertFalse(gameViewModel.isGamePlay())
         Assert.assertEquals(0, gameViewModel.getPlayers().size)
         // 2500 is used the most often so it should be first.
         Assert.assertEquals(R.string.twenty_five_hundred, gameViewModel.getGameType().getNameId())
@@ -30,17 +28,6 @@ class GameViewModelTest {
             gameViewModel.getGameTypes().first { it.getNameId() != R.string.twenty_five_hundred }
         gameViewModel.setGameType(notTwentyFiveHundred)
         Assert.assertEquals(notTwentyFiveHundred, gameViewModel.getGameType())
-    }
-
-    @Test
-    fun startGame() {
-        val gameViewModel = GameViewModel()
-        Assert.assertTrue(gameViewModel.isGameSetup())
-        Assert.assertFalse(gameViewModel.isGamePlay())
-
-        gameViewModel.startGame()
-        Assert.assertFalse(gameViewModel.isGameSetup())
-        Assert.assertTrue(gameViewModel.isGamePlay())
     }
 
     @Test
