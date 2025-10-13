@@ -1,18 +1,14 @@
 package net.hawkins.gamescore.game
 
-import net.hawkins.gamescore.R
 import net.hawkins.gamescore.data.Player
 
 class BasicScore : GameType {
     companion object {
-        const val GAME_ID = 0
+        const val NAME = "Basic Scoring"
     }
 
-    override fun getTypeId(): Int {
-        return GAME_ID
-    }
-    override fun getNameResourceId(): Int {
-        return R.string.basic_scoring
+    override fun getName(): String {
+        return NAME
     }
 
     override fun hasWinningThreshold(): Boolean {

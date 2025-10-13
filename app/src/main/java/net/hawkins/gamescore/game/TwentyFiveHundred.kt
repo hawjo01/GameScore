@@ -1,16 +1,15 @@
 package net.hawkins.gamescore.game
 
-import net.hawkins.gamescore.R
 import net.hawkins.gamescore.data.Player
 
 class TwentyFiveHundred : GameType {
 
     companion object {
-        const val GAME_ID = 1
+        const val NAME = "2500"
     }
 
-    override fun getTypeId(): Int {
-        return GAME_ID
+    override fun getName(): String {
+        return NAME
     }
 
     override fun hasWinningThreshold(): Boolean {
@@ -21,9 +20,6 @@ class TwentyFiveHundred : GameType {
         return true
     }
 
-    override fun getNameResourceId(): Int {
-        return R.string.twenty_five_hundred
-    }
 
     override fun isValidScore(score: String): Boolean {
         return (score.toIntOrNull() != null && score.toInt() % 5 == 0)

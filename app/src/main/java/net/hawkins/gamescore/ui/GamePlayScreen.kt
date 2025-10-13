@@ -14,7 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -53,6 +53,7 @@ import net.hawkins.gamescore.data.FavoriteGame
 import net.hawkins.gamescore.data.FavoriteGames
 import net.hawkins.gamescore.data.Player
 import net.hawkins.gamescore.ui.component.ConfirmAction
+import net.hawkins.gamescore.ui.theme.Typography
 
 @Composable
 fun GamePlayScreen(
@@ -61,9 +62,10 @@ fun GamePlayScreen(
     modifier: Modifier = Modifier
 ) {
     LaunchedEffect(Unit) {
-        gameViewModel.updateAppBarActions {
-            GamePlayAppBarActions(gameViewModel, favoriteGames)
-        }
+        gameViewModel.updateTopAppBar(
+            newTitle = gameViewModel.getGameType().getName(),
+            newActions = { GamePlayAppBarActions(gameViewModel, favoriteGames) }
+        )
     }
 
     Column(
@@ -382,21 +384,22 @@ fun GamePlayAppBarActions(gameViewModel: GameViewModel, favoriteGames: FavoriteG
     var showSaveFavoriteGame by remember { mutableStateOf(false) }
     var showResetGameDialog by remember { mutableStateOf(false) }
 
-    if (!gameViewModel.hasWinningThreshold()) {
-        TextButton(
-            onClick = { gameViewModel.determineWinner() }
-        ) {
-            Text(text = stringResource(R.string.find_winner))
-        }
-    }
-
     IconButton(onClick = { dropdownMenuExpanded = true }) {
-        Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "More options")
+        Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu")
     }
     DropdownMenu(
         expanded = dropdownMenuExpanded,
         onDismissRequest = { dropdownMenuExpanded = false }
     ) {
+        if (!gameViewModel.hasWinningThreshold()) {
+            DropdownMenuItem(
+                text = { Text(text = stringResource(R.string.find_winner)) },
+                onClick = {
+                    gameViewModel.determineWinner()
+                    dropdownMenuExpanded = false
+                }
+            )
+        }
         DropdownMenuItem(
             text = { Text("Favorite Game") },
             onClick = {
@@ -431,8 +434,8 @@ fun GamePlayAppBarActions(gameViewModel: GameViewModel, favoriteGames: FavoriteG
                 favoriteGames.add(
                     FavoriteGame(
                         name = name.trim(),
-                        playerNames = gameViewModel.getPlayers().map { player -> player.name },
-                        gameId = gameViewModel.getGameType().getTypeId()
+                        players = gameViewModel.getPlayers().map { player -> player.name },
+                        game = gameViewModel.getGameType().getName()
                     )
                 )
                 showSaveFavoriteGame = false
@@ -463,7 +466,10 @@ fun SaveFavoriteGame(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Text(text = "Save Favorite Game?")
+                Text(
+                    text = "Save Favorite Game?",
+                    style = Typography.titleMedium
+                )
             }
 
             Row(
@@ -537,7 +543,7 @@ fun SaveFavoriteGame(
                 horizontalArrangement = Arrangement.Start
             ) {
                 OutlinedTextField(
-                    value = stringResource(gameViewModel.getGameType().getNameResourceId()),
+                    value = gameViewModel.getGameType().getName(),
                     onValueChange = {},
                     label = { Text(text = stringResource(R.string.game)) },
                     singleLine = true,
