@@ -14,8 +14,6 @@
     <string name="remove_player">Remove Player?</string>
     <string name="update">Update</string>
     <string name="cancel">Cancel</string>
-    <string name="basic_scoring">Basic Scoring</string>
-    <string name="twenty_five_hundred">2500</string>
     <string name="game">Game</string>
     <string name="change_score">Change Score</string>
     <string name="not_a_valid_score">Not a valid score</string>

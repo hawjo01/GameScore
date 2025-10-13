@@ -56,6 +56,6 @@ class FavoriteGames(val file: File) {
 
 class FavoriteGame(
     val name: String = "",
-    val playerNames: List<String> = mutableListOf(),
-    val gameId: Int = 0
+    val players: List<String> = mutableListOf(),
+    val game: String = ""
 )

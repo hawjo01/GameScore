@@ -7,15 +7,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,10 +26,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.shapes
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -39,7 +36,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,7 +45,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -59,6 +54,8 @@ import net.hawkins.gamescore.data.FavoriteGames
 import net.hawkins.gamescore.data.FavoritePlayers
 import net.hawkins.gamescore.game.GameType
 import net.hawkins.gamescore.ui.component.ConfirmAction
+import net.hawkins.gamescore.ui.favorites.FavoriteGamesCard
+import net.hawkins.gamescore.ui.theme.GoGreen
 
 enum class GameSetupType(val labelId: Int) {
     FAVORITE(R.string.favorite),
@@ -70,10 +67,10 @@ fun GameSetupScreen(
     gameViewModel: GameViewModel,
     favoritePlayers: FavoritePlayers,
     favoriteGames: FavoriteGames,
-    onNextButtonClicked: (Int, List<String>) -> Unit
+    onNextButtonClicked: (String, List<String>) -> Unit
 ) {
     LaunchedEffect(Unit) {
-        gameViewModel.updateAppBarActions { /* No AppBarActions */ }
+        gameViewModel.updateTopAppBar { /* No AppBarActions */ }
     }
 
     var selectedSetupType by remember {
@@ -122,7 +119,7 @@ fun GameSetupScreen(
         }
 
         if (selectedSetupType == GameSetupType.FAVORITE) {
-            FavoriteGameSelection(favoriteGames, onNextButtonClicked)
+            FavoriteGamesCard(favoriteGames, onNextButtonClicked)
         }
 
         if (selectedSetupType == GameSetupType.MANUAL) {
@@ -139,13 +136,13 @@ fun GameSetupScreen(
 fun ManualGameSelection(
     gameTypes: List<GameType>,
     favoritePlayers: FavoritePlayers,
-    onNextButtonClicked: (Int, List<String>) -> Unit,
+    onNextButtonClicked: (String, List<String>) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
     var newPlayerName by remember { mutableStateOf("") }
     val playerNames = remember { mutableStateListOf<String>() }
-    var gameTypeId by remember { mutableIntStateOf(0) }
+    var gameName by remember { mutableStateOf("") }
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val hideKeyboard = { keyboardController?.hide() }
@@ -166,7 +163,7 @@ fun ManualGameSelection(
             )
             GameTypeDropdownMenu(
                 gameTypes,
-                onChange = { newGameTypeId -> gameTypeId = newGameTypeId })
+                onChange = { newGameName -> gameName = newGameName })
         }
 
         Row(
@@ -211,12 +208,19 @@ fun ManualGameSelection(
                 .fillMaxWidth()
                 .padding(top = 10.dp)
         ) {
-            OutlinedButton(
+            IconButton(
                 onClick = {
-                    onNextButtonClicked(gameTypeId, playerNames)
-                }
+                    onNextButtonClicked(gameName, playerNames)
+                },
+                enabled = playerNames.isNotEmpty()
             ) {
-                Text(stringResource(R.string.start_game))
+                Icon(
+                imageVector = Icons.Filled.PlayArrow,
+                contentDescription = stringResource(R.string.start_game),
+                    tint = GoGreen,
+                    modifier =  modifier.size(60.dp)
+
+                )
             }
         }
         Row(
@@ -328,58 +332,6 @@ fun ManualGameSelection(
 }
 
 @Composable
-fun FavoriteGameSelection(
-    favoriteGames: FavoriteGames,
-    onNextButtonClicked: (Int, List<String>) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val favorites = favoriteGames.games
-    if (favorites.isNotEmpty()) {
-        val (selectedOption, onOptionSelected) = remember { mutableStateOf(favorites[0]) }
-        // Note that Modifier.selectableGroup() is essential to ensure correct accessibility behavior
-        Column(Modifier.selectableGroup()) {
-            favorites.forEach { favorite ->
-                Row(
-                    modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .selectable(
-                            selected = (favorite == selectedOption),
-                            onClick = { onOptionSelected(favorite) },
-                            role = Role.RadioButton
-                        )
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(
-                        selected = (favorite == selectedOption),
-                        onClick = null // null recommended for accessibility with screen readers
-                    )
-                    Text(
-                        text = favorite.name,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = modifier.padding(start = 16.dp)
-                    )
-                }
-            }
-        }
-
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            modifier = modifier.fillMaxWidth()
-        ) {
-            OutlinedButton(
-                onClick = {
-                    onNextButtonClicked(selectedOption.gameId, selectedOption.playerNames)
-                }
-            ) {
-                Text(stringResource(R.string.start_game))
-            }
-        }
-    }
-}
-
-@Composable
 fun ConfirmRemovePlayer(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit
@@ -408,12 +360,11 @@ fun ConfirmDeleteSavedPlayer(
 @Composable
 fun GameTypeDropdownMenu(
     gameTypes: List<GameType>,
-    onChange: (Int) -> Unit
+    onChange: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedGameTypeId by remember { mutableIntStateOf(gameTypes[0].getTypeId()) }
-    onChange(selectedGameTypeId)
-    var selectedGameNameResourceId by remember { mutableStateOf(gameTypes[0].getNameResourceId()) }
+    var selectedGame by remember { mutableStateOf(gameTypes[0].getName()) }
+    onChange(selectedGame)
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -421,7 +372,7 @@ fun GameTypeDropdownMenu(
         Modifier.padding(vertical = 8.dp)
     ) {
         TextField(
-            value = stringResource(selectedGameNameResourceId),
+            value = selectedGame,
             onValueChange = {},
             readOnly = true,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
@@ -439,10 +390,10 @@ fun GameTypeDropdownMenu(
         ) {
             gameTypes.forEach { gameType ->
                 DropdownMenuItem(
-                    text = { Text(text = stringResource(gameType.getNameResourceId())) },
+                    text = { Text(text = gameType.getName()) },
                     onClick = {
-                        selectedGameNameResourceId = gameType.getNameResourceId()
-                        onChange(gameType.getTypeId())
+                        selectedGame = gameType.getName()
+                        onChange(gameType.getName())
                         expanded = false
                     },
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,

@@ -1,10 +1,11 @@
 package net.hawkins.gamescore
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -36,18 +37,18 @@ fun GameScoreAppBar(
     modifier: Modifier = Modifier
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-    val appBarActions by gameViewModel.appBarActions
+    val topAppBar by gameViewModel.topAppBar
 
-    TopAppBar(
+    CenterAlignedTopAppBar(
         title = {
             Text(
-                text = "",
+                text = topAppBar.title,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
         },
         actions = {
-            appBarActions.actions?.invoke(this)
+            topAppBar.actions?.invoke(this)
         },
         scrollBehavior = scrollBehavior,
         modifier = modifier,
@@ -85,8 +86,8 @@ fun GameScoreApp(
                         )
                     ),
                     favoriteGames = favoriteGames,
-                    onNextButtonClicked = { gameTypeId, players ->
-                        viewModel.setGameType(gameTypeId)
+                    onNextButtonClicked = { game, players ->
+                        viewModel.setGameType(game)
                         viewModel.setPlayers(players)
                         navController.navigate(GameScoreScreen.Play.name)
                     }
@@ -94,6 +95,9 @@ fun GameScoreApp(
             }
 
             composable(route = GameScoreScreen.Play.name) {
+                BackHandler(true) {
+                    // Prevent accidental erasure of game data
+                }
                 GamePlayScreen(
                     gameViewModel = viewModel,
                     favoriteGames = favoriteGames

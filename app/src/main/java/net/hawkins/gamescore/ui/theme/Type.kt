@@ -26,11 +26,17 @@ val Typography = Typography(
         textAlign = TextAlign.Center
     ),
     labelMedium = TextStyle(
-        fontSize = 26.sp
+        fontSize = 26.sp,
+        fontWeight = FontWeight.Bold
     ),
     displayMedium = TextStyle(
         fontFamily = FontFamily(Typeface(android.graphics.Typeface.MONOSPACE)),
         fontSize = 20.sp,
         textAlign = TextAlign.Right
-    )
+    ),
+    titleMedium = TextStyle(
+        fontSize = 24.sp,
+        fontWeight = FontWeight.Bold,
+        textAlign = TextAlign.Center
+    ),
 )

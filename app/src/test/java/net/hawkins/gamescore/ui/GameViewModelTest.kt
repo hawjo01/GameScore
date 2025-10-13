@@ -1,6 +1,5 @@
 package net.hawkins.gamescore.ui
 
-import net.hawkins.gamescore.R
 import net.hawkins.gamescore.data.Player
 import net.hawkins.gamescore.game.GameType
 import org.junit.Assert
@@ -13,7 +12,7 @@ class GameViewModelTest {
         val gameViewModel = GameViewModel()
         Assert.assertEquals(0, gameViewModel.getPlayers().size)
         // 2500 is used the most often so it should be first.
-        Assert.assertEquals(R.string.twenty_five_hundred, gameViewModel.getGameType().getNameResourceId())
+        Assert.assertEquals("2500", gameViewModel.getGameType().getName())
         // Currently only 2 game types are supported
         Assert.assertEquals(2, gameViewModel.gameTypes.size)
     }
@@ -22,10 +21,10 @@ class GameViewModelTest {
     @Test
     fun getGameType() {
         val gameViewModel = GameViewModel()
-        Assert.assertEquals(R.string.twenty_five_hundred, gameViewModel.getGameType().getNameResourceId())
+        Assert.assertEquals("2500", gameViewModel.getGameType().getName())
 
         val notTwentyFiveHundred =
-            gameViewModel.gameTypes.first { it.getNameResourceId() != R.string.twenty_five_hundred }
+            gameViewModel.gameTypes.first { it.getName() != "2500" }
         gameViewModel.setGameType(notTwentyFiveHundred)
         Assert.assertEquals(notTwentyFiveHundred, gameViewModel.getGameType())
     }
@@ -73,12 +72,8 @@ class GameViewModelTest {
     fun gameType() {
         class Seven : GameType {
 
-            override fun getTypeId(): Int {
-                return -1
-            }
-
-            override fun getNameResourceId(): Int {
-                return 7
+            override fun getName(): String {
+                return "7"
             }
 
             override fun isValidScore(score: String): Boolean {
@@ -100,7 +95,7 @@ class GameViewModelTest {
 
         val gameViewModel = GameViewModel()
         gameViewModel.setGameType(Seven())
-        Assert.assertEquals(7, gameViewModel.getGameType().getNameResourceId())
+        Assert.assertEquals("7", gameViewModel.getGameType().getName())
         Assert.assertFalse(gameViewModel.highlightNegativeScore())
         Assert.assertTrue(gameViewModel.hasWinningThreshold())
 

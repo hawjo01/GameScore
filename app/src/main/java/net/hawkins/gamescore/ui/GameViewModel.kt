@@ -12,7 +12,8 @@ import net.hawkins.gamescore.game.BasicScore
 import net.hawkins.gamescore.game.GameType
 import net.hawkins.gamescore.game.TwentyFiveHundred
 
-data class AppBarActions(
+data class TopAppBar(
+    val title: String = "",
     val actions: @Composable (RowScope.() -> Unit)? = null
 )
 
@@ -25,11 +26,11 @@ class GameViewModel : ViewModel() {
     )
     private var _gameType = mutableStateOf(gameTypes[0])
 
-    private val _appBarActions = mutableStateOf(AppBarActions())
-    val appBarActions: State<AppBarActions> = _appBarActions
+    private val _topAppBar = mutableStateOf(TopAppBar())
+    val topAppBar: State<TopAppBar> = _topAppBar
 
-    fun updateAppBarActions(newActions: @Composable (RowScope.() -> Unit)?) {
-        _appBarActions.value = AppBarActions(newActions)
+    fun updateTopAppBar(newTitle: String = "", newActions: @Composable (RowScope.() -> Unit)?) {
+        _topAppBar.value = TopAppBar(title = newTitle, actions = newActions)
     }
 
     fun resetGame() {
@@ -66,11 +67,12 @@ class GameViewModel : ViewModel() {
         _gameType.value = gameType
     }
 
-    fun setGameType(id: Int) {
-        _gameType.value = gameTypes.first { gameType -> gameType.getTypeId() == id }
+    fun setGameType(name: String) {
+        _gameType.value = gameTypes.first { gameType -> gameType.getName() == name }
     }
 
     fun setPlayers(names: List<String>) {
+        _uiState.value.players.clear()
         names.forEach { name -> _uiState.value.players.add(Player(name)) }
     }
 
