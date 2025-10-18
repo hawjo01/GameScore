@@ -29,6 +29,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -45,29 +46,42 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.Utils
 import net.hawkins.gamescore.favorites.FavoriteGame
 import net.hawkins.gamescore.favorites.FavoriteGames
+import net.hawkins.gamescore.game.Game
 import net.hawkins.gamescore.game.Player
+import net.hawkins.gamescore.game.TwentyFiveHundred
 import net.hawkins.gamescore.ui.component.ConfirmAction
 import net.hawkins.gamescore.ui.theme.Typography
 
 @Composable
 fun GamePlayScreen(
-    gameViewModel: GameViewModel,
+    viewModel: GameViewModel,
     favoriteGames: FavoriteGames,
     modifier: Modifier = Modifier
 ) {
+    val uiState by viewModel.uiState.collectAsState()
     LaunchedEffect(Unit) {
-        gameViewModel.updateTopAppBar(
-            newTitle = gameViewModel.getGameType().getName(),
-            newActions = { GamePlayAppBarActions(gameViewModel, favoriteGames) }
+        viewModel.updateTopAppBar(
+            newTitle = uiState.game.getGameName(),
+            newActions = { AppBarActions(uiState.game, favoriteGames) }
         )
     }
 
+    GamePlayScreenContent(uiState.game, modifier)
+}
+
+@Composable
+private fun GamePlayScreenContent(
+    game: Game,
+    modifier: Modifier
+) {
+    val game = game
     Column(
         modifier = modifier
             .fillMaxHeight()
@@ -78,7 +92,7 @@ fun GamePlayScreen(
             horizontalArrangement = Arrangement.Center,
 
             ) {
-            Winner(gameViewModel)
+            Winner(game)
         }
         Row(
             modifier = Modifier
@@ -86,17 +100,17 @@ fun GamePlayScreen(
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
         ) {
-            Players(gameViewModel, Modifier.weight(1f))
+            Players(game, Modifier.weight(1f))
         }
     }
 }
 
 @Composable
-private fun Winner(gameViewModel: GameViewModel) {
-    if (gameViewModel.hasWinningThreshold()) {
-        gameViewModel.determineWinner()
+private fun Winner(game: Game) {
+    if (game.hasWinningThreshold()) {
+        game.determineWinner()
     }
-    val winner = gameViewModel.getWinner()
+    val winner = game.getWinner()
     if (winner != null) {
         Winner(winner)
     }
@@ -112,20 +126,24 @@ private fun Winner(winner: Player) {
 }
 
 @Composable
-private fun Players(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
-    for ((index, player) in gameViewModel.getPlayers().withIndex()) {
+private fun Players(
+    game: Game,
+    modifier: Modifier
+) {
+    val players = game.players
+    for ((index, player) in players.withIndex()) {
         key(player.name) {
-            Player(gameViewModel = gameViewModel, player = player, index = index, modifier)
+            Player(game = game, player = player, index = index, modifier)
         }
     }
 }
 
 @Composable
 private fun Player(
-    gameViewModel: GameViewModel,
+    game: Game,
     player: Player,
     index: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -144,7 +162,7 @@ private fun Player(
         )
         if (showNewScoreDialog) {
             NewScoreDialog(
-                gameViewModel = gameViewModel,
+                game = game,
                 player = player,
                 onDismissRequest = { showNewScoreDialog = false }
             )
@@ -182,14 +200,14 @@ private fun Player(
                     Text(
                         text = score.toString().padStart(5, ' '),
                         style = MaterialTheme.typography.displayMedium,
-                        color = if (Utils.isNegativeInt(score) && gameViewModel.highlightNegativeScore()) Color.Red else Color.Unspecified,
+                        color = if (Utils.isNegativeInt(score) && game.highlightNegativeScore()) Color.Red else Color.Unspecified,
                         modifier = Modifier.clickable {
                             showChangeScoreDialog = true
                         }
                     )
                     if (showChangeScoreDialog) {
                         ChangeScore(
-                            gameViewModel = gameViewModel,
+                            game = game,
                             player = player,
                             scoreIndex = index,
                             onDismissRequest = { showChangeScoreDialog = false }
@@ -204,7 +222,7 @@ private fun Player(
 
 @Composable
 private fun NewScoreDialog(
-    gameViewModel: GameViewModel,
+    game: Game,
     player: Player,
     onDismissRequest: () -> Unit
 ) {
@@ -246,7 +264,7 @@ private fun NewScoreDialog(
                         value = newScore,
                         onValueChange = {
                             newScore = it
-                            if (gameViewModel.isValidScore(newScore)) warnInvalidScore = false
+                            if (game.isValidScore(newScore)) warnInvalidScore = false
                         },
                         label = { Text(text = stringResource(R.string.score_for, player.name)) },
                         textStyle = TextStyle(textAlign = TextAlign.Center),
@@ -258,7 +276,7 @@ private fun NewScoreDialog(
                         ),
                         keyboardActions = KeyboardActions(
                             onDone = {
-                                if (gameViewModel.isValidScore(newScore)) {
+                                if (game.isValidScore(newScore)) {
                                     warnInvalidScore = false
                                     player.addScore(newScore.toInt())
                                     newScore = ""
@@ -293,7 +311,7 @@ private fun NewScoreDialog(
 
 @Composable
 private fun ChangeScore(
-    gameViewModel: GameViewModel,
+    game: Game,
     player: Player,
     scoreIndex: Int,
     onDismissRequest: () -> Unit
@@ -349,12 +367,12 @@ private fun ChangeScore(
                 }
                 TextButton(
                     onClick = {
-                        if (gameViewModel.isValidScore(newScore)) {
+                        if (game.isValidScore(newScore)) {
                             player.changeScore(newScore = newScore.toInt(), scoreIndex = scoreIndex)
                             onDismissRequest()
                         }
                     },
-                    enabled = gameViewModel.isValidScore(newScore),
+                    enabled = game.isValidScore(newScore),
                     modifier = Modifier.padding(8.dp),
                 ) {
                     Text(stringResource(R.string.update))
@@ -378,7 +396,7 @@ private fun ConfirmResetGame(
 }
 
 @Composable
-private fun GamePlayAppBarActions(gameViewModel: GameViewModel, favoriteGames: FavoriteGames) {
+private fun AppBarActions(game: Game, favoriteGames: FavoriteGames) {
 
     var dropdownMenuExpanded by remember { mutableStateOf(false) }
     var showSaveFavoriteGame by remember { mutableStateOf(false) }
@@ -391,11 +409,11 @@ private fun GamePlayAppBarActions(gameViewModel: GameViewModel, favoriteGames: F
         expanded = dropdownMenuExpanded,
         onDismissRequest = { dropdownMenuExpanded = false }
     ) {
-        if (!gameViewModel.hasWinningThreshold()) {
+        if (!game.hasWinningThreshold()) {
             DropdownMenuItem(
                 text = { Text(text = stringResource(R.string.find_winner)) },
                 onClick = {
-                    gameViewModel.determineWinner()
+                    game.determineWinner()
                     dropdownMenuExpanded = false
                 }
             )
@@ -420,7 +438,7 @@ private fun GamePlayAppBarActions(gameViewModel: GameViewModel, favoriteGames: F
         ConfirmResetGame(
             onDismissRequest = { showResetGameDialog = false },
             onConfirmation = {
-                gameViewModel.resetGame()
+                game.resetGame()
                 showResetGameDialog = false
             }
         )
@@ -428,14 +446,14 @@ private fun GamePlayAppBarActions(gameViewModel: GameViewModel, favoriteGames: F
 
     if (showSaveFavoriteGame) {
         SaveFavoriteGame(
-            gameViewModel,
+            game,
             onDismissRequest = { showSaveFavoriteGame = false },
             onConfirmation = { name ->
                 favoriteGames.add(
                     FavoriteGame(
                         name = name.trim(),
-                        players = gameViewModel.getPlayers().map { player -> player.name },
-                        game = gameViewModel.getGameType().getName()
+                        players = game.players.map { player -> player.name },
+                        game = game.getGameName()
                     )
                 )
                 showSaveFavoriteGame = false
@@ -446,7 +464,7 @@ private fun GamePlayAppBarActions(gameViewModel: GameViewModel, favoriteGames: F
 
 @Composable
 private fun SaveFavoriteGame(
-    gameViewModel: GameViewModel,
+    game: Game,
     onDismissRequest: () -> Unit,
     onConfirmation: (String) -> Unit
 ) {
@@ -509,7 +527,7 @@ private fun SaveFavoriteGame(
             ) {
                 val text = remember {
                     mutableStateOf(
-                        gameViewModel.getPlayers()
+                        game.players
                             .joinToString(separator = ", ") { player -> player.name })
                 }
                 OutlinedTextField(
@@ -543,7 +561,7 @@ private fun SaveFavoriteGame(
                 horizontalArrangement = Arrangement.Start
             ) {
                 OutlinedTextField(
-                    value = gameViewModel.getGameType().getName(),
+                    value = game.getGameName(),
                     onValueChange = {},
                     label = { Text(text = stringResource(R.string.game)) },
                     singleLine = true,
@@ -589,4 +607,13 @@ private fun SaveFavoriteGame(
             }
         }
     }
+}
+
+@Preview
+@Composable
+private fun GamePlayScreenContentPreview() {
+    GamePlayScreenContent(
+        Game(TwentyFiveHundred, listOf("Sheldon", "Leonard")),
+        Modifier
+    )
 }

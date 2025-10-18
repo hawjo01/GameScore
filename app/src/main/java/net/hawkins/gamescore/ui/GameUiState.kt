@@ -1,10 +1,8 @@
 package net.hawkins.gamescore.ui
 
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import net.hawkins.gamescore.game.Player
+import net.hawkins.gamescore.game.BasicScore
+import net.hawkins.gamescore.game.Game
 
-class GameUiState {
-    val players = mutableStateListOf<Player>()
-    var winner = mutableStateOf<Player?>(null)
-}
+data class GameUiState(
+    val game: Game = Game(BasicScore, emptyList())
+)
