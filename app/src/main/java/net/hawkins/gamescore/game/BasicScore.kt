@@ -2,10 +2,8 @@ package net.hawkins.gamescore.game
 
 import net.hawkins.gamescore.data.Player
 
-class BasicScore : GameType {
-    companion object {
-        const val NAME = "Basic Scoring"
-    }
+object BasicScore : GameType {
+    const val NAME = "Basic Scoring"
 
     override fun getName(): String {
         return NAME

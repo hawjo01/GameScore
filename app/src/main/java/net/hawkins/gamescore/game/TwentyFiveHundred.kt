@@ -2,11 +2,9 @@ package net.hawkins.gamescore.game
 
 import net.hawkins.gamescore.data.Player
 
-class TwentyFiveHundred : GameType {
+object TwentyFiveHundred : GameType {
 
-    companion object {
-        const val NAME = "2500"
-    }
+    const val NAME = "2500"
 
     override fun getName(): String {
         return NAME
@@ -19,7 +17,6 @@ class TwentyFiveHundred : GameType {
     override fun highlightNegativeScore(): Boolean {
         return true
     }
-
 
     override fun isValidScore(score: String): Boolean {
         return (score.toIntOrNull() != null && score.toInt() % 5 == 0)

@@ -21,8 +21,8 @@ class GameViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(GameUiState())
 
     val gameTypes = listOf(
-        TwentyFiveHundred(),
-        BasicScore()
+        TwentyFiveHundred,
+        BasicScore
     )
     private var _gameType = mutableStateOf(gameTypes[0])
 
