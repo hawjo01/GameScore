@@ -3,10 +3,11 @@ package net.hawkins.gamescore
 object Utils {
     fun isNegativeInt(string: String): Boolean {
         val number = string.toIntOrNull()
-        if (number != null) {
-            return number < 0
+        return if (number != null) {
+            isNegativeInt(number)
+        } else {
+            false
         }
-        return false
     }
 
     fun isNegativeInt(int: Int): Boolean {
