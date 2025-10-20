@@ -1,25 +1,26 @@
 package net.hawkins.gamescore
 
-import org.junit.Assert
+import org.junit.Assert.*
 import org.junit.Test
 
 class UtilsTest {
 
     @Test
     fun isNegativeNumber_String() {
-        Assert.assertTrue(Utils.isNegativeInt("-5"))
-        Assert.assertFalse(Utils.isNegativeInt(""))
-        Assert.assertFalse(Utils.isNegativeInt("0"))
-        Assert.assertFalse(Utils.isNegativeInt("5"))
-        Assert.assertFalse(Utils.isNegativeInt(".5"))
-        Assert.assertFalse(Utils.isNegativeInt("-.5"))
-        Assert.assertFalse(Utils.isNegativeInt("-0"))
+        assertTrue(Utils.isNegativeInt("-5"))
+        assertFalse(Utils.isNegativeInt(""))
+        assertFalse(Utils.isNegativeInt("0"))
+        assertFalse(Utils.isNegativeInt("5"))
+        assertFalse(Utils.isNegativeInt(".5"))
+        assertFalse(Utils.isNegativeInt("-.5"))
+        assertFalse(Utils.isNegativeInt("-0"))
+        assertFalse(Utils.isNegativeInt("a"))
     }
 
     @Test
     fun isNegativeNumber_Int() {
-        Assert.assertTrue(Utils.isNegativeInt(-1))
-        Assert.assertFalse(Utils.isNegativeInt(0))
-        Assert.assertFalse(Utils.isNegativeInt(1))
+        assertTrue(Utils.isNegativeInt(-1))
+        assertFalse(Utils.isNegativeInt(0))
+        assertFalse(Utils.isNegativeInt(1))
     }
 }
