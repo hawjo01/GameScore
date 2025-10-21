@@ -57,7 +57,7 @@ import net.hawkins.gamescore.game.Game
 import net.hawkins.gamescore.game.Player
 import net.hawkins.gamescore.game.TwentyFiveHundred
 import net.hawkins.gamescore.ui.component.ConfirmAction
-import net.hawkins.gamescore.ui.theme.Typography
+import net.hawkins.gamescore.ui.favorites.SaveFavoriteGame
 
 @Composable
 fun GamePlayScreen(
@@ -462,158 +462,14 @@ private fun AppBarActions(game: Game, favoriteGames: FavoriteGames) {
     }
 }
 
-@Composable
-private fun SaveFavoriteGame(
-    game: Game,
-    onDismissRequest: () -> Unit,
-    onConfirmation: (String) -> Unit
-) {
-    Dialog(onDismissRequest = { onDismissRequest() }) {
-        Card(
-            modifier = Modifier
-                .padding(16.dp),
-            shape = RoundedCornerShape(16.dp),
-        ) {
-            var favoriteName by remember { mutableStateOf("") }
-            val keyboardController = LocalSoftwareKeyboardController.current
-            val hideKeyboard = { keyboardController?.hide() }
-
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 10.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = "Save Favorite Game?",
-                    style = Typography.titleMedium
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 10.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                OutlinedTextField(
-                    value = favoriteName,
-                    onValueChange = { favoriteName = it },
-                    label = { Text(text = stringResource(R.string.name)) },
-                    singleLine = true,
-                    shape = shapes.small,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Ascii,
-                        imeAction = ImeAction.Done,
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            hideKeyboard.invoke()
-                        }
-                    ),
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = Color.Unspecified,
-                        unfocusedTextColor = Color.Unspecified
-                    ),
-                    modifier = Modifier.padding(top = 10.dp)
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 10.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                val text = remember {
-                    mutableStateOf(
-                        game.players
-                            .joinToString(separator = ", ") { player -> player.name })
-                }
-                OutlinedTextField(
-                    value = text.value,
-                    onValueChange = { newText -> text.value = newText },
-                    label = { Text(text = stringResource(R.string.players)) },
-                    singleLine = true,
-                    readOnly = true,
-                    shape = shapes.small,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Done,
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            hideKeyboard.invoke()
-                        }
-                    ),
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = Color.Unspecified,
-                        unfocusedTextColor = Color.Unspecified
-                    ),
-                    modifier = Modifier.padding(top = 10.dp)
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 10.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                OutlinedTextField(
-                    value = game.getGameName(),
-                    onValueChange = {},
-                    label = { Text(text = stringResource(R.string.game)) },
-                    singleLine = true,
-                    readOnly = true,
-                    shape = shapes.small,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Done,
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            hideKeyboard.invoke()
-                        }
-                    ),
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = Color.Unspecified,
-                        unfocusedTextColor = Color.Unspecified
-                    ),
-                    modifier = Modifier.padding(top = 10.dp)
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-            ) {
-                TextButton(
-                    onClick = { onDismissRequest() },
-                    modifier = Modifier.padding(8.dp),
-                ) {
-                    Text(stringResource(R.string.cancel))
-                }
-                TextButton(
-                    onClick = {
-                        onConfirmation(favoriteName)
-                    },
-                    enabled = favoriteName.isNotBlank(),
-                    modifier = Modifier.padding(8.dp),
-                ) {
-                    Text(stringResource(R.string.save))
-                }
-            }
-        }
-    }
-}
-
 @Preview
 @Composable
 private fun GamePlayScreenContentPreview() {
+    val game = Game(TwentyFiveHundred, listOf("Sheldon", "Leonard"))
+    game.players[0].addScore(100)
+    game.players[1].addScore(-20)
     GamePlayScreenContent(
-        Game(TwentyFiveHundred, listOf("Sheldon", "Leonard")),
+        game,
         Modifier
     )
 }
