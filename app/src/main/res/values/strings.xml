@@ -23,4 +23,6 @@
     <string name="favorite">Favorite</string>
     <string name="manual">Manual</string>
     <string name="name">Name</string>
+    <string name="choose_players">Choose Players</string>
+    <string name="select_game">Select Game</string>
 </resources>
