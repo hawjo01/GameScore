@@ -20,6 +20,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import net.hawkins.gamescore.favorites.FavoriteGames
 import net.hawkins.gamescore.favorites.FavoritePlayers
+import net.hawkins.gamescore.game.Game
+import net.hawkins.gamescore.game.Games
 import net.hawkins.gamescore.ui.GamePlayScreen
 import net.hawkins.gamescore.ui.GameSetupScreen
 import net.hawkins.gamescore.ui.GameViewModel
@@ -78,7 +80,7 @@ fun GameScoreApp(
             composable(route = GameScoreScreen.Setup.name) {
 
                 GameSetupScreen(
-                    gameViewModel = viewModel,
+                    viewModel = viewModel,
                     favoritePlayers = FavoritePlayers(
                         File(
                             context.filesDir,
@@ -86,9 +88,8 @@ fun GameScoreApp(
                         )
                     ),
                     favoriteGames = favoriteGames,
-                    onNextButtonClicked = { game, players ->
-                        viewModel.setGameType(game)
-                        viewModel.setPlayers(players)
+                    onNextButtonClicked = { gameName, playerNames ->
+                        viewModel.setGame(Game(Games.getByName(gameName), playerNames))
                         navController.navigate(GameScoreScreen.Play.name)
                     }
                 )
@@ -99,7 +100,7 @@ fun GameScoreApp(
                     // Prevent accidental erasure of game data
                 }
                 GamePlayScreen(
-                    gameViewModel = viewModel,
+                    viewModel = viewModel,
                     favoriteGames = favoriteGames
                 )
             }

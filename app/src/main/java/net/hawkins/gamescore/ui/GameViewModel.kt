@@ -4,12 +4,12 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import net.hawkins.gamescore.game.GameType
-import net.hawkins.gamescore.game.Games
-import net.hawkins.gamescore.game.Player
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import net.hawkins.gamescore.game.Game
 
 data class TopAppBar(
     val title: String = "",
@@ -18,8 +18,7 @@ data class TopAppBar(
 
 class GameViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(GameUiState())
-
-    private var _gameType = mutableStateOf(Games.TYPES[0])
+    val uiState: StateFlow<GameUiState> = _uiState.asStateFlow()
 
     private val _topAppBar = mutableStateOf(TopAppBar())
     val topAppBar: State<TopAppBar> = _topAppBar
@@ -28,50 +27,9 @@ class GameViewModel : ViewModel() {
         _topAppBar.value = TopAppBar(title = newTitle, actions = newActions)
     }
 
-    fun resetGame() {
-        _uiState.value.winner.value = null
-        _uiState.value.players.forEach { player -> player.resetScores() }
-    }
-
-    fun getWinner(): Player? {
-        return _uiState.value.winner.value
-    }
-
-    fun determineWinner(): Player? {
-        _uiState.value.winner.value = _gameType.value.findWinner(_uiState.value.players)
-        return _uiState.value.winner.value
-    }
-
-    fun isValidScore(score: String): Boolean {
-        return _gameType.value.isValidScore(score)
-    }
-
-    fun highlightNegativeScore(): Boolean {
-        return _gameType.value.highlightNegativeScore()
-    }
-
-    fun hasWinningThreshold(): Boolean {
-        return _gameType.value.hasWinningThreshold()
-    }
-
-    fun getGameType(): GameType {
-        return _gameType.value
-    }
-
-    fun setGameType(gameType: GameType) {
-        _gameType.value = gameType
-    }
-
-    fun setGameType(name: String) {
-        _gameType.value = Games.getByName(name)
-    }
-
-    fun setPlayers(names: List<String>) {
-        _uiState.value.players.clear()
-        names.forEach { name -> _uiState.value.players.add(Player(name)) }
-    }
-
-    fun getPlayers(): SnapshotStateList<Player> {
-        return _uiState.value.players
+    fun setGame(newGame: Game) {
+        _uiState.update { currentState ->
+            currentState.copy(game = newGame)
+        }
     }
 }

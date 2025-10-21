@@ -48,6 +48,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.favorites.FavoriteGames
@@ -56,6 +57,7 @@ import net.hawkins.gamescore.game.Games
 import net.hawkins.gamescore.ui.component.ConfirmAction
 import net.hawkins.gamescore.ui.favorites.FavoriteGamesCard
 import net.hawkins.gamescore.ui.theme.GoGreen
+import java.io.File
 
 enum class GameSetupType(val labelId: Int) {
     FAVORITE(R.string.favorite),
@@ -64,15 +66,28 @@ enum class GameSetupType(val labelId: Int) {
 
 @Composable
 fun GameSetupScreen(
-    gameViewModel: GameViewModel,
+    viewModel: GameViewModel,
     favoritePlayers: FavoritePlayers,
     favoriteGames: FavoriteGames,
     onNextButtonClicked: (String, List<String>) -> Unit
 ) {
     LaunchedEffect(Unit) {
-        gameViewModel.updateTopAppBar { /* No AppBarActions */ }
+        viewModel.updateTopAppBar { /* No AppBarActions */ }
     }
 
+    GameSetupScreenContent(
+        favoritePlayers = favoritePlayers,
+        favoriteGames = favoriteGames,
+        onNextButtonClicked = onNextButtonClicked
+    )
+}
+
+@Composable
+private fun GameSetupScreenContent(
+    favoritePlayers: FavoritePlayers,
+    favoriteGames: FavoriteGames,
+    onNextButtonClicked: (String, List<String>) -> Unit
+) {
     var selectedSetupType by remember {
         mutableStateOf(
             if (favoriteGames.getGames()
@@ -212,10 +227,10 @@ private fun ManualGameSelection(
                 enabled = playerNames.isNotEmpty()
             ) {
                 Icon(
-                imageVector = Icons.Filled.PlayArrow,
-                contentDescription = stringResource(R.string.start_game),
+                    imageVector = Icons.Filled.PlayArrow,
+                    contentDescription = stringResource(R.string.start_game),
                     tint = GoGreen,
-                    modifier =  modifier.size(60.dp)
+                    modifier = modifier.size(60.dp)
 
                 )
             }
@@ -341,7 +356,7 @@ private fun ConfirmRemovePlayer(
 }
 
 @Composable
-fun ConfirmDeleteSavedPlayer(
+private fun ConfirmDeleteSavedPlayer(
     name: String,
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit
@@ -397,4 +412,14 @@ private fun GameTypeDropdownMenu(
             }
         }
     }
+}
+
+@Preview
+@Composable
+private fun GameSetupScreenContentPreview() {
+    GameSetupScreenContent(
+        FavoritePlayers(File("favorite-games.json")),
+        FavoriteGames(File("favorite-games.json")),
+        { game, players -> }
+    )
 }
