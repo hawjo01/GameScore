@@ -27,7 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import net.hawkins.gamescore.data.FavoriteGames
+import net.hawkins.gamescore.favorites.FavoriteGames
 import net.hawkins.gamescore.ui.component.ConfirmAction
 import net.hawkins.gamescore.ui.theme.DeleteRed
 import net.hawkins.gamescore.ui.theme.GoGreen
@@ -45,7 +45,7 @@ fun FavoriteGamesCard(
             containerColor = Color.Transparent),
         modifier = modifier.padding(all = 10.dp)) {
 
-        val favorites = favoriteGames.games
+        val favorites = favoriteGames.getGames()
         if (favorites.isNotEmpty()) {
             var showInfoIndex by remember { mutableIntStateOf(-1) }
             var showDeleteIndex by remember { mutableIntStateOf(-1) }
@@ -53,8 +53,8 @@ fun FavoriteGamesCard(
             favorites.forEachIndexed { index, favorite ->
                 Row (
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                    , modifier = modifier.fillMaxWidth()
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = modifier.fillMaxWidth()
                 ){
                     Column {
                         Text(

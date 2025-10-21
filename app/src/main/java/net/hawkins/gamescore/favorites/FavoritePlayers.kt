@@ -1,7 +1,5 @@
-package net.hawkins.gamescore.data
+package net.hawkins.gamescore.favorites
 
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -10,16 +8,15 @@ import java.io.File
 import java.io.FileWriter
 import java.io.IOException
 
-class FavoritePlayers(val file: File) {
+class FavoritePlayers(private val file: File) {
 
-    private var _names = mutableStateListOf<String>()
+    private val _names = mutableListOf<String>()
 
     init {
         println("Initializing FavoritePlayerNames from " + file.absolutePath)
         if (file.exists()) {
             try {
                 file.bufferedReader().use { bufferedReader: BufferedReader ->
-
                     val gson = Gson()
                     val listType = object : TypeToken<ArrayList<String>>() {}.type
                     val playerList =
@@ -34,7 +31,7 @@ class FavoritePlayers(val file: File) {
         }
     }
 
-    fun getNames(): SnapshotStateList<String> {
+    fun getNames(): List<String> {
         return _names
     }
 
@@ -46,7 +43,6 @@ class FavoritePlayers(val file: File) {
 
         _names.add(name)
         save()
-
     }
 
     fun removeName(player: String) {
@@ -65,5 +61,4 @@ class FavoritePlayers(val file: File) {
             e.printStackTrace()
         }
     }
-
 }

@@ -50,8 +50,8 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import net.hawkins.gamescore.R
-import net.hawkins.gamescore.data.FavoriteGames
-import net.hawkins.gamescore.data.FavoritePlayers
+import net.hawkins.gamescore.favorites.FavoriteGames
+import net.hawkins.gamescore.favorites.FavoritePlayers
 import net.hawkins.gamescore.game.GameType
 import net.hawkins.gamescore.ui.component.ConfirmAction
 import net.hawkins.gamescore.ui.favorites.FavoriteGamesCard
@@ -75,7 +75,7 @@ fun GameSetupScreen(
 
     var selectedSetupType by remember {
         mutableStateOf(
-            if (favoriteGames.games
+            if (favoriteGames.getGames()
                     .isNotEmpty()
             ) GameSetupType.FAVORITE else GameSetupType.MANUAL
         )
