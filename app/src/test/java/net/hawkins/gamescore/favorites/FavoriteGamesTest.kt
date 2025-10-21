@@ -38,12 +38,23 @@ class FavoriteGamesTest : AbstractFavoriteTest() {
     }
 
     @Test
+    fun getGames_InvalidGameName() {
+        val resoureDirectory = Paths.get("src", "test", "resources")
+        val file = File(resoureDirectory.toFile(), "favorite-games-invalid-game-name.json")
+        assertTrue(file.exists())
+        val favoriteGames = FavoriteGames(file)
+        val games = favoriteGames.getGames()
+        assertTrue(games.isEmpty())
+    }
+
+    @Test
     fun addAndRemove() {
         val tempFile = randomTempFile()
         val favoriteGames = FavoriteGames(tempFile)
         assertTrue(favoriteGames.getGames().isEmpty())
 
-        val favoriteGame = FavoriteGame("Add Test Favorite", listOf("Penny", "Bernadette"), "Basic Scoring")
+        val favoriteGame =
+            FavoriteGame("Add Test Favorite", listOf("Penny", "Bernadette"), "Basic Scoring")
         favoriteGames.add(favoriteGame)
 
         val favoriteGames2 = FavoriteGames(tempFile)

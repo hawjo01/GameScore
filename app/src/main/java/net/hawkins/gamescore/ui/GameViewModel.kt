@@ -7,10 +7,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import net.hawkins.gamescore.game.Player
-import net.hawkins.gamescore.game.BasicScore
 import net.hawkins.gamescore.game.GameType
-import net.hawkins.gamescore.game.TwentyFiveHundred
+import net.hawkins.gamescore.game.Games
+import net.hawkins.gamescore.game.Player
 
 data class TopAppBar(
     val title: String = "",
@@ -20,11 +19,7 @@ data class TopAppBar(
 class GameViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(GameUiState())
 
-    val gameTypes = listOf(
-        TwentyFiveHundred,
-        BasicScore
-    )
-    private var _gameType = mutableStateOf(gameTypes[0])
+    private var _gameType = mutableStateOf(Games.TYPES[0])
 
     private val _topAppBar = mutableStateOf(TopAppBar())
     val topAppBar: State<TopAppBar> = _topAppBar
@@ -68,7 +63,7 @@ class GameViewModel : ViewModel() {
     }
 
     fun setGameType(name: String) {
-        _gameType.value = gameTypes.first { gameType -> gameType.getName() == name }
+        _gameType.value = Games.getByName(name)
     }
 
     fun setPlayers(names: List<String>) {

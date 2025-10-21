@@ -2,6 +2,7 @@ package net.hawkins.gamescore.ui
 
 import net.hawkins.gamescore.game.Player
 import net.hawkins.gamescore.game.GameType
+import net.hawkins.gamescore.game.Games
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -13,8 +14,6 @@ class GameViewModelTest {
         assertEquals(0, gameViewModel.getPlayers().size)
         // 2500 is used the most often so it should be first.
         assertEquals("2500", gameViewModel.getGameType().getName())
-        // Currently only 2 game types are supported
-        assertEquals(2, gameViewModel.gameTypes.size)
     }
 
 
@@ -24,7 +23,7 @@ class GameViewModelTest {
         assertEquals("2500", gameViewModel.getGameType().getName())
 
         val notTwentyFiveHundred =
-            gameViewModel.gameTypes.first { it.getName() != "2500" }
+            Games.TYPES.first { it.getName() != "2500" }
         gameViewModel.setGameType(notTwentyFiveHundred)
         assertEquals(notTwentyFiveHundred, gameViewModel.getGameType())
     }
@@ -32,7 +31,7 @@ class GameViewModelTest {
     @Test
     fun resetGame() {
         val gameViewModel = GameViewModel()
-        val expectedGameType = gameViewModel.gameTypes[1]
+        val expectedGameType = Games.TYPES[1]
         gameViewModel.setGameType(expectedGameType)
         assertEquals(expectedGameType, gameViewModel.getGameType())
 
