@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
@@ -15,19 +17,29 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.shapes
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import net.hawkins.gamescore.R
 import net.hawkins.gamescore.favorites.FavoriteGames
+import net.hawkins.gamescore.game.Game
 import net.hawkins.gamescore.ui.component.ConfirmAction
 import net.hawkins.gamescore.ui.theme.DeleteRed
 import net.hawkins.gamescore.ui.theme.GoGreen
@@ -192,3 +204,149 @@ fun FavoriteGamesCard(
     }
 }
 
+@Composable
+fun SaveFavoriteGame(
+    game: Game,
+    onDismissRequest: () -> Unit,
+    onConfirmation: (String) -> Unit
+) {
+    Dialog(onDismissRequest = { onDismissRequest() }) {
+        Card(
+            modifier = Modifier
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            var favoriteName by remember { mutableStateOf("") }
+            val keyboardController = LocalSoftwareKeyboardController.current
+            val hideKeyboard = { keyboardController?.hide() }
+
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "Save Favorite Game?",
+                    style = Typography.titleMedium
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                OutlinedTextField(
+                    value = favoriteName,
+                    onValueChange = { favoriteName = it },
+                    label = { Text(text = stringResource(R.string.name)) },
+                    singleLine = true,
+                    shape = shapes.small,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Ascii,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            hideKeyboard.invoke()
+                        }
+                    ),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = Color.Unspecified,
+                        unfocusedTextColor = Color.Unspecified
+                    ),
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                val text = remember {
+                    mutableStateOf(
+                        game.players
+                            .joinToString(separator = ", ") { player -> player.name })
+                }
+                OutlinedTextField(
+                    value = text.value,
+                    onValueChange = { newText -> text.value = newText },
+                    label = { Text(text = stringResource(R.string.players)) },
+                    singleLine = true,
+                    readOnly = true,
+                    shape = shapes.small,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            hideKeyboard.invoke()
+                        }
+                    ),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = Color.Unspecified,
+                        unfocusedTextColor = Color.Unspecified
+                    ),
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                OutlinedTextField(
+                    value = game.getGameName(),
+                    onValueChange = {},
+                    label = { Text(text = stringResource(R.string.game)) },
+                    singleLine = true,
+                    readOnly = true,
+                    shape = shapes.small,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            hideKeyboard.invoke()
+                        }
+                    ),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = Color.Unspecified,
+                        unfocusedTextColor = Color.Unspecified
+                    ),
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                TextButton(
+                    onClick = { onDismissRequest() },
+                    modifier = Modifier.padding(8.dp),
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+                TextButton(
+                    onClick = {
+                        onConfirmation(favoriteName)
+                    },
+                    enabled = favoriteName.isNotBlank(),
+                    modifier = Modifier.padding(8.dp),
+                ) {
+                    Text(stringResource(R.string.save))
+                }
+            }
+        }
+    }
+}
