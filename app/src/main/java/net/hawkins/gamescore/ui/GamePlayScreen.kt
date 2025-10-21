@@ -92,7 +92,7 @@ fun GamePlayScreen(
 }
 
 @Composable
-fun Winner(gameViewModel: GameViewModel) {
+private fun Winner(gameViewModel: GameViewModel) {
     if (gameViewModel.hasWinningThreshold()) {
         gameViewModel.determineWinner()
     }
@@ -103,7 +103,7 @@ fun Winner(gameViewModel: GameViewModel) {
 }
 
 @Composable
-fun Winner(winner: Player) {
+private fun Winner(winner: Player) {
     Text(
         text = stringResource(R.string.player_wins, winner.name),
         color = Color.Red,
@@ -112,7 +112,7 @@ fun Winner(winner: Player) {
 }
 
 @Composable
-fun Players(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
+private fun Players(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
     for ((index, player) in gameViewModel.getPlayers().withIndex()) {
         key(player.name) {
             Player(gameViewModel = gameViewModel, player = player, index = index, modifier)
@@ -121,7 +121,7 @@ fun Players(gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun Player(
+private fun Player(
     gameViewModel: GameViewModel,
     player: Player,
     index: Int,
@@ -203,7 +203,7 @@ fun Player(
 
 
 @Composable
-fun NewScoreDialog(
+private fun NewScoreDialog(
     gameViewModel: GameViewModel,
     player: Player,
     onDismissRequest: () -> Unit
@@ -292,7 +292,7 @@ fun NewScoreDialog(
 
 
 @Composable
-fun ChangeScore(
+private fun ChangeScore(
     gameViewModel: GameViewModel,
     player: Player,
     scoreIndex: Int,
@@ -365,7 +365,7 @@ fun ChangeScore(
 }
 
 @Composable
-fun ConfirmResetGame(
+private fun ConfirmResetGame(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit
 ) {
@@ -378,7 +378,7 @@ fun ConfirmResetGame(
 }
 
 @Composable
-fun GamePlayAppBarActions(gameViewModel: GameViewModel, favoriteGames: FavoriteGames) {
+private fun GamePlayAppBarActions(gameViewModel: GameViewModel, favoriteGames: FavoriteGames) {
 
     var dropdownMenuExpanded by remember { mutableStateOf(false) }
     var showSaveFavoriteGame by remember { mutableStateOf(false) }
@@ -445,7 +445,7 @@ fun GamePlayAppBarActions(gameViewModel: GameViewModel, favoriteGames: FavoriteG
 }
 
 @Composable
-fun SaveFavoriteGame(
+private fun SaveFavoriteGame(
     gameViewModel: GameViewModel,
     onDismissRequest: () -> Unit,
     onConfirmation: (String) -> Unit

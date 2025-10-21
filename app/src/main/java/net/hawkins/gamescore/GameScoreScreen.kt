@@ -32,7 +32,7 @@ enum class GameScoreScreen() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GameScoreAppBar(
+private fun GameScoreAppBar(
     gameViewModel: GameViewModel,
     modifier: Modifier = Modifier
 ) {
