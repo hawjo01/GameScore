@@ -16,8 +16,8 @@ class FavoritePlayersTest : AbstractFavoriteTest() {
 
     @Test
     fun getNames() {
-        val resoureDirectory = Paths.get("src", "test", "resources")
-        val file = File(resoureDirectory.toFile(), "favorite-players.json")
+        val resourceDirectory = Paths.get("src", "test", "resources")
+        val file = File(resourceDirectory.toFile(), "favorite-players.json")
         val favoritePlayers = FavoritePlayers(file)
         val names = favoritePlayers.getNames()
         assertEquals(2, names.size)
