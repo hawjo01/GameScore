@@ -1,7 +1,5 @@
 package net.hawkins.gamescore.game
 
-import net.hawkins.gamescore.data.Player
-
 object BasicScore : GameType {
     const val NAME = "Basic Scoring"
 

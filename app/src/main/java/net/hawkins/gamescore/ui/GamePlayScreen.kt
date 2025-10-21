@@ -51,7 +51,7 @@ import net.hawkins.gamescore.R
 import net.hawkins.gamescore.Utils
 import net.hawkins.gamescore.favorites.FavoriteGame
 import net.hawkins.gamescore.favorites.FavoriteGames
-import net.hawkins.gamescore.data.Player
+import net.hawkins.gamescore.game.Player
 import net.hawkins.gamescore.ui.component.ConfirmAction
 import net.hawkins.gamescore.ui.theme.Typography
 

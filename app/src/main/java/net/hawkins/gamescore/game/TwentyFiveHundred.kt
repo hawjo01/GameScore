@@ -1,7 +1,5 @@
 package net.hawkins.gamescore.game
 
-import net.hawkins.gamescore.data.Player
-
 object TwentyFiveHundred : GameType {
 
     const val NAME = "2500"
