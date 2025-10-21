@@ -1,4 +1,4 @@
-package net.hawkins.gamescore.data
+package net.hawkins.gamescore.favorites
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -8,20 +8,19 @@ import java.io.File
 import java.io.FileWriter
 import java.io.IOException
 
-class FavoriteGames(val file: File) {
-    val games = mutableListOf<FavoriteGame>()
+class FavoriteGames(private val file: File) {
+    private val _games = mutableListOf<FavoriteGame>()
 
     init {
         println("Initializing FavoriteGames from " + file.absolutePath)
         if (file.exists()) {
             try {
                 file.bufferedReader().use { bufferedReader: BufferedReader ->
-
                     val gson = Gson()
                     val listType = object : TypeToken<ArrayList<FavoriteGame>>() {}.type
                     val favoriteGameList =
                         gson.fromJson<ArrayList<FavoriteGame>>(bufferedReader, listType)
-                    favoriteGameList.forEach { games.add(it) }
+                    favoriteGameList.forEach { _games.add(it) }
                 }
             } catch (e: Exception) {
                 println("An unexpected error occurred: ${e.message}")
@@ -31,13 +30,17 @@ class FavoriteGames(val file: File) {
         }
     }
 
+    fun getGames(): List<FavoriteGame> {
+        return _games
+    }
+
     fun add(favoriteGame: FavoriteGame) {
-        games.add(favoriteGame)
+        _games.add(favoriteGame)
         save()
     }
 
     fun remove(favoriteGame: FavoriteGame) {
-        games.remove(favoriteGame)
+        _games.remove(favoriteGame)
         save()
     }
 
@@ -45,7 +48,7 @@ class FavoriteGames(val file: File) {
         try {
             val gson = GsonBuilder().setPrettyPrinting().create()
             FileWriter(file).use { writer ->
-                gson.toJson(games, writer)
+                gson.toJson(_games, writer)
             }
         } catch (e: IOException) {
             println("Failed to save favorite games. " + e.message)
@@ -54,8 +57,8 @@ class FavoriteGames(val file: File) {
     }
 }
 
-class FavoriteGame(
+data class FavoriteGame(
     val name: String = "",
-    val players: List<String> = mutableListOf(),
+    val players: List<String> = listOf(),
     val game: String = ""
 )

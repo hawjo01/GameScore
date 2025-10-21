@@ -18,8 +18,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import net.hawkins.gamescore.data.FavoriteGames
-import net.hawkins.gamescore.data.FavoritePlayers
+import net.hawkins.gamescore.favorites.FavoriteGames
+import net.hawkins.gamescore.favorites.FavoritePlayers
 import net.hawkins.gamescore.ui.GamePlayScreen
 import net.hawkins.gamescore.ui.GameSetupScreen
 import net.hawkins.gamescore.ui.GameViewModel
