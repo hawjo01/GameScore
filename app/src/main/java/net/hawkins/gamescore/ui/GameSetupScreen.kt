@@ -52,7 +52,7 @@ import androidx.compose.ui.unit.dp
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.favorites.FavoriteGames
 import net.hawkins.gamescore.favorites.FavoritePlayers
-import net.hawkins.gamescore.game.GameType
+import net.hawkins.gamescore.game.Games
 import net.hawkins.gamescore.ui.component.ConfirmAction
 import net.hawkins.gamescore.ui.favorites.FavoriteGamesCard
 import net.hawkins.gamescore.ui.theme.GoGreen
@@ -124,7 +124,6 @@ fun GameSetupScreen(
 
         if (selectedSetupType == GameSetupType.MANUAL) {
             ManualGameSelection(
-                gameViewModel.gameTypes,
                 favoritePlayers,
                 onNextButtonClicked
             )
@@ -134,7 +133,6 @@ fun GameSetupScreen(
 
 @Composable
 fun ManualGameSelection(
-    gameTypes: List<GameType>,
     favoritePlayers: FavoritePlayers,
     onNextButtonClicked: (String, List<String>) -> Unit,
     modifier: Modifier = Modifier
@@ -162,7 +160,6 @@ fun ManualGameSelection(
                 modifier = modifier.padding(end = 20.dp)
             )
             GameTypeDropdownMenu(
-                gameTypes,
                 onChange = { newGameName -> gameName = newGameName })
         }
 
@@ -359,11 +356,10 @@ fun ConfirmDeleteSavedPlayer(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameTypeDropdownMenu(
-    gameTypes: List<GameType>,
     onChange: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedGame by remember { mutableStateOf(gameTypes[0].getName()) }
+    var selectedGame by remember { mutableStateOf(Games.TYPES[0].getName()) }
     onChange(selectedGame)
 
     ExposedDropdownMenuBox(
@@ -388,7 +384,7 @@ fun GameTypeDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
         ) {
-            gameTypes.forEach { gameType ->
+            Games.TYPES.forEach { gameType ->
                 DropdownMenuItem(
                     text = { Text(text = gameType.getName()) },
                     onClick = {

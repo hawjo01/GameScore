@@ -3,6 +3,7 @@ package net.hawkins.gamescore.favorites
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import net.hawkins.gamescore.game.Games
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileWriter
@@ -22,6 +23,9 @@ class FavoriteGames(private val file: File) {
                         gson.fromJson<ArrayList<FavoriteGame>>(bufferedReader, listType)
                     favoriteGameList.forEach { _games.add(it) }
                 }
+
+                // Remove any games that don't match an actual game type
+                _games.retainAll { favoriteGame ->  Games.isValidGame(favoriteGame.game) }
             } catch (e: Exception) {
                 println("An unexpected error occurred: ${e.message}")
             }
