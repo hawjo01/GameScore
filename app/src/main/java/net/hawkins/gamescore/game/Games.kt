@@ -7,7 +7,7 @@ object Games {
     )
 
     fun getByName(name: String): GameType {
-        return TYPES.first() { gameType -> gameType.getName() == name }
+        return TYPES.first { gameType -> gameType.getName() == name }
     }
 
     fun isValidGame(name: String): Boolean {

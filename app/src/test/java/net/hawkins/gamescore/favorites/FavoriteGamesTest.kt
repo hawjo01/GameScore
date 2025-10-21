@@ -16,8 +16,8 @@ class FavoriteGamesTest : AbstractFavoriteTest() {
 
     @Test
     fun getGames() {
-        val resoureDirectory = Paths.get("src", "test", "resources")
-        val file = File(resoureDirectory.toFile(), "favorite-games.json")
+        val resourceDirectory = Paths.get("src", "test", "resources")
+        val file = File(resourceDirectory.toFile(), "favorite-games.json")
         val favoriteGames = FavoriteGames(file)
         val games = favoriteGames.getGames()
         assertEquals(2, games.size)
