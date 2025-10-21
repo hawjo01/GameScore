@@ -1,4 +1,4 @@
-package net.hawkins.gamescore.data
+package net.hawkins.gamescore.game
 
 import androidx.compose.runtime.mutableStateListOf
 

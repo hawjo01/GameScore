@@ -1,6 +1,5 @@
 package net.hawkins.gamescore.game
 
-import net.hawkins.gamescore.data.Player
 import org.junit.Assert.*
 import org.junit.Test
 

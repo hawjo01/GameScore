@@ -7,7 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import net.hawkins.gamescore.data.Player
+import net.hawkins.gamescore.game.Player
 import net.hawkins.gamescore.game.BasicScore
 import net.hawkins.gamescore.game.GameType
 import net.hawkins.gamescore.game.TwentyFiveHundred

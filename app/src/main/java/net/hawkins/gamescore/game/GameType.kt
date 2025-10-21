@@ -1,7 +1,5 @@
 package net.hawkins.gamescore.game
 
-import net.hawkins.gamescore.data.Player
-
 interface GameType {
     fun getName(): String
     fun isValidScore(score: String): Boolean
