@@ -132,7 +132,7 @@ fun GameSetupScreen(
 }
 
 @Composable
-fun ManualGameSelection(
+private fun ManualGameSelection(
     favoritePlayers: FavoritePlayers,
     onNextButtonClicked: (String, List<String>) -> Unit,
     modifier: Modifier = Modifier
@@ -329,7 +329,7 @@ fun ManualGameSelection(
 }
 
 @Composable
-fun ConfirmRemovePlayer(
+private fun ConfirmRemovePlayer(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit
 ) {
@@ -355,7 +355,7 @@ fun ConfirmDeleteSavedPlayer(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GameTypeDropdownMenu(
+private fun GameTypeDropdownMenu(
     onChange: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
