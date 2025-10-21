@@ -40,10 +40,12 @@ fun FavoriteGamesCard(
     onStartButtonClick: (String, List<String>) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card (
+    Card(
         colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent),
-        modifier = modifier.padding(all = 10.dp)) {
+            containerColor = Color.Transparent
+        ),
+        modifier = modifier.padding(all = 10.dp)
+    ) {
 
         val favorites = favoriteGames.getGames()
         if (favorites.isNotEmpty()) {
@@ -51,11 +53,11 @@ fun FavoriteGamesCard(
             var showDeleteIndex by remember { mutableIntStateOf(-1) }
 
             favorites.forEachIndexed { index, favorite ->
-                Row (
+                Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = modifier.fillMaxWidth()
-                ){
+                ) {
                     Column {
                         Text(
                             text = favorite.name,
