@@ -31,8 +31,8 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -61,6 +61,7 @@ import net.hawkins.gamescore.ui.theme.GoGreen
 import net.hawkins.gamescore.ui.theme.SkyBlue
 import java.io.File
 
+@Suppress("unused")
 enum class GameSetupType(val labelId: Int) {
     FAVORITE(R.string.favorite),
     MANUAL(R.string.manual)
@@ -68,7 +69,7 @@ enum class GameSetupType(val labelId: Int) {
 
 @Composable
 fun GameSetupScreen(
-    viewModel: GameViewModel,
+    viewModel: GameSetupViewModel,
     favoritePlayers: FavoritePlayers,
     favoriteGames: FavoriteGames,
     onStartGame: (String, List<String>) -> Unit,
@@ -78,31 +79,39 @@ fun GameSetupScreen(
         viewModel.updateTopAppBar { /* No AppBarActions */ }
     }
 
+    val uiState by viewModel.uiState.collectAsState()
     GameSetupScreenContent(
+        uiState = uiState,
         favoritePlayers = favoritePlayers,
         favoriteGames = favoriteGames,
         onStartGame = onStartGame,
+        onSetGame = { gameName -> viewModel.setGameName(gameName) },
+        onAddPlayer = { playerName -> viewModel.addPlayer(playerName) },
+        onRemovePlayer = { index -> viewModel.removePlayer(index) },
+        onSetPlayers = { playerNames -> viewModel.setPlayers(playerNames) },
         modifier = modifier
     )
 }
 
 @Composable
 private fun GameSetupScreenContent(
+    uiState: GameSetupUiState,
     favoritePlayers: FavoritePlayers,
     favoriteGames: FavoriteGames,
     onStartGame: (String, List<String>) -> Unit,
+    onSetGame: (String) -> Unit,
+    onAddPlayer: (String) -> Unit,
+    onRemovePlayer: (Int) -> Unit,
+    onSetPlayers: (List<String>) -> Unit,
     modifier: Modifier
 ) {
-    val playerNames = remember { mutableStateListOf<String>() }
-    var gameName by remember { mutableStateOf("") }
-
     Column {
         GameCard(
-            gameName = gameName,
-            playerNames = playerNames,
+            gameName = uiState.gameName,
+            playerNames = uiState.playerNames,
             onStartGame = onStartGame,
-            onRemovePlayer = { index -> playerNames.removeAt(index) },
-            onChangeGame = { newGameName -> gameName = newGameName },
+            onRemovePlayer = onRemovePlayer,
+            onChangeGame = onSetGame,
             modifier = modifier
 
         )
@@ -144,16 +153,15 @@ private fun GameSetupScreenContent(
                 FavoriteGamesCard(
                     favoriteGames = favoriteGames,
                     onFavoriteSelected = { favoriteGame ->
-                        gameName = favoriteGame.game
-                        playerNames.clear()
-                        playerNames.addAll(favoriteGame.players)
+                        onSetGame(favoriteGame.game)
+                        onSetPlayers(favoriteGame.players)
                     })
             }
 
             if (selectedSetupType == GameSetupType.MANUAL) {
                 ManualGameSelection(
                     favoritePlayers = favoritePlayers,
-                    addPlayer = { name -> playerNames.add(name) }
+                    addPlayer = onAddPlayer
                 )
             }
         }
@@ -495,10 +503,16 @@ private fun GameSelectionDialog(
 @Preview
 @Composable
 private fun GameSetupScreenContentPreview() {
+    val uiState = GameSetupUiState("", listOf("Sheldon", "Leonard"))
     GameSetupScreenContent(
-        FavoritePlayers(File("favorite-games.json")),
-        FavoriteGames(File("favorite-games.json")),
-        { game, players -> },
-        Modifier
+        uiState = uiState,
+        favoritePlayers = FavoritePlayers(File("favorite-games.json")),
+        favoriteGames = FavoriteGames(File("favorite-games.json")),
+        onStartGame = { game, players -> },
+        onSetPlayers = { players -> },
+        onSetGame = { game -> },
+        onAddPlayer = { player -> },
+        onRemovePlayer = { index -> },
+        modifier = Modifier
     )
 }
