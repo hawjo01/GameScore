@@ -61,7 +61,7 @@ import net.hawkins.gamescore.ui.favorites.SaveFavoriteGame
 
 @Composable
 fun GamePlayScreen(
-    viewModel: GameViewModel,
+    viewModel: GamePlayViewModel,
     favoriteGames: FavoriteGames,
     modifier: Modifier = Modifier
 ) {
