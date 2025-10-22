@@ -11,15 +11,12 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import net.hawkins.gamescore.favorites.FavoriteGames
-import net.hawkins.gamescore.favorites.FavoritePlayers
 import net.hawkins.gamescore.game.Game
 import net.hawkins.gamescore.game.Games
 import net.hawkins.gamescore.ui.GamePlayScreen
@@ -27,7 +24,6 @@ import net.hawkins.gamescore.ui.GamePlayViewModel
 import net.hawkins.gamescore.ui.GameScoreViewModel
 import net.hawkins.gamescore.ui.GameSetupScreen
 import net.hawkins.gamescore.ui.GameSetupViewModel
-import java.io.File
 
 enum class GameScoreScreen() {
     Setup,
@@ -65,7 +61,6 @@ fun GameScoreApp(
     gamePlayViewModel: GamePlayViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
-    val context = LocalContext.current
     Scaffold(
         topBar = {
             GameScoreAppBar(
@@ -78,19 +73,10 @@ fun GameScoreApp(
             startDestination = GameScoreScreen.Setup.name,
             modifier = Modifier.padding(innerPadding)
         ) {
-            val favoriteGames = FavoriteGames(File(context.filesDir, "favorite-games.json"))
-
             composable(route = GameScoreScreen.Setup.name) {
 
                 GameSetupScreen(
                     viewModel = gameSetupViewModel,
-                    favoritePlayers = FavoritePlayers(
-                        File(
-                            context.filesDir,
-                            "favorite-players.json"
-                        )
-                    ),
-                    favoriteGames = favoriteGames,
                     onStartGame = { gameName, playerNames ->
                         gamePlayViewModel.setGame(Game(Games.getByName(gameName), playerNames))
                         navController.navigate(GameScoreScreen.Play.name)
@@ -103,8 +89,7 @@ fun GameScoreApp(
                     // Prevent accidental erasure of game data
                 }
                 GamePlayScreen(
-                    viewModel = gamePlayViewModel,
-                    favoriteGames = favoriteGames
+                    viewModel = gamePlayViewModel
                 )
             }
         }

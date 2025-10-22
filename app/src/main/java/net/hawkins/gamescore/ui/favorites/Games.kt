@@ -39,8 +39,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
-import net.hawkins.gamescore.favorites.FavoriteGame
-import net.hawkins.gamescore.favorites.FavoriteGames
+import net.hawkins.gamescore.model.FavoriteGame
 import net.hawkins.gamescore.game.Game
 import net.hawkins.gamescore.ui.component.ConfirmAction
 import net.hawkins.gamescore.ui.theme.DeleteRed
@@ -49,8 +48,9 @@ import net.hawkins.gamescore.ui.theme.Typography
 
 @Composable
 fun FavoriteGamesCard(
-    favoriteGames: FavoriteGames,
+    favoriteGames: List<FavoriteGame>,
     onFavoriteSelected: (FavoriteGame) -> Unit,
+    onDeleteFavoriteGame: (FavoriteGame) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -59,11 +59,10 @@ fun FavoriteGamesCard(
         ),
         modifier = modifier.padding(all = 10.dp)
     ) {
-        val favorites = favoriteGames.getGames()
-        if (favorites.isNotEmpty()) {
+        if (favoriteGames.isNotEmpty()) {
             var showDeleteIndex by remember { mutableIntStateOf(-1) }
 
-            favorites.forEachIndexed { index, favorite ->
+            favoriteGames.forEachIndexed { index, favorite ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -98,9 +97,9 @@ fun FavoriteGamesCard(
                 if (showDeleteIndex >= 0) {
                     ConfirmAction(
                         title = "Delete Favorite Game",
-                        description = "Delete '" + favorites[showDeleteIndex].name + "'",
+                        description = "Delete '" + favoriteGames[showDeleteIndex].name + "'",
                         onConfirmation = {
-                            favoriteGames.remove(favorites[showDeleteIndex])
+                            onDeleteFavoriteGame(favoriteGames[showDeleteIndex])
                             showDeleteIndex = -1
                         },
                         onDismissRequest = { showDeleteIndex = -1 },

@@ -51,8 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.Utils
-import net.hawkins.gamescore.favorites.FavoriteGame
-import net.hawkins.gamescore.favorites.FavoriteGames
+import net.hawkins.gamescore.model.FavoriteGame
 import net.hawkins.gamescore.game.Game
 import net.hawkins.gamescore.game.Player
 import net.hawkins.gamescore.game.TwentyFiveHundred
@@ -62,14 +61,17 @@ import net.hawkins.gamescore.ui.favorites.SaveFavoriteGame
 @Composable
 fun GamePlayScreen(
     viewModel: GamePlayViewModel,
-    favoriteGames: FavoriteGames,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
     LaunchedEffect(Unit) {
         viewModel.updateTopAppBar(
             newTitle = uiState.game.getGameName(),
-            newActions = { AppBarActions(uiState.game, favoriteGames) }
+            newActions = {
+                AppBarActions(
+                    game = uiState.game,
+                    saveFavoriteGame = { favoriteGame -> viewModel.saveFavoriteGame(favoriteGame) })
+            }
         )
     }
 
@@ -396,7 +398,7 @@ private fun ConfirmResetGame(
 }
 
 @Composable
-private fun AppBarActions(game: Game, favoriteGames: FavoriteGames) {
+private fun AppBarActions(game: Game, saveFavoriteGame: (FavoriteGame) -> Unit) {
 
     var dropdownMenuExpanded by remember { mutableStateOf(false) }
     var showSaveFavoriteGame by remember { mutableStateOf(false) }
@@ -449,7 +451,7 @@ private fun AppBarActions(game: Game, favoriteGames: FavoriteGames) {
             game,
             onDismissRequest = { showSaveFavoriteGame = false },
             onConfirmation = { name ->
-                favoriteGames.add(
+                saveFavoriteGame(
                     FavoriteGame(
                         name = name.trim(),
                         players = game.players.map { player -> player.name },
