@@ -39,4 +39,7 @@ val Typography = Typography(
         fontWeight = FontWeight.Bold,
         textAlign = TextAlign.Center
     ),
+    bodyMedium = TextStyle(
+        fontSize = 24.sp
+    )
 )

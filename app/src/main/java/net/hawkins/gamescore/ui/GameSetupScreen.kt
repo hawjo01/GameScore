@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,11 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuAnchorType
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,7 +29,6 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,18 +41,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.favorites.FavoriteGames
 import net.hawkins.gamescore.favorites.FavoritePlayers
+import net.hawkins.gamescore.game.GameType
 import net.hawkins.gamescore.game.Games
 import net.hawkins.gamescore.ui.component.ConfirmAction
 import net.hawkins.gamescore.ui.favorites.FavoriteGamesCard
 import net.hawkins.gamescore.ui.theme.GoGreen
+import net.hawkins.gamescore.ui.theme.SkyBlue
 import java.io.File
 
 enum class GameSetupType(val labelId: Int) {
@@ -69,7 +71,8 @@ fun GameSetupScreen(
     viewModel: GameViewModel,
     favoritePlayers: FavoritePlayers,
     favoriteGames: FavoriteGames,
-    onNextButtonClicked: (String, List<String>) -> Unit
+    onStartGame: (String, List<String>) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     LaunchedEffect(Unit) {
         viewModel.updateTopAppBar { /* No AppBarActions */ }
@@ -78,7 +81,8 @@ fun GameSetupScreen(
     GameSetupScreenContent(
         favoritePlayers = favoritePlayers,
         favoriteGames = favoriteGames,
-        onNextButtonClicked = onNextButtonClicked
+        onStartGame = onStartGame,
+        modifier = modifier
     )
 }
 
@@ -86,62 +90,190 @@ fun GameSetupScreen(
 private fun GameSetupScreenContent(
     favoritePlayers: FavoritePlayers,
     favoriteGames: FavoriteGames,
-    onNextButtonClicked: (String, List<String>) -> Unit
+    onStartGame: (String, List<String>) -> Unit,
+    modifier: Modifier
 ) {
-    var selectedSetupType by remember {
-        mutableStateOf(
-            if (favoriteGames.getGames()
-                    .isNotEmpty()
-            ) GameSetupType.FAVORITE else GameSetupType.MANUAL
+    val playerNames = remember { mutableStateListOf<String>() }
+    var gameName by remember { mutableStateOf("") }
+
+    Column {
+        GameCard(
+            gameName = gameName,
+            playerNames = playerNames,
+            onStartGame = onStartGame,
+            onRemovePlayer = { index -> playerNames.removeAt(index) },
+            onChangeGame = { newGameName -> gameName = newGameName },
+            modifier = modifier
+
         )
-    }
 
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .fillMaxWidth()
+        var selectedSetupType by remember {
+            mutableStateOf(
+                if (favoriteGames.getGames()
+                        .isNotEmpty()
+                ) GameSetupType.FAVORITE else GameSetupType.MANUAL
+            )
+        }
+
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
-            val gameSetupTypes = listOf(GameSetupType.FAVORITE, GameSetupType.MANUAL)
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                val gameSetupTypes = listOf(GameSetupType.FAVORITE, GameSetupType.MANUAL)
 
-            SingleChoiceSegmentedButtonRow {
-                gameSetupTypes.forEachIndexed { index, gameSetupType ->
-                    SegmentedButton(
-                        shape = SegmentedButtonDefaults.itemShape(
-                            index = index,
-                            count = gameSetupTypes.size
-                        ),
-                        onClick = { selectedSetupType = gameSetupType },
-                        selected = gameSetupType == selectedSetupType,
-                        label = { Text(stringResource(gameSetupType.labelId)) },
+                SingleChoiceSegmentedButtonRow {
+                    gameSetupTypes.forEachIndexed { index, gameSetupType ->
+                        SegmentedButton(
+                            shape = SegmentedButtonDefaults.itemShape(
+                                index = index,
+                                count = gameSetupTypes.size
+                            ),
+                            onClick = { selectedSetupType = gameSetupType },
+                            selected = gameSetupType == selectedSetupType,
+                            label = { Text(stringResource(gameSetupType.labelId)) },
+                        )
+                    }
+                }
+            }
+
+            if (selectedSetupType == GameSetupType.FAVORITE) {
+                FavoriteGamesCard(
+                    favoriteGames = favoriteGames,
+                    onFavoriteSelected = { favoriteGame ->
+                        gameName = favoriteGame.game
+                        playerNames.clear()
+                        playerNames.addAll(favoriteGame.players)
+                    })
+            }
+
+            if (selectedSetupType == GameSetupType.MANUAL) {
+                ManualGameSelection(
+                    favoritePlayers = favoritePlayers,
+                    addPlayer = { name -> playerNames.add(name) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun GameCard(
+    gameName: String,
+    playerNames: List<String>,
+    onStartGame: (String, List<String>) -> Unit,
+    onRemovePlayer: (Int) -> Unit,
+    onChangeGame: (String) -> Unit,
+    modifier: Modifier
+) {
+    var showGameSelectionDialog by remember { mutableStateOf(false) }
+    Card(
+        modifier = modifier.padding(all = 20.dp)
+    ) {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+        )
+        {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = modifier.padding(start = 10.dp, top = 10.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.game) + ":",
+                    style = MaterialTheme.typography.labelMedium,
+                    modifier = modifier.padding(end = 30.dp)
+                )
+                Text(
+                    text = if (gameName != "") gameName else stringResource(R.string.select_game),
+                    style = MaterialTheme.typography.bodyMedium.plus(
+                        TextStyle(
+                            color = SkyBlue,
+                            textDecoration = TextDecoration.Underline
+                        )
+                    ),
+                    modifier = modifier.clickable(
+                        onClick = { showGameSelectionDialog = true }
+                    )
+                )
+            }
+
+            if (showGameSelectionDialog) {
+                GameSelectionDialog(
+                    onClickAction = { gameType ->
+                        onChangeGame(gameType.getName())
+                        showGameSelectionDialog = false
+                    },
+                    onDismissRequest = { showGameSelectionDialog = false },
+                    modifier = modifier
+                )
+            }
+
+            Row(
+                modifier = modifier.padding(start = 10.dp)
+            ) {
+                Column {
+                    Text(
+                        text = stringResource(R.string.players) + ":",
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = modifier
+                            .padding(top = 10.dp, end = 10.dp)
+                    )
+                }
+                Column {
+                    FlowRow {
+                        playerNames.forEachIndexed { index, name ->
+                            var showConfirmRemovePlayer by remember { mutableStateOf(false) }
+
+                            Text(
+                                text = name + if (index + 1 < playerNames.size) ", " else "",
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = modifier
+                                    .padding(top = 10.dp)
+                                    .clickable(
+                                        onClick = {
+                                            showConfirmRemovePlayer = true
+                                        }
+                                    )
+                            )
+
+                            if (showConfirmRemovePlayer) {
+                                ConfirmRemovePlayer(
+                                    onDismissRequest = { showConfirmRemovePlayer = false },
+                                    onConfirmation = {
+                                        onRemovePlayer(index)
+                                        showConfirmRemovePlayer = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp)
+            ) {
+                IconButton(
+                    onClick = {
+                        onStartGame(gameName, playerNames)
+                    },
+                    enabled = gameName.isNotEmpty() && playerNames.isNotEmpty()
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.PlayArrow,
+                        contentDescription = stringResource(R.string.start_game),
+                        tint = GoGreen,
+                        modifier = modifier.size(60.dp)
+
                     )
                 }
             }
-        }
-
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            HorizontalDivider(
-                modifier = Modifier
-                    .padding(all = 10.dp),
-                color = Color.Gray,
-                thickness = 5.dp
-            )
-        }
-
-        if (selectedSetupType == GameSetupType.FAVORITE) {
-            FavoriteGamesCard(favoriteGames, onNextButtonClicked)
-        }
-
-        if (selectedSetupType == GameSetupType.MANUAL) {
-            ManualGameSelection(
-                favoritePlayers,
-                onNextButtonClicked
-            )
         }
     }
 }
@@ -149,198 +281,143 @@ private fun GameSetupScreenContent(
 @Composable
 private fun ManualGameSelection(
     favoritePlayers: FavoritePlayers,
-    onNextButtonClicked: (String, List<String>) -> Unit,
+    addPlayer: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    PlayerSelection(
+        favoritePlayers = favoritePlayers,
+        addPlayer = addPlayer,
+        modifier = modifier
+    )
+}
 
+@Composable
+private fun PlayerSelection(
+    favoritePlayers: FavoritePlayers,
+    addPlayer: (String) -> Unit,
+    modifier: Modifier
+) {
     var newPlayerName by remember { mutableStateOf("") }
-    val playerNames = remember { mutableStateListOf<String>() }
-    var gameName by remember { mutableStateOf("") }
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val hideKeyboard = { keyboardController?.hide() }
 
-    Column(
+    Row(
+        horizontalArrangement = Arrangement.Center,
         modifier = modifier
             .fillMaxWidth()
-    )
-    {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier.padding(start = 10.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.game) + ":",
-                style = MaterialTheme.typography.labelMedium,
-                modifier = modifier.padding(end = 20.dp)
-            )
-            GameTypeDropdownMenu(
-                onChange = { newGameName -> gameName = newGameName })
-        }
-
-        Row(
-            modifier = modifier.padding(start = 10.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.players) + ":",
-                style = MaterialTheme.typography.labelMedium,
-                modifier = modifier
-                    .padding(top = 10.dp, end = 20.dp)
-            )
-
-            playerNames.forEachIndexed { index, name ->
-                var showConfirmRemovePlayer by remember { mutableStateOf(false) }
-
-                Text(
-                    text = name + if (index + 1 < playerNames.size) ", " else "",
-                    style = MaterialTheme.typography.labelMedium,
-                    modifier = modifier
-                        .padding(top = 10.dp)
-                        .clickable(
-                            onClick = {
-                                showConfirmRemovePlayer = true
-                            }
-                        )
-                )
-
-                if (showConfirmRemovePlayer) {
-                    ConfirmRemovePlayer(
-                        onDismissRequest = { showConfirmRemovePlayer = false },
-                        onConfirmation = {
-                            playerNames.removeAt(index)
-                            showConfirmRemovePlayer = false
-                        }
-                    )
-                }
-            }
-        }
-        Row(
-            horizontalArrangement = Arrangement.Center,
+            .padding(top = 10.dp)
+    ) {
+        HorizontalDivider(
             modifier = modifier
-                .fillMaxWidth()
-                .padding(top = 10.dp)
-        ) {
-            IconButton(
-                onClick = {
-                    onNextButtonClicked(gameName, playerNames)
-                },
-                enabled = playerNames.isNotEmpty()
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.PlayArrow,
-                    contentDescription = stringResource(R.string.start_game),
-                    tint = GoGreen,
-                    modifier = modifier.size(60.dp)
-
-                )
-            }
-        }
+                .padding(all = 20.dp),
+            color = Color.Gray,
+            thickness = 5.dp
+        )
+    }
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(top = 10.dp)
+    ) {
+        Text(text = stringResource(R.string.choose_players))
+    }
+    favoritePlayers.getNames().sorted().forEach { name ->
+        var showDeleteSavedPlayer by remember { mutableStateOf(false) }
         Row(
-            horizontalArrangement = Arrangement.Center,
-            modifier = modifier.fillMaxWidth()
-        ) {
-            HorizontalDivider(
-                modifier = modifier
-                    .padding(all = 10.dp),
-                color = Color.Gray,
-                thickness = 5.dp
-            )
-        }
-        favoritePlayers.getNames().sorted().forEach { name ->
-            var showDeleteSavedPlayer by remember { mutableStateOf(false) }
-            Row(
-                modifier = modifier.padding(horizontal = 10.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                OutlinedIconButton(
-                    onClick = {
-                        playerNames.add(name)
-                    })
-                {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = stringResource(R.string.add)
-                    )
-                }
-                Text(
-                    text = name,
-                    modifier = modifier
-                        .padding(start = 10.dp)
-                        .combinedClickable(
-                            onLongClick = {
-                                showDeleteSavedPlayer = true
-                            },
-                            onClick = {}
-                        )
-                )
-
-                if (showDeleteSavedPlayer) {
-                    ConfirmDeleteSavedPlayer(
-                        name = name,
-                        onDismissRequest = { showDeleteSavedPlayer = false },
-                        onConfirmation = {
-                            favoritePlayers.removeName(name)
-                            showDeleteSavedPlayer = false
-                        }
-                    )
-                }
-            }
-        }
-        Row(
+            modifier = modifier.padding(horizontal = 10.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier.padding(10.dp)
         ) {
-            OutlinedTextField(
-                value = newPlayerName,
-                onValueChange = { newPlayerName = it },
-                label = { Text(text = stringResource(R.string.player_name)) },
-                singleLine = true,
-                shape = shapes.small,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Ascii,
-                    capitalization = KeyboardCapitalization.Words,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        hideKeyboard.invoke()
-                    }
-                ),
-                trailingIcon = {
-                    Row {
-                        IconButton(
-                            onClick = {
-                                hideKeyboard.invoke()
-                                playerNames.add(newPlayerName.trim())
-                                newPlayerName = ""
-                            },
-                            enabled = newPlayerName.isNotBlank()
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Add,
-                                contentDescription = stringResource(R.string.add)
-                            )
-                        }
-                        IconButton(
-                            onClick = {
-                                hideKeyboard.invoke()
-                                favoritePlayers.addName(newPlayerName.trim())
-                                newPlayerName = ""
-                            },
-                            enabled = newPlayerName.isNotBlank()
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Save,
-                                contentDescription = stringResource(R.string.save)
-                            )
-                        }
-                    }
-                }
+            OutlinedIconButton(
+                onClick = {
+                    addPlayer(name)
+                })
+            {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = stringResource(R.string.add)
+                )
+            }
+            Text(
+                text = name,
+                modifier = modifier
+                    .padding(start = 10.dp)
+                    .combinedClickable(
+                        onLongClick = {
+                            showDeleteSavedPlayer = true
+                        },
+                        onClick = {}
+                    )
             )
+
+            if (showDeleteSavedPlayer) {
+                ConfirmDeleteSavedPlayer(
+                    name = name,
+                    onDismissRequest = { showDeleteSavedPlayer = false },
+                    onConfirmation = {
+                        favoritePlayers.removeName(name)
+                        showDeleteSavedPlayer = false
+                    }
+                )
+            }
         }
     }
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.padding(10.dp)
+    ) {
+        OutlinedTextField(
+            value = newPlayerName,
+            onValueChange = { newPlayerName = it },
+            label = { Text(text = stringResource(R.string.player_name)) },
+            singleLine = true,
+            shape = shapes.small,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Ascii,
+                capitalization = KeyboardCapitalization.Words,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    hideKeyboard.invoke()
+                }
+            ),
+            trailingIcon = {
+                Row {
+                    IconButton(
+                        onClick = {
+                            hideKeyboard.invoke()
+                            addPlayer(newPlayerName.trim())
+                            newPlayerName = ""
+                        },
+                        enabled = newPlayerName.isNotBlank()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = stringResource(R.string.add)
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            hideKeyboard.invoke()
+                            favoritePlayers.addName(newPlayerName.trim())
+                            newPlayerName = ""
+                        },
+                        enabled = newPlayerName.isNotBlank()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Save,
+                            contentDescription = stringResource(R.string.save)
+                        )
+                    }
+                }
+            }
+        )
+    }
+
 }
 
 @Composable
@@ -368,47 +445,48 @@ private fun ConfirmDeleteSavedPlayer(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun GameTypeDropdownMenu(
-    onChange: (String) -> Unit
+private fun GameSelectionDialog(
+    onClickAction: (GameType) -> Unit,
+    onDismissRequest: () -> Unit,
+    modifier: Modifier
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    var selectedGame by remember { mutableStateOf(Games.TYPES[0].getName()) }
-    onChange(selectedGame)
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded },
-        Modifier.padding(vertical = 8.dp)
-    ) {
-        TextField(
-            value = selectedGame,
-            onValueChange = {},
-            readOnly = true,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            colors = ExposedDropdownMenuDefaults.textFieldColors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent
-            ),
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
+    Dialog(onDismissRequest = { onDismissRequest() }) {
+        Card(
+            modifier = modifier
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
         ) {
-            Games.TYPES.forEach { gameType ->
-                DropdownMenuItem(
-                    text = { Text(text = gameType.getName()) },
-                    onClick = {
-                        selectedGame = gameType.getName()
-                        onChange(gameType.getName())
-                        expanded = false
-                    },
-                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = modifier.padding(top = 10.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.select_game),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Games.TYPES.forEach { gameType ->
+                    Text(
+                        text = gameType.getName(),
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp, vertical = 10.dp)
+                            .clickable(
+                                onClick = { onClickAction(gameType) }
+                            ),
+                        style = MaterialTheme.typography.labelMedium.plus(
+                            TextStyle(
+                                color = SkyBlue,
+                                textDecoration = TextDecoration.Underline
+                            )
+                        )
+                    )
+                }
             }
         }
     }
@@ -420,6 +498,7 @@ private fun GameSetupScreenContentPreview() {
     GameSetupScreenContent(
         FavoritePlayers(File("favorite-games.json")),
         FavoriteGames(File("favorite-games.json")),
-        { game, players -> }
+        { game, players -> },
+        Modifier
     )
 }

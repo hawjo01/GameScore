@@ -35,11 +35,11 @@ enum class GameScoreScreen() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun GameScoreAppBar(
-    gameViewModel: GameViewModel,
+    viewModel: GameViewModel,
     modifier: Modifier = Modifier
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-    val topAppBar by gameViewModel.topAppBar
+    val topAppBar by viewModel.topAppBar
 
     CenterAlignedTopAppBar(
         title = {
@@ -66,7 +66,7 @@ fun GameScoreApp(
     Scaffold(
         topBar = {
             GameScoreAppBar(
-                gameViewModel = viewModel,
+                viewModel = viewModel,
             )
         }
     ) { innerPadding ->
@@ -88,7 +88,7 @@ fun GameScoreApp(
                         )
                     ),
                     favoriteGames = favoriteGames,
-                    onNextButtonClicked = { gameName, playerNames ->
+                    onStartGame = { gameName, playerNames ->
                         viewModel.setGame(Game(Games.getByName(gameName), playerNames))
                         navController.navigate(GameScoreScreen.Play.name)
                     }
