@@ -1,4 +1,4 @@
-package net.hawkins.gamescore.favorites
+package net.hawkins.gamescore.data.source
 
 import org.junit.Assert.assertFalse
 import org.junit.Rule
@@ -6,7 +6,7 @@ import org.junit.rules.TemporaryFolder
 import java.io.File
 import java.util.UUID
 
-abstract class AbstractFavoriteTest {
+abstract class AbstractFileDataSourceTest {
     @Rule
     @JvmField
     val tempDir: TemporaryFolder = TemporaryFolder()

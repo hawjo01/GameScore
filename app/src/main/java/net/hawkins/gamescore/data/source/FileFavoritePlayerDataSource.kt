@@ -1,4 +1,4 @@
-package net.hawkins.gamescore.favorites
+package net.hawkins.gamescore.data.source
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -8,53 +8,42 @@ import java.io.File
 import java.io.FileWriter
 import java.io.IOException
 
-class FavoritePlayers(private val file: File) {
+class FileFavoritePlayerDataSource(private val file: File) : FavoritePlayerDataSource {
 
-    private val _names = mutableListOf<String>()
-
-    init {
+    override fun getPlayers(): List<String> {
         println("Initializing FavoritePlayerNames from " + file.absolutePath)
-        if (file.exists()) {
+        return if (file.exists()) {
             try {
                 file.bufferedReader().use { bufferedReader: BufferedReader ->
-                    val gson = Gson()
-                    val listType = object : TypeToken<ArrayList<String>>() {}.type
-                    val playerList =
-                        gson.fromJson<ArrayList<String>>(bufferedReader, listType)
-                    playerList.forEach { _names.add(it) }
+                    val json = bufferedReader.readText()
+                    val type = object : TypeToken<ArrayList<String>>() {}.type
+                    Gson().fromJson(json, type) ?: emptyList()
                 }
             } catch (e: Exception) {
                 println("An unexpected error occurred: ${e.message}")
+                emptyList()
             }
         } else {
             println("Skip loading favorite players.  File " + file.absolutePath + " does not exist")
+            emptyList()
         }
     }
 
-    fun getNames(): List<String> {
-        return _names
+    override fun savePlayer(player: String) {
+        val players = getPlayers()
+        savePlayers(players.plus(player))
     }
 
-    fun addName(name: String) {
-        if (_names.contains(name)) {
-            println("Skipping save of player '$name', name already exists")
-            return
-        }
-
-        _names.add(name)
-        save()
+    override fun deletePlayer(player: String) {
+        val players = getPlayers()
+        savePlayers(players.minus(player))
     }
 
-    fun removeName(player: String) {
-        _names.remove(player)
-        save()
-    }
-
-    private fun save() {
+    private fun savePlayers(players: List<String>) {
         try {
             val gson = GsonBuilder().setPrettyPrinting().create()
             FileWriter(file).use { writer ->
-                gson.toJson(_names, writer)
+                gson.toJson(players, writer)
             }
         } catch (e: IOException) {
             println("Failed to save players. " + e.message)

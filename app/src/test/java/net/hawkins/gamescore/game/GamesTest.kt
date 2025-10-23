@@ -12,8 +12,8 @@ class GamesTest {
 
     @Test
     fun getByName() {
-        val twentyFiveHunderd = Games.getByName("2500")
-        assertEquals(TwentyFiveHundred, twentyFiveHunderd)
+        val twentyFiveHundred = Games.getByName("2500")
+        assertEquals(TwentyFiveHundred, twentyFiveHundred)
 
         val basicScore = Games.getByName("Basic Scoring")
         assertEquals(BasicScore, basicScore)
