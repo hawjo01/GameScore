@@ -268,8 +268,13 @@ private fun NewScoreDialog(
                             newScore = it
                             if (game.isValidScore(newScore)) warnInvalidScore = false
                         },
-                        label = { Text(text = stringResource(R.string.score_for, player.name)) },
-                        textStyle = TextStyle(textAlign = TextAlign.Center),
+                        label = {
+                            Text(
+                                text = stringResource(R.string.score_for, player.name),
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        },
+                        textStyle = MaterialTheme.typography.labelSmall.plus(TextStyle(textAlign = TextAlign.Center)),
                         singleLine = true,
                         shape = shapes.small,
                         keyboardOptions = KeyboardOptions(
@@ -337,7 +342,13 @@ private fun ChangeScore(
                 OutlinedTextField(
                     value = newScore,
                     onValueChange = { newScore = it },
-                    label = { Text(text = stringResource(R.string.change_score)) },
+                    label = {
+                        Text(
+                            text = stringResource(R.string.change_score),
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    },
+                    textStyle = MaterialTheme.typography.labelSmall.plus(TextStyle(textAlign = TextAlign.Center)),
                     singleLine = true,
                     shape = shapes.small,
                     keyboardOptions = KeyboardOptions(
