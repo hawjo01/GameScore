@@ -1,12 +1,13 @@
 package net.hawkins.gamescore.data.source
 
+import net.hawkins.gamescore.AbstractBaseTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
 import java.nio.file.Paths
 
-class FileFavoritePlayerDataSourceTest : AbstractFileDataSourceTest() {
+class FileFavoritePlayerDataSourceTest : AbstractBaseTest() {
 
     @Test
     fun fileDoesNotExist() {
