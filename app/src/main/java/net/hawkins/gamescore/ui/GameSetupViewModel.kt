@@ -52,9 +52,9 @@ class GameSetupViewModel(application: Application) : GameScoreViewModel(applicat
         }
     }
 
-    fun removePlayer(index: Int) {
+    fun removePlayer(position: Int) {
         _uiState.update { currentState ->
-            currentState.copy(playerNames = currentState.playerNames.drop(index))
+            currentState.copy(playerNames = currentState.playerNames.filterIndexed { index, name -> index != position })
         }
     }
 
