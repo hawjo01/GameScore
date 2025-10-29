@@ -36,4 +36,8 @@ class Game(private val gameType: GameType, playerNames: List<String>) {
     fun getGameName(): String {
         return gameType.getName()
     }
+
+    fun numberOfRounds(): Int {
+        return players.maxBy { player -> player.scores.size }.scores.size
+    }
 }

@@ -254,12 +254,13 @@ private fun GameCard(
                 IconButton(
                     onClick = {
                         onStartGame(gameName, playerNames)
-                    }, enabled = gameName.isNotEmpty() && playerNames.isNotEmpty()
+                    },
+                    enabled = gameName.isNotEmpty() && playerNames.isNotEmpty()
                 ) {
                     Icon(
                         imageVector = Icons.Filled.PlayArrow,
                         contentDescription = stringResource(R.string.start_game),
-                        tint = GoGreen,
+                        tint = if (gameName.isNotEmpty() && playerNames.isNotEmpty()) {GoGreen} else {Color.Transparent},
                         modifier = modifier.size(60.dp)
 
                     )

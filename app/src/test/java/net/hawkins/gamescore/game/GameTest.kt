@@ -1,6 +1,9 @@
 package net.hawkins.gamescore.game
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class GameTest {
@@ -108,5 +111,20 @@ class GameTest {
 
         val eights = Game(Eight, listOf("Howard", "Rajesh"))
         assertTrue(eights.hasWinningThreshold())
+    }
+
+    @Test
+    fun numberOfRounds() {
+        val sevens = Game(Seven, listOf("Sheldon", "Leonard"))
+        assertEquals(0, sevens.numberOfRounds())
+
+        sevens.players[0].addScore(7)
+        assertEquals(1, sevens.numberOfRounds())
+
+        sevens.players[1].addScore(14)
+        assertEquals(1, sevens.numberOfRounds())
+
+        sevens.players[1].addScore(21)
+        assertEquals(2, sevens.numberOfRounds())
     }
 }
