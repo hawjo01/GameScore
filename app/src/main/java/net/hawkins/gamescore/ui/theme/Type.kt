@@ -35,7 +35,6 @@ val Typography = Typography(
     displayMedium = TextStyle(
         fontFamily = FontFamily(Typeface(android.graphics.Typeface.MONOSPACE)),
         fontSize = 20.sp,
-        textAlign = TextAlign.Right
     ),
     titleMedium = TextStyle(
         fontSize = 24.sp,

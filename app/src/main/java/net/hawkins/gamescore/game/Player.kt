@@ -20,4 +20,8 @@ data class Player(val name: String) {
     fun changeScore(newScore: Int, scoreIndex: Int) {
         scores[scoreIndex] = newScore
     }
+
+    fun deleteScore(scoreIndex: Int) {
+        scores.removeAt(scoreIndex)
+    }
 }

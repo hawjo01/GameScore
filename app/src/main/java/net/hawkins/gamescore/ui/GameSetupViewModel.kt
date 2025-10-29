@@ -7,11 +7,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import net.hawkins.gamescore.Constants.FAVORITE_GAMES_FILENAME
 import net.hawkins.gamescore.Constants.FAVORITE_PLAYERS_FILENAME
-import net.hawkins.gamescore.model.FavoriteGame
 import net.hawkins.gamescore.data.FavoriteGameRepository
+import net.hawkins.gamescore.data.FavoritePlayerRepository
 import net.hawkins.gamescore.data.source.FileFavoriteGameDataSource
 import net.hawkins.gamescore.data.source.FileFavoritePlayerDataSource
-import net.hawkins.gamescore.data.FavoritePlayerRepository
+import net.hawkins.gamescore.model.FavoriteGame
 import java.io.File
 
 class GameSetupViewModel(application: Application) : GameScoreViewModel(application) {
