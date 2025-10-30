@@ -40,6 +40,10 @@ android {
     buildFeatures {
         compose = true
     }
+
+    lint {
+        sarifReport = true
+    }
 }
 
 dependencies {
