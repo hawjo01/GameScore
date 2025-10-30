@@ -52,8 +52,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.model.FavoriteGame
-import net.hawkins.gamescore.game.GameType
-import net.hawkins.gamescore.game.Games
+import net.hawkins.gamescore.game.type.GameType
+import net.hawkins.gamescore.game.type.Games
 import net.hawkins.gamescore.ui.component.ConfirmAction
 import net.hawkins.gamescore.ui.favorites.FavoriteGamesCard
 import net.hawkins.gamescore.ui.theme.GoGreen

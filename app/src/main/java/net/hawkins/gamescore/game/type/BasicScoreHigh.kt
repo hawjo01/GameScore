@@ -1,18 +1,12 @@
-package net.hawkins.gamescore.game
+package net.hawkins.gamescore.game.type
 
-object BasicScore : GameType {
-    const val NAME = "Basic Scoring"
+import net.hawkins.gamescore.game.Player
+
+object BasicScoreHigh : AbstractBasicScore() {
+    const val NAME = "Basic Scoring - High"
 
     override fun getName(): String {
         return NAME
-    }
-
-    override fun hasWinningThreshold(): Boolean {
-        return false
-    }
-
-    override fun isValidScore(score: String): Boolean {
-        return (score.toIntOrNull() != null)
     }
 
     override fun findWinner(players: List<Player>): Player? {
@@ -28,9 +22,5 @@ object BasicScore : GameType {
         } else {
             null
         }
-    }
-
-    override fun highlightNegativeScore(): Boolean {
-        return false
     }
 }

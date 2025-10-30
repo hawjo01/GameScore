@@ -1,6 +1,7 @@
 package net.hawkins.gamescore.game
 
 import androidx.compose.runtime.mutableStateOf
+import net.hawkins.gamescore.game.type.GameType
 
 class Game(private val gameType: GameType, playerNames: List<String>) {
 

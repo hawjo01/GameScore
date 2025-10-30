@@ -1,35 +1,36 @@
-package net.hawkins.gamescore.game
+package net.hawkins.gamescore.game.type
 
+import net.hawkins.gamescore.game.Player
 import org.junit.Assert.*
 import org.junit.Test
 
-class BasicScoreTest {
+class BasicScoreLowTest {
 
     @Test
     fun isValidScore_true() {
-        assertTrue(BasicScore.isValidScore("0"))
-        assertTrue(BasicScore.isValidScore("5"))
-        assertTrue(BasicScore.isValidScore("-5"))
-        assertTrue(BasicScore.isValidScore("1"))
-        assertTrue(BasicScore.isValidScore("-1"))
+        assertTrue(BasicScoreLow.isValidScore("0"))
+        assertTrue(BasicScoreLow.isValidScore("5"))
+        assertTrue(BasicScoreLow.isValidScore("-5"))
+        assertTrue(BasicScoreLow.isValidScore("1"))
+        assertTrue(BasicScoreLow.isValidScore("-1"))
     }
 
     @Test
     fun isValidScore_false() {
-        assertFalse(BasicScore.isValidScore(""))
-        assertFalse(BasicScore.isValidScore(".5"))
-        assertFalse(BasicScore.isValidScore("a"))
+        assertFalse(BasicScoreLow.isValidScore(""))
+        assertFalse(BasicScoreLow.isValidScore(".5"))
+        assertFalse(BasicScoreLow.isValidScore("a"))
     }
 
     @Test
     fun hasWinningThreshold() {
-        assertFalse(BasicScore.hasWinningThreshold())
+        assertFalse(BasicScoreLow.hasWinningThreshold())
     }
 
     @Test
     fun findWinner_zeroPlayers() {
         val players: List<Player> = listOf()
-        assertNull(BasicScore.findWinner(players))
+        assertNull(BasicScoreLow.findWinner(players))
     }
 
     @Test
@@ -41,12 +42,12 @@ class BasicScoreTest {
 
         val players: List<Player> = listOf(player1, player2)
 
-        val winner = BasicScore.findWinner(players)
-        assertEquals(player1, winner)
+        val winner = BasicScoreLow.findWinner(players)
+        assertEquals(player2, winner)
     }
 
     @Test
-    fun findWinner_HighScore() {
+    fun findWinner_LowScore() {
         val player1 = Player("foo")
         player1.addScore(20)
 
@@ -55,8 +56,8 @@ class BasicScoreTest {
 
         val players: List<Player> = listOf(player1, player2)
 
-        val winner = BasicScore.findWinner(players)
-        assertEquals(player2, winner)
+        val winner = BasicScoreLow.findWinner(players)
+        assertEquals(player1, winner)
     }
 
     @Test
@@ -69,12 +70,12 @@ class BasicScoreTest {
 
         val players: List<Player> = listOf(player1, player2)
 
-        val winner = BasicScore.findWinner(players)
+        val winner = BasicScoreLow.findWinner(players)
         assertNull(winner)
     }
 
     @Test
     fun highlightNegativeScore() {
-        assertFalse(BasicScore.highlightNegativeScore())
+        assertFalse(BasicScoreLow.highlightNegativeScore())
     }
 }

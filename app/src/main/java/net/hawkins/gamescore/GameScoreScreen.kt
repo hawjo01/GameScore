@@ -18,7 +18,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import net.hawkins.gamescore.game.Game
-import net.hawkins.gamescore.game.Games
+import net.hawkins.gamescore.game.type.Games
 import net.hawkins.gamescore.ui.GamePlayScreen
 import net.hawkins.gamescore.ui.GamePlayViewModel
 import net.hawkins.gamescore.ui.GameScoreViewModel
