@@ -1,4 +1,6 @@
-package net.hawkins.gamescore.game
+package net.hawkins.gamescore.game.type
+
+import net.hawkins.gamescore.game.Player
 
 interface GameType {
     fun getName(): String

@@ -1,4 +1,7 @@
-package net.hawkins.gamescore.game
+package net.hawkins.gamescore.game.type
+
+import net.hawkins.gamescore.game.type.GameType
+import net.hawkins.gamescore.game.Player
 
 object TwentyFiveHundred : GameType {
 

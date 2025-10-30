@@ -1,35 +1,36 @@
-package net.hawkins.gamescore.game
+package net.hawkins.gamescore.game.type
 
-import org.junit.Assert.*
+import net.hawkins.gamescore.game.Player
+import org.junit.Assert
 import org.junit.Test
 
 class TwentyFiveHundredTest {
 
     @Test
     fun isValidScore_true() {
-        assertTrue(TwentyFiveHundred.isValidScore("0"))
-        assertTrue(TwentyFiveHundred.isValidScore("5"))
-        assertTrue(TwentyFiveHundred.isValidScore("-5"))
+        Assert.assertTrue(TwentyFiveHundred.isValidScore("0"))
+        Assert.assertTrue(TwentyFiveHundred.isValidScore("5"))
+        Assert.assertTrue(TwentyFiveHundred.isValidScore("-5"))
     }
 
     @Test
     fun isValidScore_false() {
-        assertFalse(TwentyFiveHundred.isValidScore(""))
-        assertFalse(TwentyFiveHundred.isValidScore("1"))
-        assertFalse(TwentyFiveHundred.isValidScore("-1"))
-        assertFalse(TwentyFiveHundred.isValidScore(".5"))
-        assertFalse(TwentyFiveHundred.isValidScore("a"))
+        Assert.assertFalse(TwentyFiveHundred.isValidScore(""))
+        Assert.assertFalse(TwentyFiveHundred.isValidScore("1"))
+        Assert.assertFalse(TwentyFiveHundred.isValidScore("-1"))
+        Assert.assertFalse(TwentyFiveHundred.isValidScore(".5"))
+        Assert.assertFalse(TwentyFiveHundred.isValidScore("a"))
     }
 
     @Test
     fun hasWinningThreshold() {
-        assertTrue(TwentyFiveHundred.hasWinningThreshold())
+        Assert.assertTrue(TwentyFiveHundred.hasWinningThreshold())
     }
 
     @Test
     fun findWinner_zeroPlayers() {
         val players: List<Player> = mutableListOf()
-        assertNull(TwentyFiveHundred.findWinner(players))
+        Assert.assertNull(TwentyFiveHundred.findWinner(players))
     }
 
     @Test
@@ -41,7 +42,7 @@ class TwentyFiveHundredTest {
 
         val players: List<Player> = listOf(player1, player2)
 
-        assertNull(TwentyFiveHundred.findWinner(players))
+        Assert.assertNull(TwentyFiveHundred.findWinner(players))
     }
 
     @Test
@@ -54,7 +55,7 @@ class TwentyFiveHundredTest {
 
         val players: List<Player> = listOf(player1, player2)
 
-        assertNull(TwentyFiveHundred.findWinner(players))
+        Assert.assertNull(TwentyFiveHundred.findWinner(players))
     }
 
     @Test
@@ -68,7 +69,7 @@ class TwentyFiveHundredTest {
         val players: List<Player> = listOf(player1, player2)
 
         val winner = TwentyFiveHundred.findWinner(players)
-        assertEquals(player2, winner)
+        Assert.assertEquals(player2, winner)
     }
 
     @Test
@@ -82,7 +83,7 @@ class TwentyFiveHundredTest {
         val players: List<Player> = listOf(player1, player2)
 
         val winner = TwentyFiveHundred.findWinner(players)
-        assertEquals(player1, winner)
+        Assert.assertEquals(player1, winner)
     }
 
     @Test
@@ -96,11 +97,11 @@ class TwentyFiveHundredTest {
         val players = listOf(player1, player2)
 
         val winner = TwentyFiveHundred.findWinner(players)
-        assertNull(winner)
+        Assert.assertNull(winner)
     }
 
     @Test
     fun getScoreColor() {
-        assertTrue(TwentyFiveHundred.highlightNegativeScore())
+        Assert.assertTrue(TwentyFiveHundred.highlightNegativeScore())
     }
 }
