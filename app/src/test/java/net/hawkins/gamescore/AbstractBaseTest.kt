@@ -1,6 +1,7 @@
 package net.hawkins.gamescore
 
-import org.junit.Assert
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import java.io.File
@@ -13,18 +14,18 @@ abstract class AbstractBaseTest {
 
     fun randomTempFile(extension: String = ".json", create: Boolean = false): File {
         val tempFile = File(tempDir.root, "testfile_" + UUID.randomUUID().toString() + extension)
-        Assert.assertFalse(tempFile.exists())
+        assertFalse(tempFile.exists())
         if (create) {
-            Assert.assertTrue(tempFile.createNewFile())
+            assertTrue(tempFile.createNewFile())
         }
         return tempFile
     }
 
     fun randomTempDir(create: Boolean = false): File {
         val tempDir = File(tempDir.root, "testfile_" + UUID.randomUUID().toString())
-        Assert.assertFalse(tempDir.exists())
+        assertFalse(tempDir.exists())
         if (create) {
-            Assert.assertTrue(tempDir.mkdir())
+            assertTrue(tempDir.mkdir())
         }
         return tempDir
     }
