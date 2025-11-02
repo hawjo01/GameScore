@@ -1,11 +1,13 @@
 package net.hawkins.gamescore.game
 
 import net.hawkins.gamescore.game.type.GameType
+import net.hawkins.gamescore.game.Game.Player
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+
 
 class GameTest {
 
@@ -18,7 +20,7 @@ class GameTest {
             return (score.toIntOrNull() != null && score.toInt() % 7 == 0)
         }
 
-        override fun findWinner(players: List<Player>): Player? {
+        override fun findWinner(players: List<Game.Player>): Player? {
             return players.maxByOrNull { player -> player.totalScore() }
         }
 

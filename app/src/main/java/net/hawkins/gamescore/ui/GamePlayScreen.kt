@@ -53,8 +53,8 @@ import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.Utils
 import net.hawkins.gamescore.game.Game
-import net.hawkins.gamescore.game.Player
-import net.hawkins.gamescore.game.type.TwentyFiveHundred
+import net.hawkins.gamescore.game.Game.Player
+import net.hawkins.gamescore.game.type.Games
 import net.hawkins.gamescore.model.FavoriteGame
 import net.hawkins.gamescore.ui.component.ConfirmAction
 import net.hawkins.gamescore.ui.favorites.SaveFavoriteGame
@@ -540,7 +540,7 @@ private fun AppBarActions(game: Game, saveFavoriteGame: (FavoriteGame) -> Unit) 
 @Preview
 @Composable
 private fun GamePlayScreenContentPreview() {
-    val game = Game(TwentyFiveHundred, listOf("Sheldon", "Leonard"))
+    val game = Game(Games.getByName("2500"), listOf("Sheldon", "Leonard"))
     game.players[0].addScore(90)
     game.players[0].addScore(25)
     game.players[1].addScore(-20)
