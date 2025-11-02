@@ -70,4 +70,5 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     testImplementation(libs.mockk)
+    implementation("io.netty:netty-bom:4.1.128.Final")
 }
