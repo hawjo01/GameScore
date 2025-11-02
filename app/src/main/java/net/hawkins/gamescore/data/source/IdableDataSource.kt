@@ -4,6 +4,7 @@ import net.hawkins.gamescore.data.model.Idable
 
 interface IdableDataSource <T : Idable> {
     fun getAll(): List<T>
+    fun getById(id: Int): T?
     fun save(item: T)
     fun deleteById(id: Int)
 }

@@ -23,10 +23,14 @@ import net.hawkins.gamescore.ui.GamePlayScreen
 import net.hawkins.gamescore.ui.GamePlaySetupScreen
 import net.hawkins.gamescore.ui.GamePlaySetupViewModel
 import net.hawkins.gamescore.ui.GamePlayViewModel
+import net.hawkins.gamescore.ui.GameSetupScreen
+import net.hawkins.gamescore.ui.GameSetupUiState
+import net.hawkins.gamescore.ui.GameSetupViewModel
 
 enum class GameScoreScreen() {
     GamePlaySetup,
-    GamePlay
+    GamePlay,
+    GameSetup
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,6 +62,7 @@ private fun GameScoreAppBar(
 fun GameScoreScreen(
     gamePlaySetupViewModel: GamePlaySetupViewModel = viewModel(),
     gamePlayViewModel: GamePlayViewModel = viewModel(),
+    gameSetupViewModel: GameSetupViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
     Scaffold(
@@ -73,7 +78,6 @@ fun GameScoreScreen(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(route = GameScoreScreen.GamePlaySetup.name) {
-
                 GamePlaySetupScreen(
                     viewModel = gamePlaySetupViewModel,
                     onStartGame = { game, playerNames ->
@@ -93,7 +97,26 @@ fun GameScoreScreen(
                     // Prevent accidental erasure of game data
                 }
                 GamePlayScreen(
-                    viewModel = gamePlayViewModel
+                    viewModel = gamePlayViewModel,
+                    onShowGameDetails = { game ->
+                        gameSetupViewModel.setGame(game)
+                        gameSetupViewModel.setMode(GameSetupUiState.Mode.VIEW)
+                        navController.navigate(GameScoreScreen.GameSetup.name)
+                    }
+                )
+            }
+
+            composable(route = GameScoreScreen.GameSetup.name) {
+                GameSetupScreen(
+                    viewModel = gameSetupViewModel,
+                    onCancel = {
+                        navController.popBackStack()
+                    },
+                    onModifyGame = {
+                        val game = gameSetupViewModel.getGame()
+                        gamePlayViewModel.updateGame(game)
+                        navController.popBackStack()
+                    }
                 )
             }
         }

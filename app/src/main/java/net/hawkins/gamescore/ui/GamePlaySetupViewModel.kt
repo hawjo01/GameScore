@@ -16,7 +16,7 @@ import javax.inject.Inject
 class GamePlaySetupViewModel @Inject constructor(
     private val _gameRepository: GameRepository,
     private val _playerRepository: FavoritePlayerRepository,
-    private val _favoriteGameRepository: FavoriteGameRepository
+    private val _favoriteGameRepository: FavoriteGameRepository,
 ) : AbstractViewModel() {
     private val _uiState = MutableStateFlow(GamePlaySetupUiState())
     val uiState: StateFlow<GamePlaySetupUiState> = _uiState.asStateFlow()
@@ -35,12 +35,6 @@ class GamePlaySetupViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(selectedGame = newSelectedGame)
         }
-    }
-
-    // TODO: This needs to go away, but it's needed as we move to ID's.
-    fun setGameByName(name: String) {
-        val game = _gameRepository.getByName(name)
-        setGame(game)
     }
 
     fun addPlayer(newPlayerName: String) {

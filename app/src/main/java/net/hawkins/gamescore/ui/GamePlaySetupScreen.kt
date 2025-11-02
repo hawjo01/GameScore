@@ -84,7 +84,6 @@ fun GamePlaySetupScreen(
         saveFavoritePlayer = { playerName -> viewModel.addFavoritePlayer(playerName) },
         deleteFavoritePlayer = { playerName -> viewModel.deleteFavoritePlayer(playerName) },
         deleteFavoriteGame = { favoriteGame -> viewModel.deleteFavoriteGame(favoriteGame) },
-        onSetGameByName = { gameName -> viewModel.setGameByName(gameName) },
         modifier = modifier
     )
 }
@@ -100,7 +99,6 @@ private fun GamePlaySetupScreenContent(
     saveFavoritePlayer: (String) -> Unit,
     deleteFavoritePlayer: (String) -> Unit,
     deleteFavoriteGame: (FavoriteGame) -> Unit,
-    onSetGameByName: (String) -> Unit,
     modifier: Modifier
 ) {
     Column {
@@ -148,7 +146,7 @@ private fun GamePlaySetupScreenContent(
                     onDeleteFavoriteGame = deleteFavoriteGame,
                     onFavoriteSelected = { favoriteGame ->
                         // TODO: Fix this once the entire game is stored in the favorite
-                        onSetGameByName(favoriteGame.game)
+                        onSetGame(favoriteGame.game)
                         onSetPlayers(favoriteGame.players)
                     })
             }
@@ -463,7 +461,7 @@ private fun GameSelectionDialog(
                         fontWeight = FontWeight.Bold
                     )
                 }
-                games.forEach { game ->
+                games.sortedBy {game -> game.name}.forEach { game ->
                     Text(
                         text = game.name,
                         modifier = modifier
@@ -497,6 +495,5 @@ private fun GamePlaySetupScreenContentPreview() {
         modifier = Modifier,
         saveFavoritePlayer = { _ -> },
         deleteFavoritePlayer = { _ -> },
-        deleteFavoriteGame = { _ -> },
-        onSetGameByName = { _ -> })
+        deleteFavoriteGame = { _ -> })
 }

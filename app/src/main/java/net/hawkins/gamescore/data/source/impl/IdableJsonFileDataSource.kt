@@ -13,8 +13,7 @@ import java.io.IOException
 abstract class IdableJsonFileDataSource<T : Idable>(
     protected val file: File,
     private val clazz: Class<T>
-) :
-    IdableDataSource<T> {
+) : IdableDataSource<T> {
 
     override fun getAll(): List<T> {
         return if (file.exists()) {
@@ -34,13 +33,19 @@ abstract class IdableJsonFileDataSource<T : Idable>(
         }
     }
 
+    override fun getById(id: Int): T? {
+        val items = getAll()
+        val item = items.firstOrNull { item -> item.id == id }
+        return item
+    }
+
     override fun save(item: T) {
         val existingItems = getAll()
         val itemsToSave = if (item.id == null) {
             item.id = generateId(existingItems)
             existingItems.plus(item)
         } else {
-            existingItems.filterNot { existingItem -> existingItem.id != item.id }.plus(item)
+            existingItems.filterNot { existingItem -> existingItem.id == item.id }.plus(item)
         }
 
         saveAll(itemsToSave)

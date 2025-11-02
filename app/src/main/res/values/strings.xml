@@ -27,4 +27,20 @@
     <string name="select_game">Select Game</string>
     <string name="delete_score">Delete Score</string>
     <string name="delete_score_for_player">Delete score %1$s for %2$s</string>
+    <string name="high_score">High Score</string>
+    <string name="low_score">Low Score</string>
+    <string name="normal">Default</string>
+    <string name="red">Red</string>
+    <string name="green">Green</string>
+    <string name="only_positive">Only Positive</string>
+    <string name="multiple_of">Multiple of</string>
+    <string name="score_constraints">Score Constraints</string>
+    <string name="negative_score">Negative Score</string>
+    <string name="positive_score">Positive Score</string>
+    <string name="display_colors">Display Colors</string>
+    <string name="new_game">New Game</string>
+    <string name="objective">Objective</string>
+    <string name="type">Type</string>
+    <string name="change">Change</string>
+    <string name="modify">Modify</string>
 </resources>

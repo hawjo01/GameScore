@@ -63,6 +63,7 @@ import net.hawkins.gamescore.ui.favorites.SaveFavoriteGame
 @Composable
 fun GamePlayScreen(
     viewModel: GamePlayViewModel,
+    onShowGameDetails: (Game) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -72,6 +73,7 @@ fun GamePlayScreen(
             newActions = {
                 AppBarActions(
                     gamePlay = uiState.gamePlay,
+                    onShowGameDetails = onShowGameDetails,
                     saveFavoriteGame = { favoriteGame -> viewModel.saveFavoriteGame(favoriteGame) })
             }
         )
@@ -235,7 +237,7 @@ private fun Round(gamePlay: GamePlay, round: Int, modifier: Modifier) {
                 text = score.padStart(player.totalScore().toString().length, ' '),
                 style = MaterialTheme.typography.displayMedium,
                 textAlign = TextAlign.Center,
-                color = if (Utils.isNegativeInt(score) && gamePlay.highlightNegativeScore()) Color.Red else Color.Unspecified,
+                color = gamePlay.getScoreColor(score),
                 modifier = modifier
                     .weight(1f)
                     .combinedClickable(onLongClick = {
@@ -471,7 +473,11 @@ private fun ConfirmResetGame(
 }
 
 @Composable
-private fun AppBarActions(gamePlay: GamePlay, saveFavoriteGame: (FavoriteGame) -> Unit) {
+private fun AppBarActions(
+    gamePlay: GamePlay,
+    onShowGameDetails: (Game) -> Unit,
+    saveFavoriteGame: (FavoriteGame) -> Unit
+) {
 
     var dropdownMenuExpanded by remember { mutableStateOf(false) }
     var showSaveFavoriteGame by remember { mutableStateOf(false) }
@@ -501,7 +507,7 @@ private fun AppBarActions(gamePlay: GamePlay, saveFavoriteGame: (FavoriteGame) -
         DropdownMenuItem(
             text = {
                 Text(
-                    text = "Favorite Game",
+                    text = "Save Favorite Game",
                     fontSize = 20.sp
                 )
             },
@@ -519,6 +525,18 @@ private fun AppBarActions(gamePlay: GamePlay, saveFavoriteGame: (FavoriteGame) -
             },
             onClick = {
                 showResetGameDialog = true
+                dropdownMenuExpanded = false
+            }
+        )
+        DropdownMenuItem(
+            text = {
+                Text(
+                    text = "Details",
+                    fontSize = 20.sp
+                )
+            },
+            onClick = {
+                onShowGameDetails(gamePlay.game)
                 dropdownMenuExpanded = false
             }
         )
@@ -543,7 +561,7 @@ private fun AppBarActions(gamePlay: GamePlay, saveFavoriteGame: (FavoriteGame) -
                     FavoriteGame(
                         name = name.trim(),
                         players = gamePlay.players.map { player -> player.name },
-                        game = gamePlay.getGameName()
+                        game = gamePlay.game
                     )
                 )
                 showSaveFavoriteGame = false
