@@ -49,6 +49,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.Utils
@@ -486,7 +487,12 @@ private fun AppBarActions(game: Game, saveFavoriteGame: (FavoriteGame) -> Unit) 
     ) {
         if (!game.hasWinningThreshold()) {
             DropdownMenuItem(
-                text = { Text(text = stringResource(R.string.find_winner)) },
+                text = {
+                    Text(
+                        text = stringResource(R.string.find_winner),
+                        fontSize = 20.sp
+                    )
+                },
                 onClick = {
                     game.determineWinner()
                     dropdownMenuExpanded = false
@@ -494,14 +500,24 @@ private fun AppBarActions(game: Game, saveFavoriteGame: (FavoriteGame) -> Unit) 
             )
         }
         DropdownMenuItem(
-            text = { Text("Favorite Game") },
+            text = {
+                Text(
+                    text = "Favorite Game",
+                    fontSize = 20.sp
+                )
+            },
             onClick = {
                 showSaveFavoriteGame = true
                 dropdownMenuExpanded = false
             }
         )
         DropdownMenuItem(
-            text = { Text(text = stringResource(R.string.reset_game)) },
+            text = {
+                Text(
+                    text = stringResource(R.string.reset_game),
+                    fontSize = 20.sp
+                )
+            },
             onClick = {
                 showResetGameDialog = true
                 dropdownMenuExpanded = false
