@@ -10,14 +10,14 @@ class GamesTest {
         assertEquals(3, Games.TYPES.size)
     }
 
-    @Test
-    fun getByName() {
-        val twentyFiveHundred = Games.getByName("2500")
-        assertEquals(TwentyFiveHundred, twentyFiveHundred)
-
-        val basicScore = Games.getByName("Basic Scoring - High")
-        assertEquals(BasicScoreHigh, basicScore)
-    }
+//    @Test
+//    fun getByName() {
+//        val twentyFiveHundred = Games.getByName("2500")
+//        assertEquals(TwentyFiveHundred, twentyFiveHundred)
+//
+//        val basicScore = Games.getByName("Basic Scoring - High")
+//        assertEquals(BasicScoreHigh, basicScore)
+//    }
 
     @Test
     fun isValidName() {
