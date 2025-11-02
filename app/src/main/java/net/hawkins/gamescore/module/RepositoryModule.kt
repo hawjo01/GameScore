@@ -6,18 +6,24 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import net.hawkins.gamescore.Constants
 import net.hawkins.gamescore.data.FavoriteGameRepository
 import net.hawkins.gamescore.data.FavoritePlayerRepository
 import net.hawkins.gamescore.data.GameRepository
 import net.hawkins.gamescore.data.source.impl.FileFavoriteGameDataSource
 import net.hawkins.gamescore.data.source.impl.FileFavoritePlayerDataSource
+import net.hawkins.gamescore.data.source.impl.FileGameDataSource
 import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
+
+    const val FAVORITE_PLAYERS_FILENAME = "favorite-players.json"
+    const val FAVORITE_GAMES_FILENAME = "favorite-games.json"
+    const val GAMES_FILENAME = "games.json"
 
     @Provides
     @Singleton
@@ -28,7 +34,7 @@ object RepositoryModule {
             dataSource = FileFavoriteGameDataSource(
                 File(
                     directory,
-                    Constants.FAVORITE_GAMES_FILENAME
+                    FAVORITE_GAMES_FILENAME
                 )
             )
         )
@@ -42,7 +48,7 @@ object RepositoryModule {
             FileFavoritePlayerDataSource(
                 File(
                     directory,
-                    Constants.FAVORITE_PLAYERS_FILENAME
+                    FAVORITE_PLAYERS_FILENAME
                 )
             )
         )
@@ -50,7 +56,31 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideGameRepository(): GameRepository {
-        return GameRepository()
+    fun provideGameRepository(@ApplicationContext appContext: Context): GameRepository {
+        val dataFile = File(appContext.filesDir, GAMES_FILENAME)
+        if (!dataFile.exists()) {
+            copyAssetFile(
+                context = appContext,
+                assetFileName = GAMES_FILENAME,
+                destinationFile = dataFile
+            )
+        }
+
+        return GameRepository(dataSource = FileGameDataSource(dataFile))
+    }
+
+    private fun copyAssetFile(context: Context, assetFileName: String, destinationFile: File) {
+        try {
+            val assets = context.assets
+            assets.open(assetFileName).use { inputStream ->
+                FileOutputStream(destinationFile).use { outputStream ->
+                    // Copy the content from the asset file to the destination file
+                    inputStream.copyTo(outputStream)
+                }
+            }
+        } catch (e: IOException) {
+            System.err.println("Failed to copy asset '" + assetFileName + "' to '" + destinationFile.absolutePath + "'")
+            e.printStackTrace()
+        }
     }
 }

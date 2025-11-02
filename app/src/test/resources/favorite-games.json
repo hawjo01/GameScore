@@ -1,18 +1,35 @@
 [
   {
-    "game": "2500",
     "name": "2500 - Sheldon \u0026 Leonard",
     "players": [
       "Sheldon",
       "Leonard"
-    ]
+    ],
+    "game": {
+      "name": "2500",
+      "objective": {
+        "type": "HIGH_SCORE",
+        "goal": 2500
+      },
+      "constraints": {
+        "positiveOnly": false,
+        "equalHandSizes": false,
+        "multipleOf": 5
+      },
+      "color": {
+        "negativeScore": "RED",
+        "positiveScore": "DEFAULT"
+      }
+    }
   },
   {
-    "game": "Basic Scoring",
     "name": "Scrabble - Howard \u0026 Rajesh",
     "players": [
       "Howard",
       "Rajesh"
-    ]
+    ],
+    "game": {
+      "name": "Basic Scoring"
+    }
   }
 ]
