@@ -1,6 +1,6 @@
 package net.hawkins.gamescore.data
 
-import net.hawkins.gamescore.data.source.FileFavoriteGameDataSource
+import net.hawkins.gamescore.data.source.impl.FileFavoriteGameDataSource
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
@@ -15,7 +15,7 @@ class FavoriteGameRepositoryTest {
         assertTrue(file.exists())
         val dataSource = FileFavoriteGameDataSource(file)
         val repository = FavoriteGameRepository(dataSource)
-        val games = repository.getFavoriteGames()
+        val games = repository.getAll()
         assertTrue(games.isEmpty())
     }
 }

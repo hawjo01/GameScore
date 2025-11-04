@@ -1,21 +1,22 @@
-package net.hawkins.gamescore.data.source
+package net.hawkins.gamescore.data.source.impl
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import net.hawkins.gamescore.data.source.DataSource
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
 
-abstract class JsonFileDataSource<T>(private val file: File, private val clazz: Class<T>) {
+abstract class JsonFileDataSource<T>(protected val file: File, private val clazz: Class<T>) : DataSource<T> {
 
-    protected fun getAll(): List<T> {
+    override fun getAll(): List<T> {
         return if (file.exists()) {
             try {
                 file.bufferedReader().use { bufferedReader: BufferedReader ->
                     val json = bufferedReader.readText()
-                    val type = TypeToken.getParameterized(List::class.java, clazz).getType()
+                    val type = TypeToken.getParameterized(List::class.java, clazz).type
                     Gson().fromJson(json, type) ?: emptyList()
                 }
             } catch (e: Exception) {
@@ -28,12 +29,12 @@ abstract class JsonFileDataSource<T>(private val file: File, private val clazz: 
         }
     }
 
-    protected fun save(item: T) {
+    override fun save(item: T) {
         val items = getAll()
         saveAll(items.plus(item))
     }
 
-    protected fun delete(item: T) {
+    override fun delete(item: T) {
         val items = getAll()
         saveAll(items.minus(item))
     }
