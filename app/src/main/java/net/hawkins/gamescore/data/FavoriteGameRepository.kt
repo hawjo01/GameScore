@@ -1,23 +1,15 @@
 package net.hawkins.gamescore.data
 
-import net.hawkins.gamescore.data.source.FavoriteGameDataSource
+import net.hawkins.gamescore.data.source.DataSource
 import net.hawkins.gamescore.game.type.Games
 import net.hawkins.gamescore.model.FavoriteGame
 
-class FavoriteGameRepository (private val favoriteGameDataSource : FavoriteGameDataSource) {
+class FavoriteGameRepository (dataSource : DataSource<FavoriteGame>) : AbstractRepository<FavoriteGame>(dataSource) {
 
-    fun getFavoriteGames() : List<FavoriteGame> {
-        val favoriteGames = favoriteGameDataSource.getGames().toMutableList()
-        // Filter-out games that don't have a GameType
+    override fun getAll() : List<FavoriteGame> {
+        val favoriteGames = super.getAll().toMutableList()
+        // Filter-out games that don't have a valid GameType
         favoriteGames.retainAll { favoriteGame -> Games.isValidType( favoriteGame.game ) }
         return favoriteGames
-    }
-
-    fun addFavoriteGame(favoriteGame: FavoriteGame) {
-        favoriteGameDataSource.saveGame(favoriteGame)
-    }
-
-    fun removeFavoriteGame(favoriteGame: FavoriteGame) {
-        favoriteGameDataSource.deleteGame(favoriteGame)
     }
 }

@@ -1,4 +1,4 @@
-package net.hawkins.gamescore.data.source
+package net.hawkins.gamescore.data.source.impl
 
 import net.hawkins.gamescore.AbstractBaseTest
 import net.hawkins.gamescore.model.FavoriteGame
@@ -13,7 +13,7 @@ class FileFavoriteGameDataSourceTest : AbstractBaseTest() {
     @Test
     fun fileDoesNotExist() {
         val dataSource = FileFavoriteGameDataSource(randomTempFile())
-        assertTrue(dataSource.getGames().isEmpty())
+        assertTrue(dataSource.getAll().isEmpty())
     }
 
     @Test
@@ -21,7 +21,7 @@ class FileFavoriteGameDataSourceTest : AbstractBaseTest() {
         val resourceDirectory = Paths.get("src", "test", "resources")
         val file = File(resourceDirectory.toFile(), "favorite-games.json")
         val dataSource = FileFavoriteGameDataSource(file)
-        val games = dataSource.getGames()
+        val games = dataSource.getAll()
         assertEquals(2, games.size)
 
         val favoriteGame1 = games[0]
@@ -38,29 +38,29 @@ class FileFavoriteGameDataSourceTest : AbstractBaseTest() {
         assertEquals("Howard", favoriteGame2.players[0])
         assertEquals("Rajesh", favoriteGame2.players[1])
     }
-    
+
     @Test
     fun addAndRemove() {
         val tempFile = randomTempFile()
         val dataSource = FileFavoriteGameDataSource(tempFile)
-        assertTrue(dataSource.getGames().isEmpty())
+        assertTrue(dataSource.getAll().isEmpty())
 
         val favoriteGame =
             FavoriteGame("Add Test Favorite", listOf("Penny", "Bernadette"), "Basic Scoring")
-        dataSource.saveGame(favoriteGame)
+        dataSource.save(favoriteGame)
 
         val dataSource2 = FileFavoriteGameDataSource(tempFile)
-        assertEquals(1, dataSource2.getGames().size)
-        assertEquals(favoriteGame.name, dataSource2.getGames()[0].name)
-        assertEquals(favoriteGame.game, dataSource2.getGames()[0].game)
-        assertEquals(favoriteGame.players.size, dataSource2.getGames()[0].players.size)
-        assertEquals(favoriteGame.players[0], dataSource2.getGames()[0].players[0])
-        assertEquals(favoriteGame.players[1], dataSource2.getGames()[0].players[1])
+        assertEquals(1, dataSource2.getAll().size)
+        assertEquals(favoriteGame.name, dataSource2.getAll()[0].name)
+        assertEquals(favoriteGame.game, dataSource2.getAll()[0].game)
+        assertEquals(favoriteGame.players.size, dataSource2.getAll()[0].players.size)
+        assertEquals(favoriteGame.players[0], dataSource2.getAll()[0].players[0])
+        assertEquals(favoriteGame.players[1], dataSource2.getAll()[0].players[1])
 
-        dataSource2.deleteGame(dataSource2.getGames()[0])
-        assertTrue(dataSource2.getGames().isEmpty())
+        dataSource2.delete(dataSource2.getAll()[0])
+        assertTrue(dataSource2.getAll().isEmpty())
 
         val dataSource3 = FileFavoriteGameDataSource(tempFile)
-        assertTrue(dataSource3.getGames().isEmpty())
+        assertTrue(dataSource3.getAll().isEmpty())
     }
 }

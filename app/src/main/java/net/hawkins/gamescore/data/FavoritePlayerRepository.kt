@@ -1,18 +1,5 @@
 package net.hawkins.gamescore.data
 
-import net.hawkins.gamescore.data.source.FavoritePlayerDataSource
+import net.hawkins.gamescore.data.source.DataSource
 
-class FavoritePlayerRepository(private val favoritePlayerDataSource: FavoritePlayerDataSource) {
-
-    fun getPlayers(): List<String> {
-        return favoritePlayerDataSource.getPlayers()
-    }
-
-    fun addPlayer(player: String) {
-        favoritePlayerDataSource.savePlayer(player)
-    }
-
-    fun removePlayer(player: String) {
-        favoritePlayerDataSource.deletePlayer(player)
-    }
-}
+class FavoritePlayerRepository(dataSource: DataSource<String>) : AbstractRepository<String>(dataSource)

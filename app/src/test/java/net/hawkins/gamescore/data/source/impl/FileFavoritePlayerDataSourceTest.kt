@@ -1,4 +1,4 @@
-package net.hawkins.gamescore.data.source
+package net.hawkins.gamescore.data.source.impl
 
 import net.hawkins.gamescore.AbstractBaseTest
 import org.junit.Assert.assertEquals
@@ -12,7 +12,7 @@ class FileFavoritePlayerDataSourceTest : AbstractBaseTest() {
     @Test
     fun fileDoesNotExist() {
         val dataSource = FileFavoritePlayerDataSource(randomTempFile())
-        assertTrue(dataSource.getPlayers().isEmpty())
+        assertTrue(dataSource.getAll().isEmpty())
     }
 
     @Test
@@ -20,7 +20,7 @@ class FileFavoritePlayerDataSourceTest : AbstractBaseTest() {
         val resourceDirectory = Paths.get("src", "test", "resources")
         val file = File(resourceDirectory.toFile(), "favorite-players.json")
         val dataSource = FileFavoritePlayerDataSource(file)
-        val names = dataSource.getPlayers()
+        val names = dataSource.getAll()
         assertEquals(2, names.size)
         assertEquals("Sheldon", names[0])
         assertEquals("Leonard", names[1])
@@ -30,17 +30,17 @@ class FileFavoritePlayerDataSourceTest : AbstractBaseTest() {
     fun addAndDelete() {
         val tempFile = tempDir.newFile()
         val dataSource = FileFavoritePlayerDataSource(tempFile)
-        assertTrue(dataSource.getPlayers().isEmpty())
-        dataSource.savePlayer("Penny")
+        assertTrue(dataSource.getAll().isEmpty())
+        dataSource.save("Penny")
 
         // Load a new file
         val dataSource1 = FileFavoritePlayerDataSource(tempFile)
-        assertEquals(1, dataSource1.getPlayers().size)
-        assertEquals("Penny", dataSource1.getPlayers()[0])
+        assertEquals(1, dataSource1.getAll().size)
+        assertEquals("Penny", dataSource1.getAll()[0])
 
-        dataSource1.deletePlayer("Penny")
+        dataSource1.delete("Penny")
 
         val dataSource2 = FileFavoritePlayerDataSource(tempFile)
-        assertTrue(dataSource2.getPlayers().isEmpty())
+        assertTrue(dataSource2.getAll().isEmpty())
     }
 }
