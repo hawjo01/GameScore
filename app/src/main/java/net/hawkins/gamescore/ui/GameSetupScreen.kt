@@ -474,13 +474,13 @@ private fun GameSetupScreenContentPreview() {
     val uiState = GameSetupUiState("", listOf("Sheldon", "Leonard"))
     GameSetupScreenContent(
         uiState = uiState,
-        onStartGame = { game, players -> },
-        onSetPlayers = { players -> },
-        onSetGame = { game -> },
-        onAddPlayer = { player -> },
-        onRemovePlayer = { index -> },
+        onStartGame = { _, _ -> },
+        onSetPlayers = { _ -> },
+        onSetGame = { _ -> },
+        onAddPlayer = { _ -> },
+        onRemovePlayer = { _ -> },
         modifier = Modifier,
-        saveFavoritePlayer = { playerName -> },
-        deleteFavoritePlayer = { playerName -> },
-        deleteFavoriteGame = { game -> })
+        saveFavoritePlayer = { _ -> },
+        deleteFavoritePlayer = { _ -> },
+        deleteFavoriteGame = { _ -> })
 }
