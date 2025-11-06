@@ -54,7 +54,7 @@ import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.Utils
 import net.hawkins.gamescore.game.Game
-import net.hawkins.gamescore.game.Player
+import net.hawkins.gamescore.game.Game.Player
 import net.hawkins.gamescore.game.type.TwentyFiveHundred
 import net.hawkins.gamescore.model.FavoriteGame
 import net.hawkins.gamescore.ui.component.ConfirmAction
