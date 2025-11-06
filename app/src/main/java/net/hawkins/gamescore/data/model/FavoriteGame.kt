@@ -1,4 +1,4 @@
-package net.hawkins.gamescore.model
+package net.hawkins.gamescore.data.model
 
 data class FavoriteGame(
     val name: String = "",

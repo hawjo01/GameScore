@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.update
 import net.hawkins.gamescore.data.FavoriteGameRepository
 import net.hawkins.gamescore.data.Repository
 import net.hawkins.gamescore.game.Game
-import net.hawkins.gamescore.model.FavoriteGame
+import net.hawkins.gamescore.data.model.FavoriteGame
 
 
 class GamePlayViewModel(application: Application) : GameScoreViewModel(application) {

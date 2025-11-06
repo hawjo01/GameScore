@@ -1,6 +1,6 @@
 package net.hawkins.gamescore.ui
 
-import net.hawkins.gamescore.model.FavoriteGame
+import net.hawkins.gamescore.data.model.FavoriteGame
 
 data class GameSetupUiState(
     val gameName: String = "",

@@ -1,7 +1,7 @@
 package net.hawkins.gamescore.data.source.impl
 
 import net.hawkins.gamescore.AbstractBaseTest
-import net.hawkins.gamescore.model.FavoriteGame
+import net.hawkins.gamescore.data.model.FavoriteGame
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
