@@ -1,6 +1,6 @@
 package net.hawkins.gamescore.game.type
 
-import net.hawkins.gamescore.game.Player
+import net.hawkins.gamescore.game.Game.Player
 
 object BasicScoreHigh : AbstractBasicScore() {
     const val NAME = "Basic Scoring - High"
