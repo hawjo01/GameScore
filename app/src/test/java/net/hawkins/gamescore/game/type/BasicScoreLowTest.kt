@@ -6,31 +6,33 @@ import org.junit.Test
 
 class BasicScoreLowTest {
 
+    val game = Games.getByName("Basic Scoring - Low")
+
     @Test
     fun isValidScore_true() {
-        assertTrue(BasicScoreLow.isValidScore("0"))
-        assertTrue(BasicScoreLow.isValidScore("5"))
-        assertTrue(BasicScoreLow.isValidScore("-5"))
-        assertTrue(BasicScoreLow.isValidScore("1"))
-        assertTrue(BasicScoreLow.isValidScore("-1"))
+        assertTrue(game.isValidScore("0"))
+        assertTrue(game.isValidScore("5"))
+        assertTrue(game.isValidScore("-5"))
+        assertTrue(game.isValidScore("1"))
+        assertTrue(game.isValidScore("-1"))
     }
 
     @Test
     fun isValidScore_false() {
-        assertFalse(BasicScoreLow.isValidScore(""))
-        assertFalse(BasicScoreLow.isValidScore(".5"))
-        assertFalse(BasicScoreLow.isValidScore("a"))
+        assertFalse(game.isValidScore(""))
+        assertFalse(game.isValidScore(".5"))
+        assertFalse(game.isValidScore("a"))
     }
 
     @Test
     fun hasWinningThreshold() {
-        assertFalse(BasicScoreLow.hasWinningThreshold())
+        assertFalse(game.hasWinningThreshold())
     }
 
     @Test
     fun findWinner_zeroPlayers() {
         val players: List<Player> = listOf()
-        assertNull(BasicScoreLow.findWinner(players))
+        assertNull(game.findWinner(players))
     }
 
     @Test
@@ -42,7 +44,7 @@ class BasicScoreLowTest {
 
         val players: List<Player> = listOf(player1, player2)
 
-        val winner = BasicScoreLow.findWinner(players)
+        val winner = game.findWinner(players)
         assertEquals(player2, winner)
     }
 
@@ -56,7 +58,7 @@ class BasicScoreLowTest {
 
         val players: List<Player> = listOf(player1, player2)
 
-        val winner = BasicScoreLow.findWinner(players)
+        val winner = game.findWinner(players)
         assertEquals(player1, winner)
     }
 
@@ -70,12 +72,12 @@ class BasicScoreLowTest {
 
         val players: List<Player> = listOf(player1, player2)
 
-        val winner = BasicScoreLow.findWinner(players)
+        val winner = game.findWinner(players)
         assertNull(winner)
     }
 
     @Test
     fun highlightNegativeScore() {
-        assertFalse(BasicScoreLow.highlightNegativeScore())
+        assertFalse(game.highlightNegativeScore())
     }
 }
