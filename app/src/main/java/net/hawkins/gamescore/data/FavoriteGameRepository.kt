@@ -2,7 +2,7 @@ package net.hawkins.gamescore.data
 
 import net.hawkins.gamescore.data.source.DataSource
 import net.hawkins.gamescore.game.type.Games
-import net.hawkins.gamescore.model.FavoriteGame
+import net.hawkins.gamescore.data.model.FavoriteGame
 
 class FavoriteGameRepository (dataSource : DataSource<FavoriteGame>) : AbstractRepository<FavoriteGame>(dataSource) {
 

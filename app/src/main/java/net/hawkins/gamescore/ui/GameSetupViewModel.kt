@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.update
 import net.hawkins.gamescore.data.FavoriteGameRepository
 import net.hawkins.gamescore.data.FavoritePlayerRepository
 import net.hawkins.gamescore.data.Repository
-import net.hawkins.gamescore.model.FavoriteGame
+import net.hawkins.gamescore.data.model.FavoriteGame
 
 class GameSetupViewModel(application: Application) : GameScoreViewModel(application) {
     private val _uiState = MutableStateFlow(GameSetupUiState())

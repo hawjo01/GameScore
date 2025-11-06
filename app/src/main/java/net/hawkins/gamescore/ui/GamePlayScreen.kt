@@ -56,7 +56,7 @@ import net.hawkins.gamescore.Utils
 import net.hawkins.gamescore.game.Game
 import net.hawkins.gamescore.game.Game.Player
 import net.hawkins.gamescore.game.type.TwentyFiveHundred
-import net.hawkins.gamescore.model.FavoriteGame
+import net.hawkins.gamescore.data.model.FavoriteGame
 import net.hawkins.gamescore.ui.component.ConfirmAction
 import net.hawkins.gamescore.ui.favorites.SaveFavoriteGame
 

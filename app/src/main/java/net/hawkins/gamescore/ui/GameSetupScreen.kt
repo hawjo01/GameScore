@@ -51,7 +51,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
-import net.hawkins.gamescore.model.FavoriteGame
+import net.hawkins.gamescore.data.model.FavoriteGame
 import net.hawkins.gamescore.game.type.GameType
 import net.hawkins.gamescore.game.type.Games
 import net.hawkins.gamescore.ui.component.ConfirmAction

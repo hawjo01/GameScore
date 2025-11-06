@@ -39,7 +39,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
-import net.hawkins.gamescore.model.FavoriteGame
+import net.hawkins.gamescore.data.model.FavoriteGame
 import net.hawkins.gamescore.game.Game
 import net.hawkins.gamescore.ui.component.ConfirmAction
 import net.hawkins.gamescore.ui.theme.DeleteRed
