@@ -71,9 +71,12 @@ class GameSetupViewModel(application: Application) : GameScoreViewModel(applicat
     }
 
     fun deleteFavoriteGame(favoriteGame: FavoriteGame) {
-        _favoriteGameRepository.delete(favoriteGame)
-        _uiState.update { currentState ->
-            currentState.copy(favoriteGames = _favoriteGameRepository.getAll())
+        val favoriteGameId = favoriteGame.id
+        if (favoriteGameId != null) {
+            _favoriteGameRepository.deleteById(favoriteGameId)
+            _uiState.update { currentState ->
+                currentState.copy(favoriteGames = _favoriteGameRepository.getAll())
+            }
         }
     }
 }

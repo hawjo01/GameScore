@@ -2,11 +2,12 @@ package net.hawkins.gamescore.data.source.impl
 
 import net.hawkins.gamescore.AbstractBaseTest
 import net.hawkins.gamescore.data.model.FavoriteGame
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
 import java.nio.file.Paths
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class FileFavoriteGameDataSourceTest : AbstractBaseTest() {
 
@@ -57,7 +58,9 @@ class FileFavoriteGameDataSourceTest : AbstractBaseTest() {
         assertEquals(favoriteGame.players[0], dataSource2.getAll()[0].players[0])
         assertEquals(favoriteGame.players[1], dataSource2.getAll()[0].players[1])
 
-        dataSource2.delete(dataSource2.getAll()[0])
+        val id = dataSource2.getAll()[0].id
+        assertNotNull(id)
+        dataSource2.deleteById(id)
         assertTrue(dataSource2.getAll().isEmpty())
 
         val dataSource3 = FileFavoriteGameDataSource(tempFile)
