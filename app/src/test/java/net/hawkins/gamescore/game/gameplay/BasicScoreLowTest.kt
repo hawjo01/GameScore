@@ -1,0 +1,88 @@
+package net.hawkins.gamescore.game.gameplay
+
+import net.hawkins.gamescore.data.GameRepository
+import net.hawkins.gamescore.game.GamePlay
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class BasicScoreLowTest {
+
+    val game = GameRepository.getByName("Basic Scoring - Low")
+
+    @Test
+    fun isValidScore_true() {
+        val gamePlay = GamePlay(game, listOf())
+        assertTrue(gamePlay.isValidScore("0"))
+        assertTrue(gamePlay.isValidScore("5"))
+        assertTrue(gamePlay.isValidScore("-5"))
+        assertTrue(gamePlay.isValidScore("1"))
+        assertTrue(gamePlay.isValidScore("-1"))
+    }
+
+    @Test
+    fun isValidScore_false() {
+        val gamePlay = GamePlay(game, listOf())
+        assertFalse(gamePlay.isValidScore(""))
+        assertFalse(gamePlay.isValidScore(".5"))
+        assertFalse(gamePlay.isValidScore("a"))
+    }
+
+    @Test
+    fun hasWinningThreshold() {
+        val gamePlay = GamePlay(game, listOf())
+        assertFalse(gamePlay.hasWinningThreshold())
+    }
+
+    @Test
+    fun findWinner_zeroPlayers() {
+        val gamePlay = GamePlay(game, listOf())
+        assertNull(gamePlay.determineWinner())
+    }
+
+    @Test
+    fun findWinner_differentScores() {
+        val gamePlay = GamePlay(game, listOf("Rajesh", "Howard"))
+        val player1 = gamePlay.players[0]
+        player1.addScore(20)
+
+        val player2 = gamePlay.players[1]
+
+        val winner = gamePlay.determineWinner()
+        assertEquals(player2, winner)
+    }
+
+    @Test
+    fun findWinner_LowScore() {
+        val gamePlay = GamePlay(game, listOf("Rajesh", "Howard"))
+        val player1 = gamePlay.players[0]
+        player1.addScore(20)
+
+        val player2 = gamePlay.players[1]
+        player2.addScore(50)
+
+        val winner = gamePlay.determineWinner()
+        assertEquals(player1, winner)
+    }
+
+    @Test
+    fun findWinner_EqualScores() {
+        val gamePlay = GamePlay(game, listOf("Rajesh", "Howard"))
+        val player1 = gamePlay.players[0]
+        player1.addScore(20)
+
+        val player2 = gamePlay.players[1]
+        player2.addScore(20)
+
+        val winner = gamePlay.determineWinner()
+        assertNull(winner)
+    }
+
+    @Test
+    fun highlightNegativeScore() {
+        val gamePlay = GamePlay(game, listOf())
+        assertFalse(gamePlay.highlightNegativeScore())
+    }
+}

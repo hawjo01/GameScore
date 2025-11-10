@@ -1,6 +1,6 @@
 package net.hawkins.gamescore.game
 
-import net.hawkins.gamescore.game.Game.Player
+import net.hawkins.gamescore.game.GamePlay.Player
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

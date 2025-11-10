@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.data.model.FavoriteGame
-import net.hawkins.gamescore.game.Game
+import net.hawkins.gamescore.game.GamePlay
 import net.hawkins.gamescore.ui.component.ConfirmAction
 import net.hawkins.gamescore.ui.theme.DeleteRed
 import net.hawkins.gamescore.ui.theme.SkyBlue
@@ -122,7 +122,7 @@ fun FavoriteGamesCard(
 
 @Composable
 fun SaveFavoriteGame(
-    game: Game,
+    gamePlay: GamePlay,
     onDismissRequest: () -> Unit,
     onConfirmation: (String) -> Unit
 ) {
@@ -185,7 +185,7 @@ fun SaveFavoriteGame(
             ) {
                 val text = remember {
                     mutableStateOf(
-                        game.players
+                        gamePlay.players
                             .joinToString(separator = ", ") { player -> player.name })
                 }
                 OutlinedTextField(
@@ -219,7 +219,7 @@ fun SaveFavoriteGame(
                 horizontalArrangement = Arrangement.Start
             ) {
                 OutlinedTextField(
-                    value = game.getGameName(),
+                    value = gamePlay.getGameName(),
                     onValueChange = {},
                     label = { Text(text = stringResource(R.string.game)) },
                     singleLine = true,
