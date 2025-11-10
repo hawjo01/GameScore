@@ -1,8 +1,8 @@
 package net.hawkins.gamescore.ui
 
-import net.hawkins.gamescore.game.Game
-import net.hawkins.gamescore.game.type.Games
+import net.hawkins.gamescore.game.GamePlay
+import net.hawkins.gamescore.data.GameRepository
 
 data class GamePlayUiState(
-    val game: Game = Game(Games.getDefaultGame(), emptyList())
+    val gamePlay: GamePlay = GamePlay(GameRepository.getDefaultGame(), emptyList())
 )

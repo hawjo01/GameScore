@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import net.hawkins.gamescore.data.FavoriteGameRepository
 import net.hawkins.gamescore.data.Repository
-import net.hawkins.gamescore.game.Game
+import net.hawkins.gamescore.game.GamePlay
 import net.hawkins.gamescore.data.model.FavoriteGame
 
 
@@ -18,9 +18,9 @@ class GamePlayViewModel(application: Application) : GameScoreViewModel(applicati
     private val _favoriteGameRepository: FavoriteGameRepository =
         Repository.Factory(application).getFavoriteGameRepository()
 
-    fun setGame(newGame: Game) {
+    fun setGame(newGamePlay: GamePlay) {
         _uiState.update { currentState ->
-            currentState.copy(game = newGame)
+            currentState.copy(gamePlay = newGamePlay)
         }
     }
 

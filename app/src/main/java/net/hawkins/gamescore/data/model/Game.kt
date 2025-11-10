@@ -1,6 +1,6 @@
 package net.hawkins.gamescore.data.model
 
-data class GameRules(
+data class Game(
     val name: String,
     val objective: Objective = Objective(),
     val constraints: Constraints = Constraints(),

@@ -2,7 +2,6 @@ package net.hawkins.gamescore.data
 
 import net.hawkins.gamescore.data.model.FavoriteGame
 import net.hawkins.gamescore.data.source.IdableDataSource
-import net.hawkins.gamescore.game.type.Games
 
 class FavoriteGameRepository(dataSource: IdableDataSource<FavoriteGame>) :
     AbstractIdableRepository<FavoriteGame>(dataSource) {
@@ -10,7 +9,7 @@ class FavoriteGameRepository(dataSource: IdableDataSource<FavoriteGame>) :
     override fun getAll(): List<FavoriteGame> {
         val favoriteGames = super.getAll().toMutableList()
         // Filter-out games that don't have a valid GameType
-        favoriteGames.retainAll { favoriteGame -> Games.isValidType(favoriteGame.game) }
+        favoriteGames.retainAll { favoriteGame -> GameRepository.isGame(favoriteGame.game) }
         return favoriteGames
     }
 }

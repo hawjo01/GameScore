@@ -52,8 +52,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.data.model.FavoriteGame
-import net.hawkins.gamescore.game.type.GameType
-import net.hawkins.gamescore.game.type.Games
+import net.hawkins.gamescore.data.model.Game
+import net.hawkins.gamescore.data.GameRepository
 import net.hawkins.gamescore.ui.component.ConfirmAction
 import net.hawkins.gamescore.ui.favorites.FavoriteGamesCard
 import net.hawkins.gamescore.ui.theme.GoGreen
@@ -201,8 +201,8 @@ private fun GameCard(
 
             if (showGameSelectionDialog) {
                 GameSelectionDialog(
-                    onClickAction = { gameType ->
-                        onChangeGame(gameType.getName())
+                    onClickAction = { game ->
+                        onChangeGame(game.name)
                         showGameSelectionDialog = false
                     }, onDismissRequest = { showGameSelectionDialog = false }, modifier = modifier
                 )
@@ -429,7 +429,9 @@ private fun ConfirmDeleteSavedPlayer(
 
 @Composable
 private fun GameSelectionDialog(
-    onClickAction: (GameType) -> Unit, onDismissRequest: () -> Unit, modifier: Modifier
+    onClickAction: (Game) -> Unit,
+    onDismissRequest: () -> Unit,
+    modifier: Modifier
 ) {
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
@@ -449,14 +451,14 @@ private fun GameSelectionDialog(
                         fontWeight = FontWeight.Bold
                     )
                 }
-                Games.TYPES.forEach { gameType ->
+                GameRepository.getAll().forEach { game ->
                     Text(
-                        text = gameType.getName(),
+                        text = game.name,
                         modifier = modifier
                             .fillMaxWidth()
                             .padding(horizontal = 20.dp, vertical = 10.dp)
                             .clickable(
-                                onClick = { onClickAction(gameType) }),
+                                onClick = { onClickAction(game) }),
                         style = MaterialTheme.typography.labelMedium.plus(
                             TextStyle(
                                 color = SkyBlue, textDecoration = TextDecoration.Underline
