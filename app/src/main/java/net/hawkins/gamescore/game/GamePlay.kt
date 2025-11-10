@@ -3,6 +3,8 @@ package net.hawkins.gamescore.game
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import net.hawkins.gamescore.data.model.Game
+import net.hawkins.gamescore.data.model.game.Colors
+import net.hawkins.gamescore.data.model.game.Objective
 
 class GamePlay(private val game: Game, playerNames: List<String>) {
 
@@ -28,13 +30,13 @@ class GamePlay(private val game: Game, playerNames: List<String>) {
             return null
         }
 
-        if (game.constraints.equalHandSizes && !equalNumberOfHands(players)) {
+        if (game.rules.constraints.equalHandSizes && !equalNumberOfHands(players)) {
             return null
         }
 
-        val candidate = when (game.objective.type) {
-            Game.Objective.Type.HIGH_SCORE -> players.maxBy { player -> player.totalScore() }
-            Game.Objective.Type.LOW_SCORE -> players.minBy { player -> player.totalScore() }
+        val candidate = when (game.rules.objective.type) {
+            Objective.Type.HIGH_SCORE -> players.maxBy { player -> player.totalScore() }
+            Objective.Type.LOW_SCORE -> players.minBy { player -> player.totalScore() }
         }
 
         val candidateTotalScore = candidate.totalScore()
@@ -55,22 +57,22 @@ class GamePlay(private val game: Game, playerNames: List<String>) {
     }
 
     private fun isGoalMet(totalScore: Int): Boolean {
-        val goal = game.objective.goal ?: return true
+        val goal = game.rules.objective.goal ?: return true
 
-        return when (game.objective.type) {
-            Game.Objective.Type.HIGH_SCORE -> totalScore >= goal
-            Game.Objective.Type.LOW_SCORE -> totalScore <= goal
+        return when (game.rules.objective.type) {
+            Objective.Type.HIGH_SCORE -> totalScore >= goal
+            Objective.Type.LOW_SCORE -> totalScore <= goal
         }
     }
 
     fun isValidScore(score: String): Boolean {
         val int = score.toIntOrNull() ?: return false
 
-        if (game.constraints.positiveOnly && int < 0) {
+        if (game.rules.constraints.positiveOnly && int < 0) {
             return false
         }
 
-        if (game.constraints.multipleOf != null && int % game.constraints.multipleOf != 0) {
+        if (game.rules.constraints.multipleOf != null && int % game.rules.constraints.multipleOf != 0) {
             return false
         }
 
@@ -78,11 +80,11 @@ class GamePlay(private val game: Game, playerNames: List<String>) {
     }
 
     fun highlightNegativeScore(): Boolean {
-        return game.color.negativeScore != Game.Colors.Color.DEFAULT
+        return game.colors.negativeScore != Colors.Color.DEFAULT
     }
 
     fun hasWinningThreshold(): Boolean {
-        return game.objective.goal != null
+        return game.rules.objective.goal != null
     }
 
     fun getGameName(): String {

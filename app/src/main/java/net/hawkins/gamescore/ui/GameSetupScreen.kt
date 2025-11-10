@@ -110,7 +110,6 @@ private fun GameSetupScreenContent(
             onRemovePlayer = onRemovePlayer,
             onChangeGame = onSetGame,
             modifier = modifier
-
         )
 
         var selectedSetupType by remember {
@@ -189,7 +188,7 @@ private fun GameCard(
                     modifier = modifier.padding(end = 30.dp)
                 )
                 Text(
-                    text = if (gameName != "") gameName else stringResource(R.string.select_game),
+                    text = if (gameName.isNotBlank()) gameName else stringResource(R.string.select_game),
                     style = MaterialTheme.typography.bodyMedium.plus(
                         TextStyle(
                             color = SkyBlue, textDecoration = TextDecoration.Underline
@@ -257,12 +256,12 @@ private fun GameCard(
                     onClick = {
                         onStartGame(gameName, playerNames)
                     },
-                    enabled = gameName.isNotEmpty() && playerNames.isNotEmpty()
+                    enabled = gameName.isNotBlank() && playerNames.isNotEmpty()
                 ) {
                     Icon(
                         imageVector = Icons.Filled.PlayArrow,
                         contentDescription = stringResource(R.string.start_game),
-                        tint = if (gameName.isNotEmpty() && playerNames.isNotEmpty()) {
+                        tint = if (gameName.isNotBlank() && playerNames.isNotEmpty()) {
                             GoGreen
                         } else {
                             Color.Transparent

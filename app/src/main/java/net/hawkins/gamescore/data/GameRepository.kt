@@ -1,38 +1,48 @@
 package net.hawkins.gamescore.data
 
 import net.hawkins.gamescore.data.model.Game
+import net.hawkins.gamescore.data.model.game.Colors
+import net.hawkins.gamescore.data.model.game.Constraints
+import net.hawkins.gamescore.data.model.game.Objective
+import net.hawkins.gamescore.data.model.game.Rules
 
 object GameRepository {
 
-    fun getAll() : List<Game> {
+    fun getAll(): List<Game> {
         return listOf(
             Game(
                 name = "Basic Scoring - High",
-                constraints = Game.Constraints(
-                ),
-                objective = Game.Objective(
-                    type = Game.Objective.Type.HIGH_SCORE,
-                ),
-                color = Game.Colors()
+                id = -1,
+                rules = Rules(
+                    objective = Objective(
+                        type = Objective.Type.HIGH_SCORE
+                    )
+                )
             ),
             Game(
                 name = "2500",
-                constraints = Game.Constraints(
-                    multipleOf = 5,
-                    equalHandSizes = true
+                id = -2,
+                rules = Rules(
+                    constraints = Constraints(
+                        multipleOf = 5,
+                        equalHandSizes = true
+                    ),
+                    objective = Objective(
+                        goal = 2500
+                    )
                 ),
-                objective = Game.Objective(
-                    goal = 2500
-                ),
-                color = Game.Colors(
-                    negativeScore = Game.Colors.Color.RED
+                colors = Colors(
+                    negativeScore = Colors.Color.RED
                 )
             ),
             Game(
                 name = "Basic Scoring - Low",
-                objective = Game.Objective(
-                    type = Game.Objective.Type.LOW_SCORE
-                ),
+                id = -3,
+                rules = Rules(
+                    objective = Objective(
+                        type = Objective.Type.LOW_SCORE
+                    ),
+                )
             )
         )
     }

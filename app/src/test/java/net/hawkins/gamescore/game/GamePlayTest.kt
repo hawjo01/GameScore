@@ -1,6 +1,10 @@
 package net.hawkins.gamescore.game
 
 import net.hawkins.gamescore.data.model.Game
+import net.hawkins.gamescore.data.model.game.Colors
+import net.hawkins.gamescore.data.model.game.Constraints
+import net.hawkins.gamescore.data.model.game.Objective
+import net.hawkins.gamescore.data.model.game.Rules
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -11,14 +15,20 @@ class GamePlayTest {
 
     private val Seven = Game(
         name = "Sevens",
-        constraints = Game.Constraints(multipleOf = 7)
+        id = 7,
+        rules = Rules(
+            constraints = Constraints(multipleOf = 7)
+        )
     )
 
     private val Eight = Game(
         name = "Eights",
-        objective = Game.Objective(goal = 80),
-        constraints = Game.Constraints(multipleOf = 8),
-        color = Game.Colors(negativeScore = Game.Colors.Color.RED)
+        id = 8,
+        rules = Rules(
+            objective = Objective(goal = 80),
+            constraints = Constraints(multipleOf = 8)
+        ),
+        colors = Colors(negativeScore = Colors.Color.RED)
     )
 
     @Test
