@@ -53,10 +53,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.Utils
+import net.hawkins.gamescore.data.GameRepository
 import net.hawkins.gamescore.data.model.FavoriteGame
 import net.hawkins.gamescore.game.GamePlay
 import net.hawkins.gamescore.game.GamePlay.Player
-import net.hawkins.gamescore.data.GameRepository
 import net.hawkins.gamescore.ui.component.ConfirmAction
 import net.hawkins.gamescore.ui.favorites.SaveFavoriteGame
 
