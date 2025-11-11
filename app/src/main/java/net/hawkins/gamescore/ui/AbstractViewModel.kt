@@ -12,7 +12,7 @@ data class TopAppBar(
     val actions: @Composable (RowScope.() -> Unit)? = null
 )
 
-abstract class GameScoreViewModel(application: Application) : AndroidViewModel(application) {
+abstract class AbstractViewModel(application: Application) : AndroidViewModel(application) {
     @Suppress("unused")
     companion object {
         private val _topAppBar = mutableStateOf(TopAppBar())

@@ -10,9 +10,9 @@ import net.hawkins.gamescore.data.FavoritePlayerRepository
 import net.hawkins.gamescore.data.Repository
 import net.hawkins.gamescore.data.model.FavoriteGame
 
-class GameSetupViewModel(application: Application) : GameScoreViewModel(application) {
-    private val _uiState = MutableStateFlow(GameSetupUiState())
-    val uiState: StateFlow<GameSetupUiState> = _uiState.asStateFlow()
+class GamePlaySetupViewModel(application: Application) : AbstractViewModel(application) {
+    private val _uiState = MutableStateFlow(GamePlaySetupUiState())
+    val uiState: StateFlow<GamePlaySetupUiState> = _uiState.asStateFlow()
 
     private val _playerRepository: FavoritePlayerRepository
     private val _favoriteGameRepository: FavoriteGameRepository
