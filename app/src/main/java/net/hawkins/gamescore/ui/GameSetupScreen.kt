@@ -51,9 +51,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
+import net.hawkins.gamescore.data.GameRepository
 import net.hawkins.gamescore.data.model.FavoriteGame
 import net.hawkins.gamescore.data.model.Game
-import net.hawkins.gamescore.data.GameRepository
 import net.hawkins.gamescore.ui.component.ConfirmAction
 import net.hawkins.gamescore.ui.favorites.FavoriteGamesCard
 import net.hawkins.gamescore.ui.theme.GoGreen
@@ -196,7 +196,8 @@ private fun GameCard(
                         )
                     ),
                     modifier = modifier.clickable(
-                        onClick = { showGameSelectionDialog = true }))
+                        onClick = { showGameSelectionDialog = true })
+                )
             }
 
             if (showGameSelectionDialog) {
@@ -231,7 +232,8 @@ private fun GameCard(
                                     .clickable(
                                         onClick = {
                                             showConfirmRemovePlayer = true
-                                        }))
+                                        })
+                            )
 
                             if (showConfirmRemovePlayer) {
                                 ConfirmRemovePlayer(
@@ -260,7 +262,11 @@ private fun GameCard(
                     Icon(
                         imageVector = Icons.Filled.PlayArrow,
                         contentDescription = stringResource(R.string.start_game),
-                        tint = if (gameName.isNotEmpty() && playerNames.isNotEmpty()) {GoGreen} else {Color.Transparent},
+                        tint = if (gameName.isNotEmpty() && playerNames.isNotEmpty()) {
+                            GoGreen
+                        } else {
+                            Color.Transparent
+                        },
                         modifier = modifier.size(60.dp)
 
                     )
@@ -340,7 +346,8 @@ private fun PlayerSelection(
                     .padding(start = 10.dp)
                     .combinedClickable(onLongClick = {
                         showDeleteSavedPlayer = true
-                    }, onClick = {}))
+                    }, onClick = {})
+            )
 
             if (showDeleteSavedPlayer) {
                 ConfirmDeleteSavedPlayer(
@@ -463,7 +470,8 @@ private fun GameSelectionDialog(
                             TextStyle(
                                 color = SkyBlue, textDecoration = TextDecoration.Underline
                             )
-                        ))
+                        )
+                    )
                 }
             }
         }

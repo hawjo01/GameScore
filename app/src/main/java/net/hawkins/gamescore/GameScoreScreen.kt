@@ -17,8 +17,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import net.hawkins.gamescore.game.GamePlay
 import net.hawkins.gamescore.data.GameRepository
+import net.hawkins.gamescore.game.GamePlay
 import net.hawkins.gamescore.ui.GamePlayScreen
 import net.hawkins.gamescore.ui.GamePlayViewModel
 import net.hawkins.gamescore.ui.GameScoreViewModel
@@ -78,7 +78,12 @@ fun GameScoreApp(
                 GameSetupScreen(
                     viewModel = gameSetupViewModel,
                     onStartGame = { gameName, playerNames ->
-                        gamePlayViewModel.setGame(GamePlay(GameRepository.getByName(gameName), playerNames))
+                        gamePlayViewModel.setGame(
+                            GamePlay(
+                                GameRepository.getByName(gameName),
+                                playerNames
+                            )
+                        )
                         navController.navigate(GameScoreScreen.Play.name)
                     }
                 )
