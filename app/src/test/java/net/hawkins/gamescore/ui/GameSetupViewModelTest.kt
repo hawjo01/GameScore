@@ -19,7 +19,7 @@ class GameSetupViewModelTest : AbstractBaseTest() {
     lateinit var application: Application
 
     @MockK
-    lateinit var viewModel: GameSetupViewModel
+    lateinit var viewModel: GamePlaySetupViewModel
 
     @Before
     fun setUp() {
@@ -29,7 +29,7 @@ class GameSetupViewModelTest : AbstractBaseTest() {
         application = mockk<Application>()
         every { application.applicationContext } returns context
 
-        viewModel = GameSetupViewModel(application)
+        viewModel = GamePlaySetupViewModel(application)
     }
 
 

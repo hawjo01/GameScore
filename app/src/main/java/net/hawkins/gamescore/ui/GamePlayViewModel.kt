@@ -11,7 +11,7 @@ import net.hawkins.gamescore.data.model.FavoriteGame
 import net.hawkins.gamescore.game.GamePlay
 
 
-class GamePlayViewModel(application: Application) : GameScoreViewModel(application) {
+class GamePlayViewModel(application: Application) : AbstractViewModel(application) {
     private val _uiState = MutableStateFlow(GamePlayUiState())
     val uiState: StateFlow<GamePlayUiState> = _uiState.asStateFlow()
 

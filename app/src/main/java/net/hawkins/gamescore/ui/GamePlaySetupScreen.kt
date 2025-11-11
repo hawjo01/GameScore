@@ -65,8 +65,8 @@ enum class GameSetupType(val labelId: Int) {
 }
 
 @Composable
-fun GameSetupScreen(
-    viewModel: GameSetupViewModel,
+fun GamePlaySetupScreen(
+    viewModel: GamePlaySetupViewModel,
     onStartGame: (String, List<String>) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -75,7 +75,7 @@ fun GameSetupScreen(
     }
 
     val uiState by viewModel.uiState.collectAsState()
-    GameSetupScreenContent(
+    GamePlaySetupScreenContent(
         uiState = uiState,
         onStartGame = onStartGame,
         onSetGame = { gameName -> viewModel.setGameName(gameName) },
@@ -90,8 +90,8 @@ fun GameSetupScreen(
 }
 
 @Composable
-private fun GameSetupScreenContent(
-    uiState: GameSetupUiState,
+private fun GamePlaySetupScreenContent(
+    uiState: GamePlaySetupUiState,
     onStartGame: (String, List<String>) -> Unit,
     onSetGame: (String) -> Unit,
     onAddPlayer: (String) -> Unit,
@@ -480,9 +480,9 @@ private fun GameSelectionDialog(
 
 @Preview
 @Composable
-private fun GameSetupScreenContentPreview() {
-    val uiState = GameSetupUiState("", listOf("Sheldon", "Leonard"))
-    GameSetupScreenContent(
+private fun GamePlaySetupScreenContentPreview() {
+    val uiState = GamePlaySetupUiState("", listOf("Sheldon", "Leonard"))
+    GamePlaySetupScreenContent(
         uiState = uiState,
         onStartGame = { _, _ -> },
         onSetPlayers = { _ -> },

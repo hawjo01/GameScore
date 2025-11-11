@@ -21,9 +21,9 @@ import net.hawkins.gamescore.data.GameRepository
 import net.hawkins.gamescore.game.GamePlay
 import net.hawkins.gamescore.ui.GamePlayScreen
 import net.hawkins.gamescore.ui.GamePlayViewModel
-import net.hawkins.gamescore.ui.GameScoreViewModel
-import net.hawkins.gamescore.ui.GameSetupScreen
-import net.hawkins.gamescore.ui.GameSetupViewModel
+import net.hawkins.gamescore.ui.AbstractViewModel
+import net.hawkins.gamescore.ui.GamePlaySetupScreen
+import net.hawkins.gamescore.ui.GamePlaySetupViewModel
 
 enum class GameScoreScreen() {
     Setup,
@@ -33,7 +33,7 @@ enum class GameScoreScreen() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun GameScoreAppBar(
-    viewModel: GameScoreViewModel,
+    viewModel: AbstractViewModel,
     modifier: Modifier = Modifier
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
@@ -57,7 +57,7 @@ private fun GameScoreAppBar(
 
 @Composable
 fun GameScoreApp(
-    gameSetupViewModel: GameSetupViewModel = viewModel(),
+    gameSetupViewModel: GamePlaySetupViewModel = viewModel(),
     gamePlayViewModel: GamePlayViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
@@ -75,7 +75,7 @@ fun GameScoreApp(
         ) {
             composable(route = GameScoreScreen.Setup.name) {
 
-                GameSetupScreen(
+                GamePlaySetupScreen(
                     viewModel = gameSetupViewModel,
                     onStartGame = { gameName, playerNames ->
                         gamePlayViewModel.setGame(
