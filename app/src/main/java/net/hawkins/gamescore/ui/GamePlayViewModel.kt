@@ -1,22 +1,22 @@
 package net.hawkins.gamescore.ui
 
-import android.app.Application
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import net.hawkins.gamescore.data.FavoriteGameRepository
-import net.hawkins.gamescore.data.Repository
 import net.hawkins.gamescore.data.model.FavoriteGame
 import net.hawkins.gamescore.game.GamePlay
+import javax.inject.Inject
 
 
-class GamePlayViewModel(application: Application) : AbstractViewModel(application) {
+@HiltViewModel
+class GamePlayViewModel @Inject constructor(
+    private val _favoriteGameRepository: FavoriteGameRepository
+) : AbstractViewModel() {
     private val _uiState = MutableStateFlow(GamePlayUiState())
     val uiState: StateFlow<GamePlayUiState> = _uiState.asStateFlow()
-
-    private val _favoriteGameRepository: FavoriteGameRepository =
-        Repository.Factory(application).getFavoriteGameRepository()
 
     fun setGame(newGamePlay: GamePlay) {
         _uiState.update { currentState ->

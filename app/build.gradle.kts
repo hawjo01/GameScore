@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.google.dagger.hilt)
+    kotlin("kapt")
 }
 
 android {
@@ -62,6 +64,7 @@ dependencies {
     implementation(libs.google.gson)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.google.dagger.hilt)
     testImplementation(kotlin("test"))
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
@@ -71,4 +74,9 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    kapt(libs.google.dagger.hilt.compiler)
+}
+
+kapt {
+    correctErrorTypes = true
 }

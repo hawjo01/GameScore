@@ -1,18 +1,17 @@
 package net.hawkins.gamescore.ui
 
-import android.app.Application
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 
 data class TopAppBar(
     val title: String = "",
     val actions: @Composable (RowScope.() -> Unit)? = null
 )
 
-abstract class AbstractViewModel(application: Application) : AndroidViewModel(application) {
+abstract class AbstractViewModel() : ViewModel() {
     @Suppress("unused")
     companion object {
         private val _topAppBar = mutableStateOf(TopAppBar())

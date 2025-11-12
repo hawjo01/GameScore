@@ -12,6 +12,7 @@ gson = "2.13.2"
 mockk = "1.14.6"
 navigationRuntimeKtx = "2.9.6"
 navigationCompose = "2.9.6"
+hilt = "2.57.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,9 +36,12 @@ google-gson = { group = "com.google.code.gson", name = "gson", version.ref="gson
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+google-dagger-hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+google-dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+google-dagger-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 
