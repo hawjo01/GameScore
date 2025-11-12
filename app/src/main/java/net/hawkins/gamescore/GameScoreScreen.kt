@@ -25,8 +25,8 @@ import net.hawkins.gamescore.ui.GamePlaySetupViewModel
 import net.hawkins.gamescore.ui.GamePlayViewModel
 
 enum class GameScoreScreen() {
-    Setup,
-    Play
+    GamePlaySetup,
+    GamePlay
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,7 +56,7 @@ private fun GameScoreAppBar(
 
 @Composable
 fun GameScoreScreen(
-    gameSetupViewModel: GamePlaySetupViewModel = viewModel(),
+    gamePlaySetupViewModel: GamePlaySetupViewModel = viewModel(),
     gamePlayViewModel: GamePlayViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
@@ -69,13 +69,13 @@ fun GameScoreScreen(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = GameScoreScreen.Setup.name,
+            startDestination = GameScoreScreen.GamePlaySetup.name,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(route = GameScoreScreen.Setup.name) {
+            composable(route = GameScoreScreen.GamePlaySetup.name) {
 
                 GamePlaySetupScreen(
-                    viewModel = gameSetupViewModel,
+                    viewModel = gamePlaySetupViewModel,
                     onStartGame = { game, playerNames ->
                         gamePlayViewModel.setGame(
                             GamePlay(
@@ -83,12 +83,12 @@ fun GameScoreScreen(
                                 playerNames
                             )
                         )
-                        navController.navigate(GameScoreScreen.Play.name)
+                        navController.navigate(GameScoreScreen.GamePlay.name)
                     }
                 )
             }
 
-            composable(route = GameScoreScreen.Play.name) {
+            composable(route = GameScoreScreen.GamePlay.name) {
                 BackHandler(true) {
                     // Prevent accidental erasure of game data
                 }

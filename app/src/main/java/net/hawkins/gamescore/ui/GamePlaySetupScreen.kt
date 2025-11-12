@@ -106,7 +106,7 @@ private fun GamePlaySetupScreenContent(
     Column {
         GameCard(
             games = uiState.savedGames,
-            game = uiState.game,
+            game = uiState.selectedGame,
             playerNames = uiState.playerNames,
             onStartGame = onStartGame,
             onRemovePlayer = onRemovePlayer,
