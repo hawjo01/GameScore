@@ -2,7 +2,7 @@ package net.hawkins.gamescore.data
 
 import net.hawkins.gamescore.data.model.Game
 
-object GameRepository {
+class GameRepository {
 
     fun getAll() : List<Game> {
         return listOf(
@@ -37,15 +37,7 @@ object GameRepository {
         )
     }
 
-    fun getDefaultGame(): Game {
-        return getAll()[0]
-    }
-
     fun getByName(name: String): Game {
         return getAll().first { game -> game.name == name }
-    }
-
-    fun isGame(name: String): Boolean {
-        return getAll().firstOrNull { game -> game.name == name } != null
     }
 }

@@ -7,11 +7,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import net.hawkins.gamescore.data.FavoriteGameRepository
 import net.hawkins.gamescore.data.FavoritePlayerRepository
+import net.hawkins.gamescore.data.GameRepository
 import net.hawkins.gamescore.data.model.FavoriteGame
+import net.hawkins.gamescore.data.model.Game
 import javax.inject.Inject
 
 @HiltViewModel
 class GamePlaySetupViewModel @Inject constructor(
+    private val _gameRepository: GameRepository,
     private val _playerRepository: FavoritePlayerRepository,
     private val _favoriteGameRepository: FavoriteGameRepository
 ) : AbstractViewModel() {
@@ -22,14 +25,15 @@ class GamePlaySetupViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(
                 favoritePlayerNames = _playerRepository.getAll(),
-                favoriteGames = _favoriteGameRepository.getAll()
+                favoriteGames = _favoriteGameRepository.getAll(),
+                savedGames = _gameRepository.getAll()
             )
         }
     }
 
-    fun setGameName(newGameName: String) {
+    fun setGame(newGame: Game) {
         _uiState.update { currentState ->
-            currentState.copy(gameName = newGameName)
+            currentState.copy(game = newGame)
         }
     }
 
@@ -75,5 +79,10 @@ class GamePlaySetupViewModel @Inject constructor(
                 currentState.copy(favoriteGames = _favoriteGameRepository.getAll())
             }
         }
+    }
+
+    fun setGameByName(name: String) {
+        val game = _gameRepository.getByName(name)
+        setGame(game)
     }
 }

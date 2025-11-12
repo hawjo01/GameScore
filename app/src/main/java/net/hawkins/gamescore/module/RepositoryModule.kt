@@ -9,6 +9,7 @@ import dagger.hilt.components.SingletonComponent
 import net.hawkins.gamescore.Constants
 import net.hawkins.gamescore.data.FavoriteGameRepository
 import net.hawkins.gamescore.data.FavoritePlayerRepository
+import net.hawkins.gamescore.data.GameRepository
 import net.hawkins.gamescore.data.source.impl.FileFavoriteGameDataSource
 import net.hawkins.gamescore.data.source.impl.FileFavoritePlayerDataSource
 import java.io.File
@@ -20,11 +21,11 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideFavoriteGameRepository (@ApplicationContext appContext: Context): FavoriteGameRepository {
+    fun provideFavoriteGameRepository(@ApplicationContext appContext: Context): FavoriteGameRepository {
         val directory: File = appContext.filesDir
 
         return FavoriteGameRepository(
-            FileFavoriteGameDataSource(
+            dataSource = FileFavoriteGameDataSource(
                 File(
                     directory,
                     Constants.FAVORITE_GAMES_FILENAME
@@ -45,5 +46,11 @@ object RepositoryModule {
                 )
             )
         )
+    }
+
+    @Provides
+    @Singleton
+    fun provideGameRepository(): GameRepository {
+        return GameRepository()
     }
 }

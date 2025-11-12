@@ -6,11 +6,14 @@ import io.mockk.mockk
 import net.hawkins.gamescore.AbstractBaseTest
 import net.hawkins.gamescore.data.FavoriteGameRepository
 import net.hawkins.gamescore.data.FavoritePlayerRepository
+import net.hawkins.gamescore.data.GameRepository
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
 class GameSetupViewModelTest : AbstractBaseTest() {
+    @MockK
+    lateinit var gameRepository: GameRepository
 
     @MockK
     lateinit var favoritePlayerRepository: FavoritePlayerRepository
@@ -22,15 +25,21 @@ class GameSetupViewModelTest : AbstractBaseTest() {
 
     @Before
     fun setUp() {
+        gameRepository = mockk<GameRepository>()
+        every { gameRepository.getAll() } returns emptyList()
+
         favoriteGameRepository = mockk<FavoriteGameRepository>()
         every { favoriteGameRepository.getAll() } returns emptyList()
 
         favoritePlayerRepository = mockk<FavoritePlayerRepository>()
         every { favoritePlayerRepository.getAll() } returns emptyList()
 
+
+
         viewModel = GamePlaySetupViewModel(
             _favoriteGameRepository = favoriteGameRepository,
-            _playerRepository = favoritePlayerRepository
+            _playerRepository = favoritePlayerRepository,
+            _gameRepository = gameRepository
         )
     }
 

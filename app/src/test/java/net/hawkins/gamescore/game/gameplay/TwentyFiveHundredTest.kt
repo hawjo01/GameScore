@@ -1,6 +1,6 @@
 package net.hawkins.gamescore.game.gameplay
 
-import net.hawkins.gamescore.data.GameRepository
+import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.game.GamePlay
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -10,7 +10,19 @@ import org.junit.Test
 
 class TwentyFiveHundredTest {
 
-    val game = GameRepository.getByName("2500")
+    val game = Game(
+        name = "2500",
+        constraints = Game.Constraints(
+            multipleOf = 5,
+            equalHandSizes = true
+        ),
+        objective = Game.Objective(
+            goal = 2500
+        ),
+        color = Game.Colors(
+            negativeScore = Game.Colors.Color.RED
+        )
+    )
 
     @Test
     fun isValidScore_true() {
@@ -111,8 +123,6 @@ class TwentyFiveHundredTest {
 
         val player2 = gamePlay.players[1]
         player2.addScore(2600)
-
-        val players = listOf(player1, player2)
 
         val winner = gamePlay.determineWinner()
         assertNull(winner)

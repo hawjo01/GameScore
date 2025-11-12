@@ -53,8 +53,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.Utils
-import net.hawkins.gamescore.data.GameRepository
 import net.hawkins.gamescore.data.model.FavoriteGame
+import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.game.GamePlay
 import net.hawkins.gamescore.game.GamePlay.Player
 import net.hawkins.gamescore.ui.component.ConfirmAction
@@ -555,7 +555,21 @@ private fun AppBarActions(gamePlay: GamePlay, saveFavoriteGame: (FavoriteGame) -
 @Preview
 @Composable
 private fun GamePlayScreenContentPreview() {
-    val gamePlay = GamePlay(GameRepository.getByName("2500"), listOf("Sheldon", "Leonard"))
+    val gamePlay = GamePlay(
+        Game(
+            name = "2500",
+            constraints = Game.Constraints(
+                multipleOf = 5,
+                equalHandSizes = true
+            ),
+            objective = Game.Objective(
+                goal = 2500
+            ),
+            color = Game.Colors(
+                negativeScore = Game.Colors.Color.RED
+            )
+        ), listOf("Sheldon", "Leonard")
+    )
     gamePlay.players[0].addScore(90)
     gamePlay.players[0].addScore(25)
     gamePlay.players[1].addScore(-20)
