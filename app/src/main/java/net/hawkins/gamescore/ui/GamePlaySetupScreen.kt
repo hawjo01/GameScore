@@ -51,7 +51,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
-import net.hawkins.gamescore.data.GameRepository
 import net.hawkins.gamescore.data.model.FavoriteGame
 import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.ui.component.ConfirmAction
@@ -67,7 +66,7 @@ enum class GameSetupType(val labelId: Int) {
 @Composable
 fun GamePlaySetupScreen(
     viewModel: GamePlaySetupViewModel,
-    onStartGame: (String, List<String>) -> Unit,
+    onStartGame: (Game, List<String>) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LaunchedEffect(Unit) {
@@ -78,13 +77,14 @@ fun GamePlaySetupScreen(
     GamePlaySetupScreenContent(
         uiState = uiState,
         onStartGame = onStartGame,
-        onSetGame = { gameName -> viewModel.setGameName(gameName) },
+        onSetGame = { game -> viewModel.setGame(game) },
         onAddPlayer = { playerName -> viewModel.addPlayer(playerName) },
         onRemovePlayer = { index -> viewModel.removePlayer(index) },
         onSetPlayers = { playerNames -> viewModel.setPlayers(playerNames) },
         saveFavoritePlayer = { playerName -> viewModel.addFavoritePlayer(playerName) },
         deleteFavoritePlayer = { playerName -> viewModel.deleteFavoritePlayer(playerName) },
         deleteFavoriteGame = { favoriteGame -> viewModel.deleteFavoriteGame(favoriteGame) },
+        onSetGameByName = { gameName -> viewModel.setGameByName(gameName) },
         modifier = modifier
     )
 }
@@ -92,25 +92,26 @@ fun GamePlaySetupScreen(
 @Composable
 private fun GamePlaySetupScreenContent(
     uiState: GamePlaySetupUiState,
-    onStartGame: (String, List<String>) -> Unit,
-    onSetGame: (String) -> Unit,
+    onStartGame: (Game, List<String>) -> Unit,
+    onSetGame: (Game) -> Unit,
     onAddPlayer: (String) -> Unit,
     onRemovePlayer: (Int) -> Unit,
     onSetPlayers: (List<String>) -> Unit,
     saveFavoritePlayer: (String) -> Unit,
     deleteFavoritePlayer: (String) -> Unit,
     deleteFavoriteGame: (FavoriteGame) -> Unit,
+    onSetGameByName: (String) -> Unit,
     modifier: Modifier
 ) {
     Column {
         GameCard(
-            gameName = uiState.gameName,
+            games = uiState.savedGames,
+            game = uiState.game,
             playerNames = uiState.playerNames,
             onStartGame = onStartGame,
             onRemovePlayer = onRemovePlayer,
             onChangeGame = onSetGame,
             modifier = modifier
-
         )
 
         var selectedSetupType by remember {
@@ -146,7 +147,8 @@ private fun GamePlaySetupScreenContent(
                     favoriteGames = uiState.favoriteGames,
                     onDeleteFavoriteGame = deleteFavoriteGame,
                     onFavoriteSelected = { favoriteGame ->
-                        onSetGame(favoriteGame.game)
+                        // TODO: Fix this once the entire game is stored in the favorite
+                        onSetGameByName(favoriteGame.game)
                         onSetPlayers(favoriteGame.players)
                     })
             }
@@ -165,11 +167,12 @@ private fun GamePlaySetupScreenContent(
 
 @Composable
 private fun GameCard(
-    gameName: String,
+    games: List<Game>,
+    game: Game,
     playerNames: List<String>,
-    onStartGame: (String, List<String>) -> Unit,
+    onStartGame: (Game, List<String>) -> Unit,
     onRemovePlayer: (Int) -> Unit,
-    onChangeGame: (String) -> Unit,
+    onChangeGame: (Game) -> Unit,
     modifier: Modifier
 ) {
     var showGameSelectionDialog by remember { mutableStateOf(false) }
@@ -189,7 +192,7 @@ private fun GameCard(
                     modifier = modifier.padding(end = 30.dp)
                 )
                 Text(
-                    text = if (gameName != "") gameName else stringResource(R.string.select_game),
+                    text = if (game.name != "") game.name else stringResource(R.string.select_game),
                     style = MaterialTheme.typography.bodyMedium.plus(
                         TextStyle(
                             color = SkyBlue, textDecoration = TextDecoration.Underline
@@ -202,8 +205,9 @@ private fun GameCard(
 
             if (showGameSelectionDialog) {
                 GameSelectionDialog(
+                    games = games,
                     onClickAction = { game ->
-                        onChangeGame(game.name)
+                        onChangeGame(game)
                         showGameSelectionDialog = false
                     }, onDismissRequest = { showGameSelectionDialog = false }, modifier = modifier
                 )
@@ -255,14 +259,14 @@ private fun GameCard(
             ) {
                 IconButton(
                     onClick = {
-                        onStartGame(gameName, playerNames)
+                        onStartGame(game, playerNames)
                     },
-                    enabled = gameName.isNotEmpty() && playerNames.isNotEmpty()
+                    enabled = game.name.isNotEmpty() && playerNames.isNotEmpty()
                 ) {
                     Icon(
                         imageVector = Icons.Filled.PlayArrow,
                         contentDescription = stringResource(R.string.start_game),
-                        tint = if (gameName.isNotEmpty() && playerNames.isNotEmpty()) {
+                        tint = if (game.name.isNotEmpty() && playerNames.isNotEmpty()) {
                             GoGreen
                         } else {
                             Color.Transparent
@@ -436,6 +440,7 @@ private fun ConfirmDeleteSavedPlayer(
 
 @Composable
 private fun GameSelectionDialog(
+    games: List<Game>,
     onClickAction: (Game) -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier
@@ -458,7 +463,7 @@ private fun GameSelectionDialog(
                         fontWeight = FontWeight.Bold
                     )
                 }
-                GameRepository.getAll().forEach { game ->
+                games.forEach { game ->
                     Text(
                         text = game.name,
                         modifier = modifier
@@ -481,7 +486,7 @@ private fun GameSelectionDialog(
 @Preview
 @Composable
 private fun GamePlaySetupScreenContentPreview() {
-    val uiState = GamePlaySetupUiState("", listOf("Sheldon", "Leonard"))
+    val uiState = GamePlaySetupUiState(playerNames = listOf("Sheldon", "Leonard"))
     GamePlaySetupScreenContent(
         uiState = uiState,
         onStartGame = { _, _ -> },
@@ -492,5 +497,6 @@ private fun GamePlaySetupScreenContentPreview() {
         modifier = Modifier,
         saveFavoritePlayer = { _ -> },
         deleteFavoritePlayer = { _ -> },
-        deleteFavoriteGame = { _ -> })
+        deleteFavoriteGame = { _ -> },
+        onSetGameByName = { _ -> })
 }

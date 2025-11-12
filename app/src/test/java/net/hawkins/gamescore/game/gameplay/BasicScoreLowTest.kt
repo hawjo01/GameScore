@@ -1,6 +1,6 @@
 package net.hawkins.gamescore.game.gameplay
 
-import net.hawkins.gamescore.data.GameRepository
+import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.game.GamePlay
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -10,7 +10,12 @@ import org.junit.Test
 
 class BasicScoreLowTest {
 
-    val game = GameRepository.getByName("Basic Scoring - Low")
+    val game = Game(
+        name = "Basic Scoring - Low",
+        objective = Game.Objective(
+            type = Game.Objective.Type.LOW_SCORE
+        ),
+    )
 
     @Test
     fun isValidScore_true() {
