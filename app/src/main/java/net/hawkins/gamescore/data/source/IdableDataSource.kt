@@ -1,6 +1,6 @@
 package net.hawkins.gamescore.data.source
 
-import net.hawkins.gamescore.data.Idable
+import net.hawkins.gamescore.data.model.Idable
 
 interface IdableDataSource <T : Idable> {
     fun getAll(): List<T>

@@ -3,7 +3,7 @@ package net.hawkins.gamescore.data.source.impl
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import net.hawkins.gamescore.data.Idable
+import net.hawkins.gamescore.data.model.Idable
 import net.hawkins.gamescore.data.source.IdableDataSource
 import java.io.BufferedReader
 import java.io.File
