@@ -1,35 +1,37 @@
 package net.hawkins.gamescore.ui
 
-import android.app.Application
-import android.content.ContextWrapper
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import net.hawkins.gamescore.AbstractBaseTest
-import org.junit.Assert.*
+import net.hawkins.gamescore.data.FavoriteGameRepository
+import net.hawkins.gamescore.data.FavoritePlayerRepository
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
 class GameSetupViewModelTest : AbstractBaseTest() {
 
     @MockK
-    lateinit var context: ContextWrapper
+    lateinit var favoritePlayerRepository: FavoritePlayerRepository
 
     @MockK
-    lateinit var application: Application
+    lateinit var favoriteGameRepository: FavoriteGameRepository
 
-    @MockK
     lateinit var viewModel: GamePlaySetupViewModel
 
     @Before
     fun setUp() {
-        context = mockk<ContextWrapper>()
-        every { context.filesDir } returns randomTempDir()
+        favoriteGameRepository = mockk<FavoriteGameRepository>()
+        every { favoriteGameRepository.getAll() } returns emptyList()
 
-        application = mockk<Application>()
-        every { application.applicationContext } returns context
+        favoritePlayerRepository = mockk<FavoritePlayerRepository>()
+        every { favoritePlayerRepository.getAll() } returns emptyList()
 
-        viewModel = GamePlaySetupViewModel(application)
+        viewModel = GamePlaySetupViewModel(
+            _favoriteGameRepository = favoriteGameRepository,
+            _playerRepository = favoritePlayerRepository
+        )
     }
 
 
