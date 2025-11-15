@@ -19,7 +19,7 @@ data class Game(
     data class Constraints(
         val positiveOnly: Boolean = false,
         val multipleOf: Int? = null,
-        val equalHandSizes: Boolean = false
+        val equalHandSizes: Boolean = true
     )
 
     data class Colors(
