@@ -12,6 +12,9 @@ class BasicScoreLowTest {
 
     val game = Game(
         name = "Basic Scoring - Low",
+        Constraints = Game.Constraints(
+            equalHandSizes = false
+        ),
         objective = Game.Objective(
             type = Game.Objective.Type.LOW_SCORE
         ),
