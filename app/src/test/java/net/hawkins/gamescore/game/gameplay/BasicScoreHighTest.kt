@@ -13,6 +13,7 @@ class BasicScoreHighTest {
     val game = Game(
         name = "Basic Scoring - High",
         constraints = Game.Constraints(
+            equalHandSizes = false
         ),
         objective = Game.Objective(
             type = Game.Objective.Type.HIGH_SCORE,
