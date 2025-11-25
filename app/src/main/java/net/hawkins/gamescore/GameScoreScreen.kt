@@ -88,6 +88,10 @@ fun GameScoreScreen(
                             )
                         )
                         navController.navigate(GameScoreScreen.GamePlay.name)
+                    },
+                    onNewGameSetup = {
+                        gameSetupViewModel.resetGame()
+                        navController.navigate(GameScoreScreen.GameSetup.name)
                     }
                 )
             }

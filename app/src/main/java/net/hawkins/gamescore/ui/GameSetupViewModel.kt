@@ -7,10 +7,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import net.hawkins.gamescore.data.GameRepository
 import net.hawkins.gamescore.data.model.Game
-import net.hawkins.gamescore.data.model.Game.Colors
-import net.hawkins.gamescore.data.model.Game.Constraints
-import net.hawkins.gamescore.data.model.Game.Objective
 import javax.inject.Inject
+import kotlin.String
 
 @HiltViewModel
 class GameSetupViewModel @Inject constructor(
@@ -21,69 +19,107 @@ class GameSetupViewModel @Inject constructor(
     val uiState: StateFlow<GameSetupUiState> = _uiState.asStateFlow()
 
     fun saveGame() {
-        _gameRepository.save(_uiState.value.toGame())
+        _gameRepository.save(_uiState.value.game)
     }
 
     fun setGameName(newName: String) {
+        val currentGame = _uiState.value.game
+        val newGame = currentGame.copy(name = newName)
         _uiState.update { currentState ->
-            currentState.copy(name = newName)
+            currentState.copy(
+                game = newGame
+            )
         }
     }
 
     fun setConstraintAllowNegative(state: Boolean) {
+        val currentGame = _uiState.value.game
+        val currentConstraints = currentGame.constraints
+        val newConstraints = currentConstraints.copy(positiveOnly = state)
+        val newGame = currentGame.copy(constraints = newConstraints)
         _uiState.update { currentState ->
-            currentState.copy(constraintPositiveOnly = state)
+            currentState.copy(
+                game = newGame
+            )
         }
     }
 
     fun setConstraintEqualHandSizes(state: Boolean) {
+        val currentGame = _uiState.value.game
+        val currentConstraints = currentGame.constraints
+        val newConstraints = currentConstraints.copy(equalHandSizes = state)
+        val newGame = currentGame.copy(constraints = newConstraints)
         _uiState.update { currentState ->
-            currentState.copy(constraintEqualHandSizes = state)
+            currentState.copy(
+                game = newGame
+            )
         }
     }
 
-    fun setObjectiveType(newType: Objective.Type) {
+    fun setObjectiveType(newType: Game.Objective.Type) {
+        val currentGame = _uiState.value.game
+        val currentObjective = currentGame.objective
+        val newObjective = currentObjective.copy(type = newType)
+        val newGame = currentGame.copy(objective = newObjective)
         _uiState.update { currentState ->
-            currentState.copy(objectiveType = newType)
+            currentState.copy(
+                game = newGame
+            )
         }
     }
 
     fun setObjectiveGoal(newGoal: Int?) {
-        _uiState.update { currentState ->
-            currentState.copy(objectiveGoal = newGoal)
-        }
-    }
-
-    fun setConstraintModulus(newGoal: Int?) {
-        _uiState.update { currentState ->
-            currentState.copy(constraintMultipleOf = newGoal)
-        }
-    }
-
-    fun setDisplayNegative(value: Colors.Color) {
-        _uiState.update { currentState ->
-            currentState.copy(negativeColor = value)
-        }
-    }
-
-    fun setDisplayPositive(value: Colors.Color) {
-        _uiState.update { currentState ->
-            currentState.copy(positiveColor = value)
-        }
-    }
-
-    fun setGame(game: Game) {
+        val currentGame = _uiState.value.game
+        val currentObjective = currentGame.objective
+        val newObjective = currentObjective.copy(goal = newGoal)
+        val newGame = currentGame.copy(objective = newObjective)
         _uiState.update { currentState ->
             currentState.copy(
-                name = game.name,
-                objectiveGoal = game.objective.goal,
-                objectiveType = game.objective.type,
-                constraintEqualHandSizes = game.constraints.equalHandSizes,
-                constraintPositiveOnly = game.constraints.positiveOnly,
-                constraintMultipleOf = game.constraints.multipleOf,
-                negativeColor = game.color.negativeScore,
-                positiveColor = game.color.positiveScore,
-                mode = GameSetupUiState.Mode.VIEW
+                game = newGame
+            )
+        }
+    }
+
+    fun setConstraintModulus(newMultipleOf: Int?) {
+        val currentGame = _uiState.value.game
+        val currentConstraints = currentGame.constraints
+        val newConstraints = currentConstraints.copy(multipleOf = newMultipleOf)
+        val newGame = currentGame.copy(constraints = newConstraints)
+        _uiState.update { currentState ->
+            currentState.copy(
+                game = newGame
+            )
+        }
+    }
+
+    fun setDisplayNegative(newColor: Game.Colors.Color) {
+        val currentGame = _uiState.value.game
+        val currentColors = currentGame.color
+        val newColors = currentColors.copy(negativeScore = newColor)
+        val newGame = currentGame.copy(color = newColors)
+        _uiState.update { currentState ->
+            currentState.copy(
+                game = newGame
+            )
+        }
+    }
+
+    fun setDisplayPositive(newColor: Game.Colors.Color) {
+        val currentGame = _uiState.value.game
+        val currentColors = currentGame.color
+        val newColors = currentColors.copy(positiveScore = newColor)
+        val newGame = currentGame.copy(color = newColors)
+        _uiState.update { currentState ->
+            currentState.copy(
+                game = newGame
+            )
+        }
+    }
+
+    fun setGame(newGame: Game) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                game = newGame
             )
         }
     }
@@ -96,28 +132,11 @@ class GameSetupViewModel @Inject constructor(
         }
     }
 
+    fun resetGame() {
+        _uiState.value = GameSetupUiState()
+    }
 
     fun getGame(): Game {
-        return _uiState.value.toGame()
+        return _uiState.value.game
     }
-}
-
-
-fun GameSetupUiState.toGame(): Game {
-    return Game(
-        name = this.name,
-        objective = Objective(
-            type = objectiveType,
-            goal = objectiveGoal
-        ),
-        constraints = Constraints(
-            positiveOnly = constraintPositiveOnly,
-            equalHandSizes = constraintEqualHandSizes,
-            multipleOf = constraintMultipleOf
-        ),
-        color = Colors(
-            negativeScore = negativeColor,
-            positiveScore = positiveColor
-        )
-    )
 }

@@ -65,6 +65,8 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.google.dagger.hilt)
+    implementation(libs.androidx.compose.animation)
+    implementation(libs.androidx.compose.material3)
     testImplementation(kotlin("test"))
     testImplementation(libs.junit)
     testImplementation(libs.mockk)

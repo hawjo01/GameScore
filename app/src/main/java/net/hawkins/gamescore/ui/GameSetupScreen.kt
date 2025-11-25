@@ -1,5 +1,11 @@
 package net.hawkins.gamescore.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,12 +16,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -30,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -200,7 +210,7 @@ private fun NameCard(
             val hideKeyboard = { keyboardController?.hide() }
 
             OutlinedTextField(
-                value = uiState.name,
+                value = uiState.game.name,
                 onValueChange = { newName -> onNameChange(newName) },
                 label = { Text(text = stringResource(R.string.name)) },
                 singleLine = true,
@@ -235,14 +245,14 @@ private fun DisplayColorsCard(
     {
         DisplayTypeDropMenu(
             label = stringResource(R.string.positive_score),
-            value = uiState.positiveColor,
+            value = uiState.game.color.positiveScore,
             onChange = onDisplayPositiveChange,
             readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
         DisplayTypeDropMenu(
             label = stringResource(R.string.negative_score),
-            value = uiState.negativeColor,
+            value = uiState.game.color.negativeScore,
             onChange = onDisplayNegativeChange,
             readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
@@ -264,7 +274,7 @@ private fun ConstraintCard(
     ) {
         SwitchWithLabel(
             label = stringResource(R.string.only_positive),
-            initialChecked = uiState.constraintPositiveOnly,
+            initialChecked = uiState.game.constraints.positiveOnly,
             onCheckedChange = { newCheckedState ->
                 onConstraintAllowNegativeChange(newCheckedState)
             },
@@ -273,7 +283,7 @@ private fun ConstraintCard(
         )
         SwitchWithLabel(
             label = "Require Equal Hand Sizes",
-            initialChecked = uiState.constraintEqualHandSizes,
+            initialChecked = uiState.game.constraints.equalHandSizes,
             onCheckedChange = { newCheckedState ->
                 onConstraintEqualHandSizesChange(newCheckedState)
             },
@@ -282,7 +292,7 @@ private fun ConstraintCard(
         )
         NullableIntOutlinedTextField(
             label = stringResource(R.string.multiple_of),
-            number = uiState.constraintMultipleOf,
+            number = uiState.game.constraints.multipleOf,
             onValueChange = onModulusChange,
             readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
@@ -290,24 +300,57 @@ private fun ConstraintCard(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun GameSectionCard(
     title: String = "",
     modifier: Modifier,
     content: @Composable () -> Unit
 ) {
+
+    var expanded by remember { mutableStateOf(false) }
+    val rotationState by animateFloatAsState(
+        targetValue = if (expanded) 180f else 0f,
+        label = "arrowRotation"
+    )
     Card(
-        modifier = modifier.padding(top = 10.dp)
+        modifier = modifier
+            .padding(top = 10.dp)
+            .animateContentSize()
     ) {
         if (title.isNotBlank()) {
-            GameSectionRow(modifier) {
-                Text(
-                    text = title,
-                    style = Typography.titleSmall
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { expanded = !expanded } // Toggle expansion on click
+                    .padding(all = 5.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(text = title, style = Typography.titleSmall)
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowDown,
+                    contentDescription = "Expand/Collapse Arrow",
+                    modifier = Modifier.rotate(rotationState) // Rotate the arrow icon
                 )
             }
+            AnimatedVisibility(
+                visible = expanded,
+                enter = expandVertically(expandFrom = Alignment.Top),
+                exit = shrinkVertically(shrinkTowards = Alignment.Top)
+            ) {
+                Column {
+                    content()
+                }
+            }
+        } else {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                content()
+            }
         }
-        content()
     }
 }
 
@@ -316,7 +359,7 @@ private fun GameSectionRow(
     modifier: Modifier,
     verticalAlignment: Alignment.Vertical = Alignment.Top,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
-    content: @Composable RowScope.() -> Unit
+    content: @Composable RowScope.() -> Unit,
 ) {
     Row(
         verticalAlignment = verticalAlignment,
@@ -339,14 +382,14 @@ private fun ObjectiveCard(
         modifier = modifier
     ) {
         ObjectiveTypeDropMenu(
-            uiState.objectiveType,
+            uiState.game.objective.type,
             onObjectiveTypeChange = onObjectiveTypeChange,
             readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
         NullableIntOutlinedTextField(
             label = "Goal",
-            number = uiState.objectiveGoal,
+            number = uiState.game.objective.goal,
             onValueChange = onGoalChange,
             readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
@@ -560,10 +603,18 @@ private fun DisplayTypeDropMenu(
 private fun GameSetupContentPreview() {
     GameSetupScreenContent(
         uiState = GameSetupUiState(
-            name = "2500",
-            objectiveGoal = 2500,
-            constraintMultipleOf = 5,
-            negativeColor = Game.Colors.Color.RED
+            Game(
+                name = "2500",
+                objective = Game.Objective(
+                    goal = 2500
+                ),
+                constraints = Game.Constraints(
+                    multipleOf = 5
+                ),
+                color = Game.Colors(
+                    negativeScore = Game.Colors.Color.RED
+                )
+            )
         ),
         onConstraintAllowNegativeChange = { _ -> },
         onConstraintEqualHandSizesChange = { _ -> },

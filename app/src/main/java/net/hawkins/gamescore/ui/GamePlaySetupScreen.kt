@@ -67,6 +67,7 @@ enum class GameSetupType(val labelId: Int) {
 fun GamePlaySetupScreen(
     viewModel: GamePlaySetupViewModel,
     onStartGame: (Game, List<String>) -> Unit,
+    onNewGameSetup: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     LaunchedEffect(Unit) {
@@ -77,6 +78,7 @@ fun GamePlaySetupScreen(
     GamePlaySetupScreenContent(
         uiState = uiState,
         onStartGame = onStartGame,
+        onNewGameSetup = onNewGameSetup,
         onSetGame = { game -> viewModel.setGame(game) },
         onAddPlayer = { playerName -> viewModel.addPlayer(playerName) },
         onRemovePlayer = { index -> viewModel.removePlayer(index) },
@@ -92,6 +94,7 @@ fun GamePlaySetupScreen(
 private fun GamePlaySetupScreenContent(
     uiState: GamePlaySetupUiState,
     onStartGame: (Game, List<String>) -> Unit,
+    onNewGameSetup: () -> Unit,
     onSetGame: (Game) -> Unit,
     onAddPlayer: (String) -> Unit,
     onRemovePlayer: (Int) -> Unit,
@@ -106,6 +109,7 @@ private fun GamePlaySetupScreenContent(
             games = uiState.savedGames,
             game = uiState.selectedGame,
             playerNames = uiState.playerNames,
+            onNewGameSetup = onNewGameSetup,
             onStartGame = onStartGame,
             onRemovePlayer = onRemovePlayer,
             onChangeGame = onSetGame,
@@ -167,6 +171,7 @@ private fun GamePlaySetupScreenContent(
 private fun GameCard(
     games: List<Game>,
     game: Game,
+    onNewGameSetup: () -> Unit,
     playerNames: List<String>,
     onStartGame: (Game, List<String>) -> Unit,
     onRemovePlayer: (Int) -> Unit,
@@ -204,6 +209,7 @@ private fun GameCard(
             if (showGameSelectionDialog) {
                 GameSelectionDialog(
                     games = games,
+                    onNewGameSetup = onNewGameSetup,
                     onClickAction = { game ->
                         onChangeGame(game)
                         showGameSelectionDialog = false
@@ -439,6 +445,7 @@ private fun ConfirmDeleteSavedPlayer(
 @Composable
 private fun GameSelectionDialog(
     games: List<Game>,
+    onNewGameSetup: () -> Unit,
     onClickAction: (Game) -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier
@@ -461,6 +468,21 @@ private fun GameSelectionDialog(
                         fontWeight = FontWeight.Bold
                     )
                 }
+
+                Text(
+                    text = "New Game",
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 10.dp)
+                        .clickable(
+                            onClick = onNewGameSetup),
+                    style = MaterialTheme.typography.labelMedium.plus(
+                        TextStyle(
+                            color = SkyBlue, textDecoration = TextDecoration.Underline
+                        )
+                    )
+                )
+
                 games.sortedBy {game -> game.name}.forEach { game ->
                     Text(
                         text = game.name,
@@ -488,6 +510,7 @@ private fun GamePlaySetupScreenContentPreview() {
     GamePlaySetupScreenContent(
         uiState = uiState,
         onStartGame = { _, _ -> },
+        onNewGameSetup = {},
         onSetPlayers = { _ -> },
         onSetGame = { _ -> },
         onAddPlayer = { _ -> },
