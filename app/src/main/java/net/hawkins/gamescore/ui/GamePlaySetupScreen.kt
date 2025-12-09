@@ -58,7 +58,6 @@ import net.hawkins.gamescore.ui.favorites.FavoriteGamesCard
 import net.hawkins.gamescore.ui.theme.GoGreen
 import net.hawkins.gamescore.ui.theme.SkyBlue
 
-@Suppress("unused")
 enum class GameSetupType(val labelId: Int) {
     FAVORITE(R.string.favorite), MANUAL(R.string.manual)
 }

@@ -12,7 +12,6 @@ data class TopAppBar(
 )
 
 abstract class AbstractViewModel() : ViewModel() {
-    @Suppress("unused")
     companion object {
         private val _topAppBar = mutableStateOf(TopAppBar())
     }

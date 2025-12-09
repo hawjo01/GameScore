@@ -1,7 +1,5 @@
 package net.hawkins.gamescore.data.model
 
-import net.hawkins.gamescore.data.model.Idable
-
 data class FavoriteGame(
     val name: String = "",
     val players: List<String> = emptyList(),
