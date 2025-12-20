@@ -15,7 +15,8 @@ on:
   push:
     branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+    types: [ opened, edited, reopened, review_requested, synchronize ]
+    branches: [ main ]
   schedule:
     - cron: '20 2 * * 4'
 
