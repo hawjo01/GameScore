@@ -13,7 +13,7 @@ name: "CodeQL Advanced"
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   pull_request:
     types: [ opened, edited, reopened, review_requested, synchronize ]
     branches: [ main ]
