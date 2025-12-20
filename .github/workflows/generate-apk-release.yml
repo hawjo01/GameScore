@@ -1,4 +1,4 @@
-name: Generated APK AAB (Upload - Create Artifact To Github Action)
+name: Generated APK (Upload - Create Artifact To Github Action)
 
 permissions:
   contents: read
@@ -8,11 +8,7 @@ env:
   main_project_module: app
 
 on:
-
   push:
-    branches: [ main ]
-  pull_request:
-    types: [ opened, edited, reopened, review_requested, synchronize ]
     branches: [ main ]
 
   # Allows you to run this workflow manually from the Actions tab
