@@ -13,6 +13,7 @@ mockk = "1.14.7"
 navigationRuntimeKtx = "2.9.6"
 navigationCompose = "2.9.6"
 hilt = "2.57.2"
+ksp = "2.3.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -44,4 +45,5 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 google-dagger-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
