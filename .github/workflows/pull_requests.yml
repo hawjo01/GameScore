@@ -1,4 +1,4 @@
-name: Android Lint
+name: Pull Request - Lint and Test
 
 permissions:
   contents: read
@@ -9,9 +9,6 @@ env:
   main_project_module: app
 
 on:
-
-  push:
-    branches: [ main ]
   pull_request:
     types: [ opened, edited, reopened, review_requested, synchronize ]
     branches: [ main ]
@@ -44,3 +41,7 @@ jobs:
         with:
           sarif_file: app/build/reports/lint-results-debug.sarif
           category: android-lint
+
+      # Run Tests Build
+      - name: Run gradle tests
+        run: ./gradlew test
