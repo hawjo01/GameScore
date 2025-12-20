@@ -75,4 +75,5 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     ksp(libs.google.dagger.hilt.compiler)
+    ksp(libs.kotlin.metadata.jvm)
 }
