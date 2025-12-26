@@ -6,6 +6,7 @@ import net.hawkins.gamescore.data.source.IdableDataSource
 abstract class AbstractIdableRepository<T : Idable>(protected val dataSource: IdableDataSource<T>) :
     IdableRepository<T> {
     override fun getAll(): List<T> = dataSource.getAll()
-    override fun save(item: T) = dataSource.save(item)
+    override fun getById(id: Int): T? = dataSource.getById(id)
+    override fun save(item: T): T = dataSource.save(item)
     override fun deleteById(id: Int) = dataSource.deleteById(id)
 }
