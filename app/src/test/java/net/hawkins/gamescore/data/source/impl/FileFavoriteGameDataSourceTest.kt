@@ -7,6 +7,7 @@ import java.io.File
 import java.nio.file.Paths
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class FileFavoriteGameDataSourceTest : AbstractBaseTest() {
@@ -65,5 +66,84 @@ class FileFavoriteGameDataSourceTest : AbstractBaseTest() {
 
         val dataSource3 = FileFavoriteGameDataSource(tempFile)
         assertTrue(dataSource3.getAll().isEmpty())
+    }
+
+    @Test
+    fun saveAndUpdate() {
+        val tempFile = randomTempFile()
+        val dataSource = FileFavoriteGameDataSource(tempFile)
+        assertTrue(dataSource.getAll().isEmpty())
+
+        val favoriteGame =
+            FavoriteGame("Add Test Favorite", listOf("Penny", "Bernadette"), "Basic Scoring")
+        dataSource.save(favoriteGame)
+
+        val dataSource2 = FileFavoriteGameDataSource(tempFile)
+        assertEquals(1, dataSource2.getAll().size)
+        val savedGame = dataSource2.getAll()[0]
+        assertEquals(favoriteGame.name, savedGame.name)
+        assertEquals(favoriteGame.game, savedGame.game)
+        assertEquals(favoriteGame.players.size, savedGame.players.size)
+        assertEquals(favoriteGame.players[0], savedGame.players[0])
+        assertEquals(favoriteGame.players[1], savedGame.players[1])
+        assertNotNull(savedGame.id)
+
+        val modifiedGame = savedGame.copy(name = "Updated Name")
+        dataSource2.save(modifiedGame)
+
+        val dataSource3 = FileFavoriteGameDataSource(tempFile)
+        assertEquals(1, dataSource3.getAll().size)
+        val updatedGame = dataSource3.getAll()[0]
+        assertEquals("Updated Name", updatedGame.name)
+        assertEquals(favoriteGame.game, updatedGame.game)
+        assertEquals(favoriteGame.players.size, updatedGame.players.size)
+        assertEquals(favoriteGame.players[0], updatedGame.players[0])
+        assertEquals(favoriteGame.players[1], updatedGame.players[1])
+        assertEquals(updatedGame.id, savedGame.id)
+    }
+
+    @Test
+    fun getById_NoSavedItems() {
+        val tempFile = randomTempFile()
+        val dataSource = FileFavoriteGameDataSource(tempFile)
+        assertTrue(dataSource.getAll().isEmpty())
+
+        assertNull(dataSource.getById(1))
+    }
+
+    @Test
+    fun getById() {
+        val tempFile = randomTempFile()
+        val dataSource = FileFavoriteGameDataSource(tempFile)
+        assertTrue(dataSource.getAll().isEmpty())
+
+        val favoriteGame =
+            FavoriteGame("Add Test Favorite", listOf("Penny", "Bernadette"), "Basic Scoring")
+        val savedGame = dataSource.save(favoriteGame)
+        assertNotNull(savedGame.id)
+
+        val retrievedGame = dataSource.getById(savedGame.id!!)
+        assertNotNull(retrievedGame)
+    }
+
+    @Test
+    fun getById_NoItemWithId() {
+        val tempFile = randomTempFile()
+        val dataSource = FileFavoriteGameDataSource(tempFile)
+        assertTrue(dataSource.getAll().isEmpty())
+
+        val favoriteGame =
+            FavoriteGame("Add Test Favorite", listOf("Penny", "Bernadette"), "Basic Scoring")
+        val savedGame = dataSource.save(favoriteGame)
+        assertNotNull(savedGame.id)
+
+        val retrievedGame = dataSource.getById(savedGame.id!!)
+        assertNotNull(retrievedGame)
+
+        val newId = retrievedGame.id!! + 1
+        val nullGame = dataSource.getById(newId)
+        assertNull(nullGame)
+
+
     }
 }
