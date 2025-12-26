@@ -17,9 +17,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import net.hawkins.gamescore.game.GamePlay
 import net.hawkins.gamescore.ui.AbstractViewModel
 import net.hawkins.gamescore.ui.gameplay.GamePlayScreen
+import net.hawkins.gamescore.ui.gameplay.GamePlayUiEvent
 import net.hawkins.gamescore.ui.gameplay.GamePlayViewModel
 import net.hawkins.gamescore.ui.gameplaysetup.GamePlaySetupScreen
 import net.hawkins.gamescore.ui.gameplaysetup.GamePlaySetupUiEvent
@@ -83,12 +83,10 @@ fun GameScoreScreen(
                 GamePlaySetupScreen(
                     viewModel = gamePlaySetupViewModel,
                     onStartGame = { game, playerNames ->
-                        gamePlayViewModel.setGame(
-                            GamePlay(
+                        gamePlayViewModel.onEvent(GamePlayUiEvent.StartGame(
                                 game,
                                 playerNames
-                            )
-                        )
+                        ))
                         navController.navigate(GameScoreScreen.GamePlay.name)
                     },
                     onNewGameSetup = {
@@ -120,7 +118,7 @@ fun GameScoreScreen(
                     },
                     onModifyGame = {
                         val game = gameSetupViewModel.getGame()
-                        gamePlayViewModel.updateGame(game)
+                        gamePlayViewModel.onEvent(GamePlayUiEvent.UpdateGame(game))
                         navController.popBackStack()
                     },
                     onSaveNewGame = {

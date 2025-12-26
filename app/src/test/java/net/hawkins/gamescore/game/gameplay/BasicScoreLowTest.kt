@@ -2,6 +2,7 @@ package net.hawkins.gamescore.game.gameplay
 
 import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.game.GamePlay
+import net.hawkins.gamescore.ui.gameplay.Player
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -22,7 +23,7 @@ class BasicScoreLowTest {
 
     @Test
     fun isValidScore_true() {
-        val gamePlay = GamePlay(game, listOf())
+        val gamePlay = GamePlay(game)
         assertTrue(gamePlay.isValidScore("0"))
         assertTrue(gamePlay.isValidScore("5"))
         assertTrue(gamePlay.isValidScore("-5"))
@@ -32,65 +33,48 @@ class BasicScoreLowTest {
 
     @Test
     fun isValidScore_false() {
-        val gamePlay = GamePlay(game, listOf())
+        val gamePlay = GamePlay(game)
         assertFalse(gamePlay.isValidScore(""))
         assertFalse(gamePlay.isValidScore(".5"))
         assertFalse(gamePlay.isValidScore("a"))
     }
 
     @Test
-    fun hasWinningThreshold() {
-        val gamePlay = GamePlay(game, listOf())
-        assertFalse(gamePlay.hasWinningThreshold())
-    }
-
-    @Test
     fun findWinner_zeroPlayers() {
-        val gamePlay = GamePlay(game, listOf())
-        assertNull(gamePlay.determineWinner())
+        val gamePlay = GamePlay(game)
+        assertNull(gamePlay.determineWinner(emptyList()))
     }
 
     @Test
     fun findWinner_differentScores() {
-        val gamePlay = GamePlay(game, listOf("Rajesh", "Howard"))
-        val player1 = gamePlay.players[0]
-        player1.addScore(20)
+        val gamePlay = GamePlay(game)
+        val player1 = Player("Howard", listOf(20))
+        val player2 = Player("Rajesh")
+        val players = listOf(player1, player2)
 
-        val player2 = gamePlay.players[1]
-
-        val winner = gamePlay.determineWinner()
-        assertEquals(player2, winner)
+        val winner = gamePlay.determineWinner(players)
+        assertEquals(player2.name, winner)
     }
 
     @Test
     fun findWinner_LowScore() {
-        val gamePlay = GamePlay(game, listOf("Rajesh", "Howard"))
-        val player1 = gamePlay.players[0]
-        player1.addScore(20)
+        val gamePlay = GamePlay(game)
+        val player1 = Player("Howard", listOf(20))
+        val player2 = Player("Rajesh", listOf(50))
+        val players = listOf(player1, player2)
 
-        val player2 = gamePlay.players[1]
-        player2.addScore(50)
-
-        val winner = gamePlay.determineWinner()
-        assertEquals(player1, winner)
+        val winner = gamePlay.determineWinner(players)
+        assertEquals(player1.name, winner)
     }
 
     @Test
     fun findWinner_EqualScores() {
-        val gamePlay = GamePlay(game, listOf("Rajesh", "Howard"))
-        val player1 = gamePlay.players[0]
-        player1.addScore(20)
+        val gamePlay = GamePlay(game)
+        val player1 = Player("Howard", listOf(20))
+        val player2 = Player("Rajesh", listOf(20))
+        val players = listOf(player1, player2)
 
-        val player2 = gamePlay.players[1]
-        player2.addScore(20)
-
-        val winner = gamePlay.determineWinner()
+        val winner = gamePlay.determineWinner(players)
         assertNull(winner)
-    }
-
-    @Test
-    fun highlightNegativeScore() {
-        val gamePlay = GamePlay(game, listOf())
-        assertFalse(gamePlay.highlightNegativeScore())
     }
 }

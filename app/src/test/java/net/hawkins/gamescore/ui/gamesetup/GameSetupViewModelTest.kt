@@ -1,4 +1,4 @@
-package net.hawkins.gamescore.ui
+package net.hawkins.gamescore.ui.gamesetup
 
 import io.mockk.every
 import io.mockk.impl.annotations.MockK

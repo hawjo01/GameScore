@@ -23,7 +23,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,8 +39,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.data.model.FavoriteGame
-import net.hawkins.gamescore.game.GamePlay
+import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.ui.component.ConfirmAction
+import net.hawkins.gamescore.ui.gameplay.Player
 import net.hawkins.gamescore.ui.gameplaysetup.GamePlaySetupUiEvent
 import net.hawkins.gamescore.ui.theme.DeleteRed
 import net.hawkins.gamescore.ui.theme.SkyBlue
@@ -61,9 +61,9 @@ fun FavoriteGamesCard(
         modifier = modifier.padding(all = 10.dp)
     ) {
         if (favoriteGames.isNotEmpty()) {
-            var showDeleteIndex by remember { mutableIntStateOf(-1) }
 
-            favoriteGames.sortedBy { game -> game.name }.forEachIndexed { index, favorite ->
+            favoriteGames.sortedBy { game -> game.name }.forEach { favorite ->
+                var showDeleteFavoriteGame by remember { mutableStateOf(false) }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -86,7 +86,7 @@ fun FavoriteGamesCard(
                         )
                     }
                     Column {
-                        IconButton(onClick = { showDeleteIndex = index }) {
+                        IconButton(onClick = { showDeleteFavoriteGame = true}) {
                             Icon(
                                 Icons.Filled.Delete,
                                 tint = DeleteRed,
@@ -95,15 +95,15 @@ fun FavoriteGamesCard(
                         }
                     }
                 }
-                if (showDeleteIndex >= 0) {
+                if (showDeleteFavoriteGame) {
                     ConfirmAction(
                         title = "Delete Favorite Game",
-                        description = "Delete '" + favoriteGames[showDeleteIndex].name + "'",
+                        description = "Delete '" + favorite.name + "'",
                         onConfirmation = {
-                            onEvent(GamePlaySetupUiEvent.DeleteFavoriteGame(showDeleteIndex))
-                            showDeleteIndex = -1
+                            onEvent(GamePlaySetupUiEvent.DeleteFavoriteGame(favorite.id!!))
+                            showDeleteFavoriteGame = false
                         },
-                        onDismissRequest = { showDeleteIndex = -1 },
+                        onDismissRequest = { showDeleteFavoriteGame = false },
                     )
                 }
             }
@@ -123,7 +123,8 @@ fun FavoriteGamesCard(
 
 @Composable
 fun SaveFavoriteGame(
-    gamePlay: GamePlay,
+    game: Game,
+    players: List<Player>,
     onDismissRequest: () -> Unit,
     onConfirmation: (String) -> Unit
 ) {
@@ -186,7 +187,7 @@ fun SaveFavoriteGame(
             ) {
                 val text = remember {
                     mutableStateOf(
-                        gamePlay.players
+                        players
                             .joinToString(separator = ", ") { player -> player.name })
                 }
                 OutlinedTextField(
@@ -220,7 +221,7 @@ fun SaveFavoriteGame(
                 horizontalArrangement = Arrangement.Start
             ) {
                 OutlinedTextField(
-                    value = gamePlay.getGameName(),
+                    value = game.name,
                     onValueChange = {},
                     label = { Text(text = stringResource(R.string.game)) },
                     singleLine = true,

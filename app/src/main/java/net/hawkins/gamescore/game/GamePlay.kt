@@ -1,31 +1,13 @@
 package net.hawkins.gamescore.game
 
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import net.hawkins.gamescore.data.model.Game
 import androidx.compose.ui.graphics.Color
-import net.hawkins.gamescore.Utils
+import net.hawkins.gamescore.data.model.Game
+import net.hawkins.gamescore.ui.gameplay.Player
+import net.hawkins.gamescore.utils.isNegativeInt
 
-class GamePlay(val game: Game, playerNames: List<String>) {
+class GamePlay(val game: Game) {
+    fun determineWinner(players: List<Player>): String? {
 
-    private val _winner = mutableStateOf<Player?>(null)
-    val players: List<Player> = playerNames.map { playerName -> Player(playerName) }
-
-    fun resetGame() {
-        _winner.value = null
-        players.forEach { player -> player.resetScores() }
-    }
-
-    fun getWinner(): Player? {
-        return _winner.value
-    }
-
-    fun determineWinner(): Player? {
-        _winner.value = findWinner()
-        return _winner.value
-    }
-
-    private fun findWinner(): Player? {
         if (players.isEmpty()) {
             return null
         }
@@ -46,7 +28,7 @@ class GamePlay(val game: Game, playerNames: List<String>) {
 
         val numberOfWinners = players.count { player -> player.totalScore() == candidateTotalScore }
         return if (numberOfWinners == 1) {
-            candidate
+            candidate.name
         } else {
             null
         }
@@ -79,24 +61,8 @@ class GamePlay(val game: Game, playerNames: List<String>) {
         return true
     }
 
-    fun highlightNegativeScore(): Boolean {
-        return game.color.negativeScore != Game.Colors.Color.DEFAULT
-    }
-
-    fun hasWinningThreshold(): Boolean {
-        return game.objective.goal != null
-    }
-
-    fun getGameName(): String {
-        return game.name
-    }
-
-    fun numberOfRounds(): Int {
-        return players.maxBy { player -> player.scores.size }.scores.size
-    }
-
-    fun getScoreColor(score: String) : Color {
-        return if (Utils.isNegativeInt(score)) {
+    fun getScoreColor(score: String): Color {
+        return if (score.isNegativeInt()) {
             when (game.color.negativeScore) {
                 Game.Colors.Color.DEFAULT -> Color.Unspecified
                 Game.Colors.Color.RED -> Color.Red
@@ -109,32 +75,6 @@ class GamePlay(val game: Game, playerNames: List<String>) {
                 Game.Colors.Color.RED -> Color.Red
                 Game.Colors.Color.GREEN -> Color.Green
             }
-
-        }
-    }
-
-
-    data class Player(val name: String) {
-        val scores = mutableStateListOf<Int>()
-
-        fun totalScore(): Int {
-            return scores.sum()
-        }
-
-        fun resetScores() {
-            scores.clear()
-        }
-
-        fun addScore(score: Int) {
-            scores.add(score)
-        }
-
-        fun changeScore(newScore: Int, scoreIndex: Int) {
-            scores[scoreIndex] = newScore
-        }
-
-        fun deleteScore(scoreIndex: Int) {
-            scores.removeAt(scoreIndex)
         }
     }
 }

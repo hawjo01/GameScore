@@ -25,7 +25,7 @@ class GameSetupViewModel @Inject constructor(
     fun onEvent(event: GameSetupUiEvent) {
         when (event) {
             is GameSetupUiEvent.SetGameName -> setGameName(event.name)
-            is GameSetupUiEvent.SetConstraintPostiveOnlyScores -> setConstraintAllowNegative(event.positiveOnly)
+            is GameSetupUiEvent.SetConstraintPositiveOnlyScores -> setConstraintAllowNegative(event.positiveOnly)
             is GameSetupUiEvent.SetConstraintEqualHandSizes -> setConstraintEqualHandSizes(event.requireEqualHandSizes)
             is GameSetupUiEvent.SetConstraintScoreModulus -> setConstraintModulus(event.modulus)
             is GameSetupUiEvent.SetObjectiveGoal -> setObjectiveGoal(event.goal)
