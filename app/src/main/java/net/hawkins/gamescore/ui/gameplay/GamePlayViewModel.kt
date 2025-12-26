@@ -44,4 +44,13 @@ class GamePlayViewModel @Inject constructor(
             }
         }
     }
+
+    fun resetGame() {
+        val players = _uiState.value.gamePlay.players.map { player -> player.name }
+        val game = _uiState.value.gamePlay.game
+        val gamePlay = GamePlay(game, players)
+        _uiState.update { currentState ->
+            currentState.copy( gamePlay = gamePlay )
+        }
+    }
 }

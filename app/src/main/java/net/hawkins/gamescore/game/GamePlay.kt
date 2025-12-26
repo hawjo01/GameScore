@@ -11,11 +11,6 @@ class GamePlay(val game: Game, playerNames: List<String>) {
     private val _winner = mutableStateOf<Player?>(null)
     val players: List<Player> = playerNames.map { playerName -> Player(playerName) }
 
-    fun resetGame() {
-        _winner.value = null
-        players.forEach { player -> player.resetScores() }
-    }
-
     fun getWinner(): Player? {
         return _winner.value
     }

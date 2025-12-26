@@ -74,7 +74,9 @@ fun GamePlayScreen(
                 AppBarActions(
                     gamePlay = uiState.gamePlay,
                     onShowGameDetails = onShowGameDetails,
-                    saveFavoriteGame = { favoriteGame -> viewModel.saveFavoriteGame(favoriteGame) })
+                    saveFavoriteGame = { favoriteGame -> viewModel.saveFavoriteGame(favoriteGame) },
+                    resetGame = { viewModel.resetGame() }
+                )
             }
         )
     }
@@ -476,7 +478,8 @@ private fun ConfirmResetGame(
 private fun AppBarActions(
     gamePlay: GamePlay,
     onShowGameDetails: (Game) -> Unit,
-    saveFavoriteGame: (FavoriteGame) -> Unit
+    saveFavoriteGame: (FavoriteGame) -> Unit,
+    resetGame: () -> Unit,
 ) {
 
     var dropdownMenuExpanded by remember { mutableStateOf(false) }
@@ -546,7 +549,7 @@ private fun AppBarActions(
         ConfirmResetGame(
             onDismissRequest = { showResetGameDialog = false },
             onConfirmation = {
-                gamePlay.resetGame()
+                resetGame()
                 showResetGameDialog = false
             }
         )

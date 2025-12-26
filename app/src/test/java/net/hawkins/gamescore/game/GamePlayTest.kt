@@ -3,7 +3,6 @@ package net.hawkins.gamescore.game
 import net.hawkins.gamescore.data.model.Game
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -46,22 +45,6 @@ class GamePlayTest {
         assertTrue(gamePlay.isValidScore("-7"))
         assertTrue(gamePlay.isValidScore("0"))
         assertTrue(gamePlay.isValidScore("7"))
-    }
-
-    @Test
-    fun resetGame() {
-        val gamePlay = GamePlay(seven, listOf("Sheldon", "Leonard"))
-        gamePlay.players[0].addScore(10)
-        gamePlay.players[1].addScore(20)
-
-        val winner = gamePlay.determineWinner()
-        assertEquals("Leonard", winner?.name)
-        assertEquals("Leonard", gamePlay.getWinner()?.name)
-
-        gamePlay.resetGame()
-        assertTrue(gamePlay.players[0].scores.isEmpty())
-        assertTrue(gamePlay.players[1].scores.isEmpty())
-        assertNull(gamePlay.getWinner())
     }
 
     @Test
