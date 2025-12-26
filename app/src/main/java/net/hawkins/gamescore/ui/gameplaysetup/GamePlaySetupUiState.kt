@@ -1,4 +1,4 @@
-package net.hawkins.gamescore.ui
+package net.hawkins.gamescore.ui.gameplaysetup
 
 import net.hawkins.gamescore.data.model.FavoriteGame
 import net.hawkins.gamescore.data.model.Game

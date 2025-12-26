@@ -7,6 +7,7 @@ import net.hawkins.gamescore.AbstractBaseTest
 import net.hawkins.gamescore.data.FavoriteGameRepository
 import net.hawkins.gamescore.data.FavoritePlayerRepository
 import net.hawkins.gamescore.data.GameRepository
+import net.hawkins.gamescore.ui.gameplaysetup.GamePlaySetupViewModel
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test

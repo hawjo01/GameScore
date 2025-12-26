@@ -1,4 +1,4 @@
-package net.hawkins.gamescore.ui
+package net.hawkins.gamescore.ui.gameplaysetup
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,6 +10,7 @@ import net.hawkins.gamescore.data.FavoritePlayerRepository
 import net.hawkins.gamescore.data.GameRepository
 import net.hawkins.gamescore.data.model.FavoriteGame
 import net.hawkins.gamescore.data.model.Game
+import net.hawkins.gamescore.ui.AbstractViewModel
 import javax.inject.Inject
 
 @HiltViewModel
