@@ -6,7 +6,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import net.hawkins.gamescore.Constants
 import net.hawkins.gamescore.data.FavoriteGameRepository
 import net.hawkins.gamescore.data.FavoritePlayerRepository
 import net.hawkins.gamescore.data.GameRepository
@@ -19,6 +18,9 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
 
+    const val FAVORITE_PLAYERS_FILENAME = "favorite-players.json"
+    const val FAVORITE_GAMES_FILENAME = "favorite-games.json"
+
     @Provides
     @Singleton
     fun provideFavoriteGameRepository(@ApplicationContext appContext: Context): FavoriteGameRepository {
@@ -28,7 +30,7 @@ object RepositoryModule {
             dataSource = FileFavoriteGameDataSource(
                 File(
                     directory,
-                    Constants.FAVORITE_GAMES_FILENAME
+                    FAVORITE_GAMES_FILENAME
                 )
             )
         )
@@ -42,7 +44,7 @@ object RepositoryModule {
             FileFavoritePlayerDataSource(
                 File(
                     directory,
-                    Constants.FAVORITE_PLAYERS_FILENAME
+                    FAVORITE_PLAYERS_FILENAME
                 )
             )
         )
