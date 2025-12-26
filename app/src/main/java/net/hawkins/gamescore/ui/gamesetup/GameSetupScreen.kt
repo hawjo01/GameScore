@@ -177,13 +177,11 @@ private fun ActionButtons(
             ) {
                 Text(stringResource(R.string.save))
             }
-
             GameSetupUiState.Mode.EDIT -> OutlinedButton(
                 onClick = onModifyGame
             ) {
                 Text(stringResource(R.string.modify))
             }
-
             else -> OutlinedButton(
                 onClick = onEnableEdits
             ) {

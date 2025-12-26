@@ -2,9 +2,9 @@ package net.hawkins.gamescore.game
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import net.hawkins.gamescore.data.model.Game
 import androidx.compose.ui.graphics.Color
 import net.hawkins.gamescore.Utils
+import net.hawkins.gamescore.data.model.Game
 
 class GamePlay(val game: Game, playerNames: List<String>) {
 
@@ -95,7 +95,7 @@ class GamePlay(val game: Game, playerNames: List<String>) {
         return players.maxBy { player -> player.scores.size }.scores.size
     }
 
-    fun getScoreColor(score: String) : Color {
+    fun getScoreColor(score: String): Color {
         return if (Utils.isNegativeInt(score)) {
             when (game.color.negativeScore) {
                 Game.Colors.Color.DEFAULT -> Color.Unspecified
@@ -109,7 +109,6 @@ class GamePlay(val game: Game, playerNames: List<String>) {
                 Game.Colors.Color.RED -> Color.Red
                 Game.Colors.Color.GREEN -> Color.Green
             }
-
         }
     }
 

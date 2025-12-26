@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import net.hawkins.gamescore.data.FavoriteGameRepository
+import net.hawkins.gamescore.data.GamePlayRepository
 import net.hawkins.gamescore.data.model.FavoriteGame
 import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.game.GamePlay
@@ -16,6 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class GamePlayViewModel @Inject constructor(
     private val _favoriteGameRepository: FavoriteGameRepository,
+    private val _gamePlayRepository: GamePlayRepository
 ) : AbstractViewModel() {
     private val _uiState = MutableStateFlow(GamePlayUiState())
     val uiState: StateFlow<GamePlayUiState> = _uiState.asStateFlow()
@@ -43,5 +45,9 @@ class GamePlayViewModel @Inject constructor(
                 _uiState.value.gamePlay.players[playerIndex].addScore(score)
             }
         }
+    }
+
+    fun saveGamePlay() {
+        _gamePlayRepository.save(uiState.value.gamePlay)
     }
 }

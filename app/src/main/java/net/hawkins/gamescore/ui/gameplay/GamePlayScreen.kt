@@ -36,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -77,6 +78,22 @@ fun GamePlayScreen(
                     saveFavoriteGame = { favoriteGame -> viewModel.saveFavoriteGame(favoriteGame) })
             }
         )
+    }
+    LaunchedEffect(Unit) {
+        snapshotFlow {
+            viewModel.uiState
+        }.collect { _ ->
+            viewModel.saveGamePlay()
+        }
+    }
+    for (player in uiState.gamePlay.players) {
+        LaunchedEffect(Unit) {
+            snapshotFlow {
+                player.scores
+            }.collect { _ ->
+                viewModel.saveGamePlay()
+            }
+        }
     }
 
     GamePlayScreenContent(uiState.gamePlay, modifier)
