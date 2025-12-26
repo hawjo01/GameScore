@@ -1,4 +1,4 @@
-package net.hawkins.gamescore.ui
+package net.hawkins.gamescore.ui.gameplay
 
 import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.game.GamePlay

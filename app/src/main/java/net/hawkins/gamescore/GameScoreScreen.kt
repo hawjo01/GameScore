@@ -19,10 +19,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import net.hawkins.gamescore.game.GamePlay
 import net.hawkins.gamescore.ui.AbstractViewModel
-import net.hawkins.gamescore.ui.GamePlayScreen
-import net.hawkins.gamescore.ui.GamePlaySetupScreen
-import net.hawkins.gamescore.ui.GamePlaySetupViewModel
-import net.hawkins.gamescore.ui.GamePlayViewModel
+import net.hawkins.gamescore.ui.gameplay.GamePlayScreen
+import net.hawkins.gamescore.ui.gameplaysetup.GamePlaySetupScreen
+import net.hawkins.gamescore.ui.gameplaysetup.GamePlaySetupViewModel
+import net.hawkins.gamescore.ui.gameplay.GamePlayViewModel
 
 enum class GameScoreScreen() {
     GamePlaySetup,

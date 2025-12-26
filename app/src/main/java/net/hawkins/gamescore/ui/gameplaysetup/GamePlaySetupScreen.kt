@@ -1,4 +1,4 @@
-package net.hawkins.gamescore.ui
+package net.hawkins.gamescore.ui.gameplaysetup
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
