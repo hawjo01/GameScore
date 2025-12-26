@@ -62,7 +62,7 @@ fun FavoriteGamesCard(
         if (favoriteGames.isNotEmpty()) {
             var showDeleteIndex by remember { mutableIntStateOf(-1) }
 
-            favoriteGames.forEachIndexed { index, favorite ->
+            favoriteGames.sortedBy { game -> game.name }.forEachIndexed { index, favorite ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
