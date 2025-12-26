@@ -462,7 +462,7 @@ private fun GameSelectionDialog(
                         fontWeight = FontWeight.Bold
                     )
                 }
-                games.forEach { game ->
+                games.sortedBy { game -> game.name }.forEach { game ->
                     Text(
                         text = game.name,
                         modifier = modifier
