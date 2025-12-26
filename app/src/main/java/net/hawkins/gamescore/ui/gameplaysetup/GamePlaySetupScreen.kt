@@ -6,18 +6,25 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -49,6 +56,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.data.model.FavoriteGame
@@ -66,16 +74,25 @@ enum class GameSetupType(val labelId: Int) {
 fun GamePlaySetupScreen(
     viewModel: GamePlaySetupViewModel,
     onStartGame: (Game, List<String>) -> Unit,
+    onNewGameSetup: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     LaunchedEffect(Unit) {
-        viewModel.updateTopAppBar { /* No AppBarActions */ }
+        viewModel.updateTopAppBar {
+            AppBarActions(
+                uiState = uiState,
+                onDeleteGame = { gameId -> viewModel.deleteSavedGame(gameId) },
+                modifier = modifier
+            )
+        }
     }
 
-    val uiState by viewModel.uiState.collectAsState()
     GamePlaySetupScreenContent(
         uiState = uiState,
         onStartGame = onStartGame,
+        onNewGameSetup = onNewGameSetup,
         onSetGame = { game -> viewModel.setGame(game) },
         onAddPlayer = { playerName -> viewModel.addPlayer(playerName) },
         onRemovePlayer = { index -> viewModel.removePlayer(index) },
@@ -83,7 +100,6 @@ fun GamePlaySetupScreen(
         saveFavoritePlayer = { playerName -> viewModel.addFavoritePlayer(playerName) },
         deleteFavoritePlayer = { playerName -> viewModel.deleteFavoritePlayer(playerName) },
         deleteFavoriteGame = { favoriteGame -> viewModel.deleteFavoriteGame(favoriteGame) },
-        onSetGameByName = { gameName -> viewModel.setGameByName(gameName) },
         modifier = modifier
     )
 }
@@ -92,6 +108,7 @@ fun GamePlaySetupScreen(
 private fun GamePlaySetupScreenContent(
     uiState: GamePlaySetupUiState,
     onStartGame: (Game, List<String>) -> Unit,
+    onNewGameSetup: () -> Unit,
     onSetGame: (Game) -> Unit,
     onAddPlayer: (String) -> Unit,
     onRemovePlayer: (Int) -> Unit,
@@ -99,7 +116,6 @@ private fun GamePlaySetupScreenContent(
     saveFavoritePlayer: (String) -> Unit,
     deleteFavoritePlayer: (String) -> Unit,
     deleteFavoriteGame: (FavoriteGame) -> Unit,
-    onSetGameByName: (String) -> Unit,
     modifier: Modifier
 ) {
     Column {
@@ -107,6 +123,7 @@ private fun GamePlaySetupScreenContent(
             games = uiState.savedGames,
             game = uiState.selectedGame,
             playerNames = uiState.playerNames,
+            onNewGameSetup = onNewGameSetup,
             onStartGame = onStartGame,
             onRemovePlayer = onRemovePlayer,
             onChangeGame = onSetGame,
@@ -147,7 +164,7 @@ private fun GamePlaySetupScreenContent(
                     onDeleteFavoriteGame = deleteFavoriteGame,
                     onFavoriteSelected = { favoriteGame ->
                         // TODO: Fix this once the entire game is stored in the favorite
-                        onSetGameByName(favoriteGame.game)
+                        onSetGame(favoriteGame.game)
                         onSetPlayers(favoriteGame.players)
                     })
             }
@@ -168,6 +185,7 @@ private fun GamePlaySetupScreenContent(
 private fun GameCard(
     games: List<Game>,
     game: Game,
+    onNewGameSetup: () -> Unit,
     playerNames: List<String>,
     onStartGame: (Game, List<String>) -> Unit,
     onRemovePlayer: (Int) -> Unit,
@@ -205,6 +223,7 @@ private fun GameCard(
             if (showGameSelectionDialog) {
                 GameSelectionDialog(
                     games = games,
+                    onNewGameSetup = onNewGameSetup,
                     onClickAction = { game ->
                         onChangeGame(game)
                         showGameSelectionDialog = false
@@ -327,91 +346,98 @@ private fun PlayerSelection(
     ) {
         Text(text = stringResource(R.string.choose_players))
     }
-    favoritePlayers.sorted().forEach { name ->
-        var showDeleteSavedPlayer by remember { mutableStateOf(false) }
-        Row(
-            modifier = modifier.padding(horizontal = 10.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            OutlinedIconButton(
-                onClick = {
-                    addPlayer(name)
-                }) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = stringResource(R.string.add)
-                )
-            }
-            Text(
-                text = name,
-                modifier = modifier
-                    .padding(start = 10.dp)
-                    .combinedClickable(onLongClick = {
-                        showDeleteSavedPlayer = true
-                    }, onClick = {})
-            )
-
-            if (showDeleteSavedPlayer) {
-                ConfirmDeleteSavedPlayer(
-                    name = name,
-                    onDismissRequest = { showDeleteSavedPlayer = false },
-                    onConfirmation = {
-                        deleteFavoritePlayer(name)
-                        showDeleteSavedPlayer = false
-                    })
-            }
-        }
-    }
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.padding(10.dp)
-    ) {
-        OutlinedTextField(
-            value = newPlayerName,
-            onValueChange = { newPlayerName = it },
-            label = { Text(text = stringResource(R.string.player_name)) },
-            singleLine = true,
-            shape = shapes.small,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Ascii,
-                capitalization = KeyboardCapitalization.Words,
-                imeAction = ImeAction.Done
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    hideKeyboard.invoke()
-                }),
-            trailingIcon = {
-                Row {
-                    IconButton(
+    Row {
+        LazyColumn {
+            items(favoritePlayers.sorted(), key = { it }) { name ->
+                var showDeleteSavedPlayer by remember { mutableStateOf(false) }
+                Row(
+                    modifier = modifier.padding(horizontal = 10.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    OutlinedIconButton(
                         onClick = {
-                            hideKeyboard.invoke()
-                            addPlayer(newPlayerName.trim())
-                            newPlayerName = ""
-                        }, enabled = newPlayerName.isNotBlank()
-                    ) {
+                            addPlayer(name)
+                        }) {
                         Icon(
                             imageVector = Icons.Filled.Add,
                             contentDescription = stringResource(R.string.add)
                         )
                     }
-                    IconButton(
-                        onClick = {
-                            hideKeyboard.invoke()
-                            saveFavoritePlayer(newPlayerName.trim())
-                            newPlayerName = ""
-                        }, enabled = newPlayerName.isNotBlank()
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Save,
-                            contentDescription = stringResource(R.string.save)
-                        )
+                    Text(
+                        text = name,
+                        modifier = modifier
+                            .padding(start = 10.dp)
+                            .combinedClickable(onLongClick = {
+                                showDeleteSavedPlayer = true
+                            }, onClick = {})
+                    )
+
+                    if (showDeleteSavedPlayer) {
+                        ConfirmDeleteSavedPlayer(
+                            name = name,
+                            onDismissRequest = { showDeleteSavedPlayer = false },
+                            onConfirmation = {
+                                deleteFavoritePlayer(name)
+                                showDeleteSavedPlayer = false
+                            })
                     }
                 }
-            })
+            }
+            item {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = modifier.padding(10.dp)
+                ) {
+                    OutlinedTextField(
+                        value = newPlayerName,
+                        onValueChange = { newPlayerName = it },
+                        label = { Text(text = stringResource(R.string.player_name)) },
+                        singleLine = true,
+                        shape = shapes.small,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Ascii,
+                            capitalization = KeyboardCapitalization.Words,
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                hideKeyboard.invoke()
+                            }),
+                        trailingIcon = {
+                            Row {
+                                IconButton(
+                                    onClick = {
+                                        hideKeyboard.invoke()
+                                        addPlayer(newPlayerName.trim())
+                                        newPlayerName = ""
+                                    }, enabled = newPlayerName.isNotBlank()
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Add,
+                                        contentDescription = stringResource(R.string.add)
+                                    )
+                                }
+                                IconButton(
+                                    onClick = {
+                                        hideKeyboard.invoke()
+                                        saveFavoritePlayer(newPlayerName.trim())
+                                        newPlayerName = ""
+                                    }, enabled = newPlayerName.isNotBlank()
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Save,
+                                        contentDescription = stringResource(R.string.save)
+                                    )
+                                }
+                            }
+                        })
+                }
+            }
+        }
     }
+
 
 }
 
@@ -440,6 +466,7 @@ private fun ConfirmDeleteSavedPlayer(
 @Composable
 private fun GameSelectionDialog(
     games: List<Game>,
+    onNewGameSetup: () -> Unit,
     onClickAction: (Game) -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier
@@ -462,6 +489,20 @@ private fun GameSelectionDialog(
                         fontWeight = FontWeight.Bold
                     )
                 }
+                Text(
+                    text = "New Game",
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 10.dp)
+                        .clickable(
+                            onClick = onNewGameSetup
+                        ),
+                    style = MaterialTheme.typography.labelMedium.plus(
+                        TextStyle(
+                            color = SkyBlue, textDecoration = TextDecoration.Underline
+                        )
+                    )
+                )
                 games.sortedBy { game -> game.name }.forEach { game ->
                     Text(
                         text = game.name,
@@ -482,6 +523,122 @@ private fun GameSelectionDialog(
     }
 }
 
+@Composable
+private fun ConfirmDeleteGame(
+    game: Game,
+    onDismissRequest: () -> Unit,
+    onConfirmation: (Int) -> Unit
+) {
+    ConfirmAction(
+        title = "Delete Game",
+        description = "Delete '" + game.name + "'?",
+        onConfirmation = { onConfirmation(game.id!!) },
+        onDismissRequest = onDismissRequest
+    )
+}
+
+@Composable
+private fun ManageGamesDialog(
+    onDismissRequest: () -> Unit,
+    uiState: GamePlaySetupUiState,
+    onDeleteGame: (Int) -> Unit,
+    modifier: Modifier
+) {
+    Dialog(
+        onDismissRequest = { onDismissRequest() },
+    ) {
+        Card(
+            modifier = modifier.padding(50.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = modifier.fillMaxWidth()
+            ) {
+                Text("Manage Games")
+            }
+            LazyColumn {
+                items(items = uiState.savedGames.sortedBy { game -> game.name }) { game ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .padding(start = 20.dp, end = 20.dp, top = 10.dp)
+                    ) {
+                        var showConfirmDeleteGame by remember { mutableStateOf(false) }
+                        Text(text = game.name)
+                        Spacer(modifier = Modifier.weight(1f))
+                        IconButton(onClick = {
+                            if (game.id != null) {
+                                showConfirmDeleteGame = true
+                            }
+                        }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = "Delete",
+                                tint = Color.Red
+                            )
+                        }
+
+                        if (showConfirmDeleteGame) {
+                            ConfirmDeleteGame(
+                                game = game,
+                                onDismissRequest = { showConfirmDeleteGame = false },
+                                onConfirmation = { gameId ->
+                                    onDeleteGame(gameId)
+                                    showConfirmDeleteGame = false
+                                })
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AppBarActions(
+    uiState: GamePlaySetupUiState,
+    onDeleteGame: (Int) -> Unit,
+    modifier: Modifier
+) {
+
+    var dropdownMenuExpanded by remember { mutableStateOf(false) }
+    var showManageGames by remember { mutableStateOf(false) }
+
+    IconButton(onClick = { dropdownMenuExpanded = true }) {
+        Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu")
+    }
+    DropdownMenu(
+        expanded = dropdownMenuExpanded,
+        onDismissRequest = { dropdownMenuExpanded = false }
+    ) {
+        DropdownMenuItem(
+            text = {
+                Text(
+                    text = "Manage Games",
+                    fontSize = 20.sp
+                )
+            },
+            onClick = {
+                showManageGames = true
+                dropdownMenuExpanded = false
+            }
+        )
+    }
+
+    if (showManageGames) {
+        ManageGamesDialog(
+            onDismissRequest = { showManageGames = false },
+            uiState = uiState,
+            onDeleteGame = onDeleteGame,
+            modifier = modifier
+        )
+    }
+}
+
+
 @Preview
 @Composable
 private fun GamePlaySetupScreenContentPreview() {
@@ -489,6 +646,7 @@ private fun GamePlaySetupScreenContentPreview() {
     GamePlaySetupScreenContent(
         uiState = uiState,
         onStartGame = { _, _ -> },
+        onNewGameSetup = {},
         onSetPlayers = { _ -> },
         onSetGame = { _ -> },
         onAddPlayer = { _ -> },
@@ -496,6 +654,5 @@ private fun GamePlaySetupScreenContentPreview() {
         modifier = Modifier,
         saveFavoritePlayer = { _ -> },
         deleteFavoritePlayer = { _ -> },
-        deleteFavoriteGame = { _ -> },
-        onSetGameByName = { _ -> })
+        deleteFavoriteGame = { _ -> })
 }

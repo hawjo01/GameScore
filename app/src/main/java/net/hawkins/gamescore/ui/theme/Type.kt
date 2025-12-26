@@ -41,6 +41,11 @@ val Typography = Typography(
         fontWeight = FontWeight.Bold,
         textAlign = TextAlign.Center
     ),
+    titleSmall = TextStyle(
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold,
+        textAlign = TextAlign.Center
+    ),
     bodyMedium = TextStyle(
         fontSize = 24.sp
     )

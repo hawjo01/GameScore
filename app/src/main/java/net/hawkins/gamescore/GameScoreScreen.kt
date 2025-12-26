@@ -20,13 +20,17 @@ import androidx.navigation.compose.rememberNavController
 import net.hawkins.gamescore.game.GamePlay
 import net.hawkins.gamescore.ui.AbstractViewModel
 import net.hawkins.gamescore.ui.gameplay.GamePlayScreen
+import net.hawkins.gamescore.ui.gameplay.GamePlayViewModel
 import net.hawkins.gamescore.ui.gameplaysetup.GamePlaySetupScreen
 import net.hawkins.gamescore.ui.gameplaysetup.GamePlaySetupViewModel
-import net.hawkins.gamescore.ui.gameplay.GamePlayViewModel
+import net.hawkins.gamescore.ui.gamesetup.GameSetupScreen
+import net.hawkins.gamescore.ui.gamesetup.GameSetupUiState
+import net.hawkins.gamescore.ui.gamesetup.GameSetupViewModel
 
 enum class GameScoreScreen() {
     GamePlaySetup,
-    GamePlay
+    GamePlay,
+    GameSetup
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,6 +62,7 @@ private fun GameScoreAppBar(
 fun GameScoreScreen(
     gamePlaySetupViewModel: GamePlaySetupViewModel = viewModel(),
     gamePlayViewModel: GamePlayViewModel = viewModel(),
+    gameSetupViewModel: GameSetupViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
     Scaffold(
@@ -73,7 +78,6 @@ fun GameScoreScreen(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(route = GameScoreScreen.GamePlaySetup.name) {
-
                 GamePlaySetupScreen(
                     viewModel = gamePlaySetupViewModel,
                     onStartGame = { game, playerNames ->
@@ -84,6 +88,10 @@ fun GameScoreScreen(
                             )
                         )
                         navController.navigate(GameScoreScreen.GamePlay.name)
+                    },
+                    onNewGameSetup = {
+                        gameSetupViewModel.resetGame()
+                        navController.navigate(GameScoreScreen.GameSetup.name)
                     }
                 )
             }
@@ -93,7 +101,32 @@ fun GameScoreScreen(
                     // Prevent accidental erasure of game data
                 }
                 GamePlayScreen(
-                    viewModel = gamePlayViewModel
+                    viewModel = gamePlayViewModel,
+                    onShowGameDetails = { game ->
+                        gameSetupViewModel.setGame(game)
+                        gameSetupViewModel.setMode(GameSetupUiState.Mode.VIEW)
+                        navController.navigate(GameScoreScreen.GameSetup.name)
+                    }
+                )
+            }
+
+            composable(route = GameScoreScreen.GameSetup.name) {
+                GameSetupScreen(
+                    viewModel = gameSetupViewModel,
+                    onCancel = {
+                        navController.popBackStack()
+                    },
+                    onModifyGame = {
+                        val game = gameSetupViewModel.getGame()
+                        gamePlayViewModel.updateGame(game)
+                        navController.popBackStack()
+                    },
+                    onSaveNewGame = {
+                        val game = gameSetupViewModel.saveGame()
+                        gamePlaySetupViewModel.reloadGames()
+                        gamePlaySetupViewModel.setGame(game)
+                        navController.popBackStack()
+                    }
                 )
             }
         }

@@ -38,12 +38,6 @@ class GamePlaySetupViewModel @Inject constructor(
         }
     }
 
-    // TODO: This needs to go away, but it's needed as we move to ID's.
-    fun setGameByName(name: String) {
-        val game = _gameRepository.getByName(name)
-        setGame(game)
-    }
-
     fun addPlayer(newPlayerName: String) {
         _uiState.update { currentState ->
             currentState.copy(playerNames = currentState.playerNames.plus(newPlayerName))
@@ -85,6 +79,25 @@ class GamePlaySetupViewModel @Inject constructor(
             _uiState.update { currentState ->
                 currentState.copy(favoriteGames = _favoriteGameRepository.getAll())
             }
+        }
+    }
+
+    fun reloadGames() {
+        val newGames = _gameRepository.getAll()
+        _uiState.update { currentState ->
+            currentState.copy(savedGames = newGames)
+        }
+    }
+
+    fun deleteSavedGame(id: Int) {
+        _gameRepository.deleteById(id)
+        val selectedGame = if (_uiState.value.selectedGame.id == id) {Game(name = "")} else { _uiState.value.selectedGame }
+
+        val newGames = _gameRepository.getAll()
+        _uiState.update { currentState ->
+            currentState.copy(
+                selectedGame = selectedGame,
+                savedGames = newGames)
         }
     }
 }
