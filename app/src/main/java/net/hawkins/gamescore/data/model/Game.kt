@@ -1,11 +1,12 @@
 package net.hawkins.gamescore.data.model
 
 data class Game(
-    val name: String,
+    override var id: Int? = null,
+    val name: String = "",
     val objective: Objective = Objective(),
     val constraints: Constraints = Constraints(),
     val color: Colors = Colors()
-) {
+) : Idable {
     data class Objective(
         val type: Type = Type.HIGH_SCORE,
         val goal: Int? = null
@@ -28,6 +29,7 @@ data class Game(
     ) {
         enum class Color {
             DEFAULT,
+            GREEN,
             RED
         }
     }

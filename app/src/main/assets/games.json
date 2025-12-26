@@ -1,0 +1,49 @@
+[
+  {
+    "color": {
+      "negativeScore": "DEFAULT",
+      "positiveScore": "DEFAULT"
+    },
+    "constraints": {
+      "equalHandSizes": false,
+      "positiveOnly": false
+    },
+    "id": 1,
+    "name": "Basic Scoring - High",
+    "objective": {
+      "type": "HIGH_SCORE"
+    }
+  },
+  {
+    "color": {
+      "negativeScore": "RED",
+      "positiveScore": "DEFAULT"
+    },
+    "constraints": {
+      "equalHandSizes": true,
+      "multipleOf": 5,
+      "positiveOnly": false
+    },
+    "id": 2,
+    "name": "2500",
+    "objective": {
+      "goal": 2500,
+      "type": "HIGH_SCORE"
+    }
+  },
+  {
+    "color": {
+      "negativeScore": "DEFAULT",
+      "positiveScore": "DEFAULT"
+    },
+    "constraints": {
+      "equalHandSizes": false,
+      "positiveOnly": false
+    },
+    "id": 3,
+    "name": "Basic Scoring - Low",
+    "objective": {
+      "type": "LOW_SCORE"
+    }
+  }
+]
