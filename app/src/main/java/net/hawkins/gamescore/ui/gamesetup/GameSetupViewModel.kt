@@ -1,0 +1,143 @@
+package net.hawkins.gamescore.ui.gamesetup
+
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import net.hawkins.gamescore.data.GameRepository
+import net.hawkins.gamescore.data.model.Game
+import net.hawkins.gamescore.ui.AbstractViewModel
+import javax.inject.Inject
+import kotlin.String
+
+@HiltViewModel
+class GameSetupViewModel @Inject constructor(
+    private val _gameRepository: GameRepository,
+) : AbstractViewModel() {
+
+    private val _uiState = MutableStateFlow(GameSetupUiState())
+    val uiState: StateFlow<GameSetupUiState> = _uiState.asStateFlow()
+
+    fun saveGame(): Game {
+        return _gameRepository.save(_uiState.value.game)
+    }
+
+    fun setGameName(newName: String) {
+        val currentGame = _uiState.value.game
+        val newGame = currentGame.copy(name = newName)
+        _uiState.update { currentState ->
+            currentState.copy(
+                game = newGame
+            )
+        }
+    }
+
+    fun setConstraintAllowNegative(state: Boolean) {
+        val currentGame = _uiState.value.game
+        val currentConstraints = currentGame.constraints
+        val newConstraints = currentConstraints.copy(positiveOnly = state)
+        val newGame = currentGame.copy(constraints = newConstraints)
+        _uiState.update { currentState ->
+            currentState.copy(
+                game = newGame
+            )
+        }
+    }
+
+    fun setConstraintEqualHandSizes(state: Boolean) {
+        val currentGame = _uiState.value.game
+        val currentConstraints = currentGame.constraints
+        val newConstraints = currentConstraints.copy(equalHandSizes = state)
+        val newGame = currentGame.copy(constraints = newConstraints)
+        _uiState.update { currentState ->
+            currentState.copy(
+                game = newGame
+            )
+        }
+    }
+
+    fun setObjectiveType(newType: Game.Objective.Type) {
+        val currentGame = _uiState.value.game
+        val currentObjective = currentGame.objective
+        val newObjective = currentObjective.copy(type = newType)
+        val newGame = currentGame.copy(objective = newObjective)
+        _uiState.update { currentState ->
+            currentState.copy(
+                game = newGame
+            )
+        }
+    }
+
+    fun setObjectiveGoal(newGoal: Int?) {
+        val currentGame = _uiState.value.game
+        val currentObjective = currentGame.objective
+        val newObjective = currentObjective.copy(goal = newGoal)
+        val newGame = currentGame.copy(objective = newObjective)
+        _uiState.update { currentState ->
+            currentState.copy(
+                game = newGame
+            )
+        }
+    }
+
+    fun setConstraintModulus(newMultipleOf: Int?) {
+        val currentGame = _uiState.value.game
+        val currentConstraints = currentGame.constraints
+        val newConstraints = currentConstraints.copy(multipleOf = newMultipleOf)
+        val newGame = currentGame.copy(constraints = newConstraints)
+        _uiState.update { currentState ->
+            currentState.copy(
+                game = newGame
+            )
+        }
+    }
+
+    fun setDisplayNegative(newColor: Game.Colors.Color) {
+        val currentGame = _uiState.value.game
+        val currentColors = currentGame.color
+        val newColors = currentColors.copy(negativeScore = newColor)
+        val newGame = currentGame.copy(color = newColors)
+        _uiState.update { currentState ->
+            currentState.copy(
+                game = newGame
+            )
+        }
+    }
+
+    fun setDisplayPositive(newColor: Game.Colors.Color) {
+        val currentGame = _uiState.value.game
+        val currentColors = currentGame.color
+        val newColors = currentColors.copy(positiveScore = newColor)
+        val newGame = currentGame.copy(color = newColors)
+        _uiState.update { currentState ->
+            currentState.copy(
+                game = newGame
+            )
+        }
+    }
+
+    fun setGame(newGame: Game) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                game = newGame
+            )
+        }
+    }
+
+    fun setMode(newMode:  GameSetupUiState.Mode) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                mode = newMode
+            )
+        }
+    }
+
+    fun resetGame() {
+        _uiState.value = GameSetupUiState()
+    }
+
+    fun getGame(): Game {
+        return _uiState.value.game
+    }
+}

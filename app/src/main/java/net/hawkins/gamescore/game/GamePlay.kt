@@ -3,8 +3,10 @@ package net.hawkins.gamescore.game
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import net.hawkins.gamescore.data.model.Game
+import androidx.compose.ui.graphics.Color
+import net.hawkins.gamescore.Utils
 
-class GamePlay(private val game: Game, playerNames: List<String>) {
+class GamePlay(val game: Game, playerNames: List<String>) {
 
     private val _winner = mutableStateOf<Player?>(null)
     val players: List<Player> = playerNames.map { playerName -> Player(playerName) }
@@ -92,6 +94,25 @@ class GamePlay(private val game: Game, playerNames: List<String>) {
     fun numberOfRounds(): Int {
         return players.maxBy { player -> player.scores.size }.scores.size
     }
+
+    fun getScoreColor(score: String) : Color {
+        return if (Utils.isNegativeInt(score)) {
+            when (game.color.negativeScore) {
+                Game.Colors.Color.DEFAULT -> Color.Unspecified
+                Game.Colors.Color.RED -> Color.Red
+                Game.Colors.Color.GREEN -> Color.Green
+
+            }
+        } else {
+            when (game.color.positiveScore) {
+                Game.Colors.Color.DEFAULT -> Color.Unspecified
+                Game.Colors.Color.RED -> Color.Red
+                Game.Colors.Color.GREEN -> Color.Green
+            }
+
+        }
+    }
+
 
     data class Player(val name: String) {
         val scores = mutableStateListOf<Int>()

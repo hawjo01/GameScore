@@ -7,6 +7,7 @@ data class Game(
     val constraints: Constraints = Constraints(),
     val color: Colors = Colors()
 ) : Idable {
+
     data class Objective(
         val type: Type = Type.HIGH_SCORE,
         val goal: Int? = null

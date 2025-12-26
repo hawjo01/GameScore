@@ -2,6 +2,7 @@ package net.hawkins.gamescore.data.source.impl
 
 import net.hawkins.gamescore.AbstractBaseTest
 import net.hawkins.gamescore.data.model.FavoriteGame
+import net.hawkins.gamescore.data.model.Game
 import org.junit.Test
 import java.io.File
 import java.nio.file.Paths
@@ -28,14 +29,14 @@ class FileFavoriteGameDataSourceTest : AbstractBaseTest() {
 
         val favoriteGame1 = games[0]
         assertEquals("2500 - Sheldon & Leonard", favoriteGame1.name)
-        assertEquals("2500", favoriteGame1.game)
+        assertEquals("2500", favoriteGame1.game.name)
         assertEquals(2, favoriteGame1.players.size)
         assertEquals("Sheldon", favoriteGame1.players[0])
         assertEquals("Leonard", favoriteGame1.players[1])
 
         val favoriteGame2 = games[1]
         assertEquals("Scrabble - Howard & Rajesh", favoriteGame2.name)
-        assertEquals("Basic Scoring", favoriteGame2.game)
+        assertEquals("Basic Scoring", favoriteGame2.game.name)
         assertEquals(2, favoriteGame2.players.size)
         assertEquals("Howard", favoriteGame2.players[0])
         assertEquals("Rajesh", favoriteGame2.players[1])
@@ -48,7 +49,11 @@ class FileFavoriteGameDataSourceTest : AbstractBaseTest() {
         assertTrue(dataSource.getAll().isEmpty())
 
         val favoriteGame =
-            FavoriteGame("Add Test Favorite", listOf("Penny", "Bernadette"), "Basic Scoring")
+            FavoriteGame(
+                "Add Test Favorite",
+                listOf("Penny", "Bernadette"),
+                Game(name = "Basic Scoring")
+            )
         dataSource.save(favoriteGame)
 
         val dataSource2 = FileFavoriteGameDataSource(tempFile)
@@ -75,7 +80,11 @@ class FileFavoriteGameDataSourceTest : AbstractBaseTest() {
         assertTrue(dataSource.getAll().isEmpty())
 
         val favoriteGame =
-            FavoriteGame("Add Test Favorite", listOf("Penny", "Bernadette"), "Basic Scoring")
+            FavoriteGame(
+                "Add Test Favorite",
+                listOf("Penny", "Bernadette"),
+                Game(name = "Basic Scoring")
+            )
         dataSource.save(favoriteGame)
 
         val dataSource2 = FileFavoriteGameDataSource(tempFile)
@@ -118,7 +127,11 @@ class FileFavoriteGameDataSourceTest : AbstractBaseTest() {
         assertTrue(dataSource.getAll().isEmpty())
 
         val favoriteGame =
-            FavoriteGame("Add Test Favorite", listOf("Penny", "Bernadette"), "Basic Scoring")
+            FavoriteGame(
+                "Add Test Favorite",
+                listOf("Penny", "Bernadette"),
+                Game(name = "Basic Scoring")
+            )
         val savedGame = dataSource.save(favoriteGame)
         assertNotNull(savedGame.id)
 
@@ -133,7 +146,11 @@ class FileFavoriteGameDataSourceTest : AbstractBaseTest() {
         assertTrue(dataSource.getAll().isEmpty())
 
         val favoriteGame =
-            FavoriteGame("Add Test Favorite", listOf("Penny", "Bernadette"), "Basic Scoring")
+            FavoriteGame(
+                "Add Test Favorite",
+                listOf("Penny", "Bernadette"),
+                Game(name = "Basic Scoring")
+            )
         val savedGame = dataSource.save(favoriteGame)
         assertNotNull(savedGame.id)
 
