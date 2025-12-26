@@ -60,7 +60,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.data.model.Game
-import net.hawkins.gamescore.ui.component.ConfirmAction
+import net.hawkins.gamescore.ui.component.ConfirmActionDialog
 import net.hawkins.gamescore.ui.favorites.FavoriteGamesCard
 import net.hawkins.gamescore.ui.theme.GoGreen
 import net.hawkins.gamescore.ui.theme.SkyBlue
@@ -422,7 +422,7 @@ private fun PlayerSelection(
 private fun ConfirmRemovePlayer(
     onDismissRequest: () -> Unit, onConfirmation: () -> Unit
 ) {
-    ConfirmAction(
+    ConfirmActionDialog(
         title = stringResource(R.string.remove_player),
         onConfirmation = onConfirmation,
         onDismissRequest = onDismissRequest
@@ -433,7 +433,7 @@ private fun ConfirmRemovePlayer(
 private fun ConfirmDeleteSavedPlayer(
     name: String, onDismissRequest: () -> Unit, onConfirmation: () -> Unit
 ) {
-    ConfirmAction(
+    ConfirmActionDialog(
         title = stringResource(R.string.delete_saved_player, name),
         onConfirmation = onConfirmation,
         onDismissRequest = onDismissRequest
@@ -506,7 +506,7 @@ private fun ConfirmDeleteGame(
     onDismissRequest: () -> Unit,
     onConfirmation: (Int) -> Unit
 ) {
-    ConfirmAction(
+    ConfirmActionDialog(
         title = "Delete Game",
         description = "Delete '" + game.name + "'?",
         onConfirmation = { onConfirmation(game.id!!) },

@@ -8,10 +8,12 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import net.hawkins.gamescore.data.FavoriteGameRepository
 import net.hawkins.gamescore.data.FavoritePlayerRepository
+import net.hawkins.gamescore.data.GameProgressRepository
 import net.hawkins.gamescore.data.GameRepository
 import net.hawkins.gamescore.data.source.impl.FileFavoriteGameDataSource
 import net.hawkins.gamescore.data.source.impl.FileFavoritePlayerDataSource
 import net.hawkins.gamescore.data.source.impl.FileGameDataSource
+import net.hawkins.gamescore.data.source.impl.FileGameProgressDataSource
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -24,6 +26,7 @@ object RepositoryModule {
     const val FAVORITE_PLAYERS_FILENAME = "favorite-players.json"
     const val FAVORITE_GAMES_FILENAME = "favorite-games.json"
     const val GAMES_FILENAME = "games.json"
+    const val GAME_PROGRESS_FILENAME = "game-progress.json"
 
     @Provides
     @Singleton
@@ -67,6 +70,13 @@ object RepositoryModule {
         }
 
         return GameRepository(dataSource = FileGameDataSource(dataFile))
+    }
+
+    @Provides
+    @Singleton
+    fun provideGamePlayRepository(@ApplicationContext appContext: Context): GameProgressRepository {
+        val dataFile = File(appContext.filesDir, GAME_PROGRESS_FILENAME)
+        return GameProgressRepository(dataSource = FileGameProgressDataSource(dataFile))
     }
 
     private fun copyAssetFile(context: Context, assetFileName: String, destinationFile: File) {

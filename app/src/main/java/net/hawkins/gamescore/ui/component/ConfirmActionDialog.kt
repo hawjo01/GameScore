@@ -8,9 +8,11 @@ import androidx.compose.ui.res.stringResource
 import net.hawkins.gamescore.R
 
 @Composable
-fun ConfirmAction(
+fun ConfirmActionDialog(
     title: String,
     description: String = "",
+    confirmLabel: String = stringResource(R.string.confirm),
+    dismissLabel: String = stringResource(R.string.cancel),
     onConfirmation: () -> Unit,
     onDismissRequest: () -> Unit
 ) {
@@ -30,7 +32,7 @@ fun ConfirmAction(
                     onConfirmation()
                 }
             ) {
-                Text(stringResource(R.string.confirm))
+                Text(confirmLabel)
             }
         },
         dismissButton = {
@@ -39,7 +41,7 @@ fun ConfirmAction(
                     onDismissRequest()
                 }
             ) {
-                Text(stringResource(R.string.dismiss))
+                Text(dismissLabel)
             }
         }
     )

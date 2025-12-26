@@ -8,6 +8,7 @@ import io.mockk.slot
 import io.mockk.verify
 import junit.framework.TestCase.assertEquals
 import net.hawkins.gamescore.data.FavoriteGameRepository
+import net.hawkins.gamescore.data.GameProgressRepository
 import net.hawkins.gamescore.data.model.FavoriteGame
 import net.hawkins.gamescore.data.model.Game
 import org.junit.Assert.assertFalse
@@ -22,6 +23,9 @@ class GamePlayViewModelTest {
     @MockK
     lateinit var favoriteGameRepository: FavoriteGameRepository
 
+    @MockK
+    lateinit var gameProgressRepository: GameProgressRepository
+
     lateinit var sevens: Game
 
     lateinit var viewModel: GamePlayViewModel
@@ -34,8 +38,12 @@ class GamePlayViewModelTest {
         )
 
         favoriteGameRepository = mockk<FavoriteGameRepository>()
+        gameProgressRepository = mockk<GameProgressRepository>()
 
-        viewModel = GamePlayViewModel(_favoriteGameRepository = favoriteGameRepository)
+        viewModel = GamePlayViewModel(
+            _favoriteGameRepository = favoriteGameRepository,
+            _gameProgressRepository = gameProgressRepository
+        )
     }
 
     @Test

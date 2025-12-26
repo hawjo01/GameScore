@@ -2,7 +2,6 @@
     <string name="app_name">GameScore</string>
     <string name="add">Add</string>
     <string name="confirm">Confirm</string>
-    <string name="dismiss">Dismiss</string>
     <string name="new_game_confirm_title">New Game?</string>
     <string name="new_game_confirm_description">All current scores will be lost if you start a new game!</string>
     <string name="reset_game">Reset Game</string>
@@ -41,6 +40,15 @@
     <string name="new_game">New Game</string>
     <string name="objective">Objective</string>
     <string name="type">Type</string>
-    <string name="change">Change</string>
-    <string name="modify">Modify</string>
+    <string name="yes">Yes</string>
+    <string name="resume_the_game_in_progress">Resume the game in progress?</string>
+    <string name="game_in_progress">Game In Progress</string>
+    <string name="no">No</string>
+    <string name="save_favorite_game">Save Favorite Game</string>
+    <string name="game_details">Game Details</string>
+    <string name="start_new_game">Start New Game?</string>
+    <string name="start_a_different_game">Start a different Game?</string>
+    <string name="menu">Menu</string>
+    <string name="edit">Edit</string>
+    <string name="apply">Apply</string>
 </resources>

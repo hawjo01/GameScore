@@ -10,7 +10,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -18,6 +21,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import net.hawkins.gamescore.ui.AbstractViewModel
+import net.hawkins.gamescore.ui.component.ConfirmActionDialog
 import net.hawkins.gamescore.ui.gameplay.GamePlayScreen
 import net.hawkins.gamescore.ui.gameplay.GamePlayUiEvent
 import net.hawkins.gamescore.ui.gameplay.GamePlayViewModel
@@ -52,6 +56,9 @@ private fun GameScoreAppBar(
                 overflow = TextOverflow.Ellipsis
             )
         },
+        navigationIcon = {
+            topAppBar.navigationIcon?.invoke()
+        },
         actions = {
             topAppBar.actions?.invoke(this)
         },
@@ -74,19 +81,38 @@ fun GameScoreScreen(
             )
         }
     ) { innerPadding ->
+        val (showGameInProgressDialog, setShowGameInProgressDialog) = remember {
+            mutableStateOf(
+                gamePlayViewModel.isGameInProgress()
+            )
+        }
+        if (showGameInProgressDialog) {
+            ResumeGameInProgress(
+                onResumeGame = {
+                    gamePlayViewModel.loadInProgressGame()
+                    navController.navigate(GameScoreScreen.GamePlay.name)
+                    setShowGameInProgressDialog(false)
+                },
+                onDismissRequest = { setShowGameInProgressDialog(false) }
+            )
+        }
         NavHost(
             navController = navController,
             startDestination = GameScoreScreen.GamePlaySetup.name,
             modifier = Modifier.padding(innerPadding)
         ) {
+
+
             composable(route = GameScoreScreen.GamePlaySetup.name) {
                 GamePlaySetupScreen(
                     viewModel = gamePlaySetupViewModel,
                     onStartGame = { game, playerNames ->
-                        gamePlayViewModel.onEvent(GamePlayUiEvent.StartGame(
+                        gamePlayViewModel.onEvent(
+                            GamePlayUiEvent.StartGame(
                                 game,
                                 playerNames
-                        ))
+                            )
+                        )
                         navController.navigate(GameScoreScreen.GamePlay.name)
                     },
                     onNewGameSetup = {
@@ -102,6 +128,9 @@ fun GameScoreScreen(
                 }
                 GamePlayScreen(
                     viewModel = gamePlayViewModel,
+                    onStartNewGame = {
+                        navController.navigate(GameScoreScreen.GamePlaySetup.name)
+                    },
                     onShowGameDetails = { game ->
                         gameSetupViewModel.setGame(game)
                         gameSetupViewModel.onEvent(GameSetupUiEvent.SetScreenMode(GameSetupUiState.Mode.VIEW))
@@ -131,4 +160,19 @@ fun GameScoreScreen(
             }
         }
     }
+}
+
+@Composable
+private fun ResumeGameInProgress(
+    onResumeGame: () -> Unit,
+    onDismissRequest: () -> Unit
+) {
+    ConfirmActionDialog(
+        title = stringResource(R.string.game_in_progress),
+        description = stringResource(R.string.resume_the_game_in_progress),
+        confirmLabel = stringResource(R.string.yes),
+        dismissLabel = stringResource(R.string.no),
+        onConfirmation = onResumeGame,
+        onDismissRequest = onDismissRequest
+    )
 }

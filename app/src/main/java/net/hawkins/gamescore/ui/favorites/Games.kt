@@ -40,7 +40,7 @@ import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.data.model.FavoriteGame
 import net.hawkins.gamescore.data.model.Game
-import net.hawkins.gamescore.ui.component.ConfirmAction
+import net.hawkins.gamescore.ui.component.ConfirmActionDialog
 import net.hawkins.gamescore.ui.gameplay.Player
 import net.hawkins.gamescore.ui.gameplaysetup.GamePlaySetupUiEvent
 import net.hawkins.gamescore.ui.theme.DeleteRed
@@ -96,7 +96,7 @@ fun FavoriteGamesCard(
                     }
                 }
                 if (showDeleteFavoriteGame) {
-                    ConfirmAction(
+                    ConfirmActionDialog(
                         title = "Delete Favorite Game",
                         description = "Delete '" + favorite.name + "'",
                         onConfirmation = {
