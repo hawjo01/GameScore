@@ -34,7 +34,13 @@ abstract class IdableJsonFileDataSource<T : Idable>(
         }
     }
 
-    override fun save(item: T) {
+    override fun getById(id: Int): T? {
+        val items = getAll()
+        val item = items.firstOrNull { item -> item.id == id }
+        return item
+    }
+
+    override fun save(item: T): T {
         val existingItems = getAll()
         val itemsToSave = if (item.id == null) {
             item.id = generateId(existingItems)
@@ -44,6 +50,7 @@ abstract class IdableJsonFileDataSource<T : Idable>(
         }
 
         saveAll(itemsToSave)
+        return item
     }
 
     override fun deleteById(id: Int) {
