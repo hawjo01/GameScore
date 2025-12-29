@@ -59,7 +59,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
-import net.hawkins.gamescore.data.model.FavoriteGame
 import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.ui.component.ConfirmAction
 import net.hawkins.gamescore.ui.favorites.FavoriteGamesCard
@@ -83,7 +82,7 @@ fun GamePlaySetupScreen(
         viewModel.updateTopAppBar {
             AppBarActions(
                 uiState = uiState,
-                onDeleteGame = { gameId -> viewModel.deleteSavedGame(gameId) },
+                onDeleteGame = { gameId -> viewModel.onEvent(GamePlaySetupUiEvent.DeleteGame(gameId)) },
                 modifier = modifier
             )
         }
@@ -91,15 +90,9 @@ fun GamePlaySetupScreen(
 
     GamePlaySetupScreenContent(
         uiState = uiState,
+        onEvent = { event: GamePlaySetupUiEvent -> viewModel.onEvent(event) },
         onStartGame = onStartGame,
         onNewGameSetup = onNewGameSetup,
-        onSetGame = { game -> viewModel.setGame(game) },
-        onAddPlayer = { playerName -> viewModel.addPlayer(playerName) },
-        onRemovePlayer = { index -> viewModel.removePlayer(index) },
-        onSetPlayers = { playerNames -> viewModel.setPlayers(playerNames) },
-        saveFavoritePlayer = { playerName -> viewModel.addFavoritePlayer(playerName) },
-        deleteFavoritePlayer = { playerName -> viewModel.deleteFavoritePlayer(playerName) },
-        deleteFavoriteGame = { favoriteGame -> viewModel.deleteFavoriteGame(favoriteGame) },
         modifier = modifier
     )
 }
@@ -107,26 +100,19 @@ fun GamePlaySetupScreen(
 @Composable
 private fun GamePlaySetupScreenContent(
     uiState: GamePlaySetupUiState,
+    onEvent: (GamePlaySetupUiEvent) -> Unit,
     onStartGame: (Game, List<String>) -> Unit,
     onNewGameSetup: () -> Unit,
-    onSetGame: (Game) -> Unit,
-    onAddPlayer: (String) -> Unit,
-    onRemovePlayer: (Int) -> Unit,
-    onSetPlayers: (List<String>) -> Unit,
-    saveFavoritePlayer: (String) -> Unit,
-    deleteFavoritePlayer: (String) -> Unit,
-    deleteFavoriteGame: (FavoriteGame) -> Unit,
     modifier: Modifier
 ) {
     Column {
         GameCard(
             games = uiState.savedGames,
             game = uiState.selectedGame,
+            onEvent = onEvent,
             playerNames = uiState.playerNames,
             onNewGameSetup = onNewGameSetup,
             onStartGame = onStartGame,
-            onRemovePlayer = onRemovePlayer,
-            onChangeGame = onSetGame,
             modifier = modifier
         )
 
@@ -161,20 +147,18 @@ private fun GamePlaySetupScreenContent(
             if (selectedSetupType == GameSetupType.FAVORITE) {
                 FavoriteGamesCard(
                     favoriteGames = uiState.favoriteGames,
-                    onDeleteFavoriteGame = deleteFavoriteGame,
+                    onEvent = onEvent,
                     onFavoriteSelected = { favoriteGame ->
                         // TODO: Fix this once the entire game is stored in the favorite
-                        onSetGame(favoriteGame.game)
-                        onSetPlayers(favoriteGame.players)
+                        onEvent(GamePlaySetupUiEvent.SetGame(favoriteGame.game))
+                        onEvent(GamePlaySetupUiEvent.SetPlayers(favoriteGame.players))
                     })
             }
 
             if (selectedSetupType == GameSetupType.MANUAL) {
                 ManualGameSelection(
                     favoritePlayers = uiState.favoritePlayerNames,
-                    addPlayer = onAddPlayer,
-                    saveFavoritePlayer = saveFavoritePlayer,
-                    deleteFavoritePlayer = deleteFavoritePlayer
+                    onEvent = onEvent,
                 )
             }
         }
@@ -185,11 +169,10 @@ private fun GamePlaySetupScreenContent(
 private fun GameCard(
     games: List<Game>,
     game: Game,
+    onEvent: (GamePlaySetupUiEvent) -> Unit,
     onNewGameSetup: () -> Unit,
     playerNames: List<String>,
     onStartGame: (Game, List<String>) -> Unit,
-    onRemovePlayer: (Int) -> Unit,
-    onChangeGame: (Game) -> Unit,
     modifier: Modifier
 ) {
     var showGameSelectionDialog by remember { mutableStateOf(false) }
@@ -225,7 +208,7 @@ private fun GameCard(
                     games = games,
                     onNewGameSetup = onNewGameSetup,
                     onClickAction = { game ->
-                        onChangeGame(game)
+                        onEvent(GamePlaySetupUiEvent.SetGame(game))
                         showGameSelectionDialog = false
                     }, onDismissRequest = { showGameSelectionDialog = false }, modifier = modifier
                 )
@@ -261,7 +244,7 @@ private fun GameCard(
                                 ConfirmRemovePlayer(
                                     onDismissRequest = { showConfirmRemovePlayer = false },
                                     onConfirmation = {
-                                        onRemovePlayer(index)
+                                        onEvent(GamePlaySetupUiEvent.RemovePlayer(index))
                                         showConfirmRemovePlayer = false
                                     })
                             }
@@ -301,16 +284,12 @@ private fun GameCard(
 @Composable
 private fun ManualGameSelection(
     favoritePlayers: List<String>,
-    addPlayer: (String) -> Unit,
-    saveFavoritePlayer: (String) -> Unit,
-    deleteFavoritePlayer: (String) -> Unit,
+    onEvent: (GamePlaySetupUiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     PlayerSelection(
         favoritePlayers = favoritePlayers,
-        addPlayer = addPlayer,
-        saveFavoritePlayer = saveFavoritePlayer,
-        deleteFavoritePlayer = deleteFavoritePlayer,
+        onEvent = onEvent,
         modifier = modifier
     )
 }
@@ -318,9 +297,7 @@ private fun ManualGameSelection(
 @Composable
 private fun PlayerSelection(
     favoritePlayers: List<String>,
-    addPlayer: (String) -> Unit,
-    saveFavoritePlayer: (String) -> Unit,
-    deleteFavoritePlayer: (String) -> Unit,
+    onEvent: (GamePlaySetupUiEvent) -> Unit,
     modifier: Modifier
 ) {
     var newPlayerName by remember { mutableStateOf("") }
@@ -357,7 +334,7 @@ private fun PlayerSelection(
                 ) {
                     OutlinedIconButton(
                         onClick = {
-                            addPlayer(name)
+                            onEvent(GamePlaySetupUiEvent.AddPlayer(name))
                         }) {
                         Icon(
                             imageVector = Icons.Filled.Add,
@@ -378,7 +355,7 @@ private fun PlayerSelection(
                             name = name,
                             onDismissRequest = { showDeleteSavedPlayer = false },
                             onConfirmation = {
-                                deleteFavoritePlayer(name)
+                                onEvent(GamePlaySetupUiEvent.DeleteFavoritePlayer(name))
                                 showDeleteSavedPlayer = false
                             })
                     }
@@ -410,7 +387,7 @@ private fun PlayerSelection(
                                 IconButton(
                                     onClick = {
                                         hideKeyboard.invoke()
-                                        addPlayer(newPlayerName.trim())
+                                        onEvent(GamePlaySetupUiEvent.AddPlayer(newPlayerName.trim()))
                                         newPlayerName = ""
                                     }, enabled = newPlayerName.isNotBlank()
                                 ) {
@@ -422,7 +399,7 @@ private fun PlayerSelection(
                                 IconButton(
                                     onClick = {
                                         hideKeyboard.invoke()
-                                        saveFavoritePlayer(newPlayerName.trim())
+                                        onEvent(GamePlaySetupUiEvent.AddFavoritePlayer(newPlayerName.trim()))
                                         newPlayerName = ""
                                     }, enabled = newPlayerName.isNotBlank()
                                 ) {
@@ -645,14 +622,9 @@ private fun GamePlaySetupScreenContentPreview() {
     val uiState = GamePlaySetupUiState(playerNames = listOf("Sheldon", "Leonard"))
     GamePlaySetupScreenContent(
         uiState = uiState,
+        onEvent = { _ -> },
         onStartGame = { _, _ -> },
         onNewGameSetup = {},
-        onSetPlayers = { _ -> },
-        onSetGame = { _ -> },
-        onAddPlayer = { _ -> },
-        onRemovePlayer = { _ -> },
         modifier = Modifier,
-        saveFavoritePlayer = { _ -> },
-        deleteFavoritePlayer = { _ -> },
-        deleteFavoriteGame = { _ -> })
+    )
 }

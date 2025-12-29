@@ -42,6 +42,7 @@ import net.hawkins.gamescore.R
 import net.hawkins.gamescore.data.model.FavoriteGame
 import net.hawkins.gamescore.game.GamePlay
 import net.hawkins.gamescore.ui.component.ConfirmAction
+import net.hawkins.gamescore.ui.gameplaysetup.GamePlaySetupUiEvent
 import net.hawkins.gamescore.ui.theme.DeleteRed
 import net.hawkins.gamescore.ui.theme.SkyBlue
 import net.hawkins.gamescore.ui.theme.Typography
@@ -49,8 +50,8 @@ import net.hawkins.gamescore.ui.theme.Typography
 @Composable
 fun FavoriteGamesCard(
     favoriteGames: List<FavoriteGame>,
+    onEvent: (GamePlaySetupUiEvent) -> Unit,
     onFavoriteSelected: (FavoriteGame) -> Unit,
-    onDeleteFavoriteGame: (FavoriteGame) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -99,7 +100,7 @@ fun FavoriteGamesCard(
                         title = "Delete Favorite Game",
                         description = "Delete '" + favoriteGames[showDeleteIndex].name + "'",
                         onConfirmation = {
-                            onDeleteFavoriteGame(favoriteGames[showDeleteIndex])
+                            onEvent(GamePlaySetupUiEvent.DeleteFavoriteGame(showDeleteIndex))
                             showDeleteIndex = -1
                         },
                         onDismissRequest = { showDeleteIndex = -1 },

@@ -7,6 +7,7 @@ import net.hawkins.gamescore.AbstractBaseTest
 import net.hawkins.gamescore.data.FavoriteGameRepository
 import net.hawkins.gamescore.data.FavoritePlayerRepository
 import net.hawkins.gamescore.data.GameRepository
+import net.hawkins.gamescore.ui.gameplaysetup.GamePlaySetupUiEvent
 import net.hawkins.gamescore.ui.gameplaysetup.GamePlaySetupViewModel
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -35,8 +36,6 @@ class GameSetupViewModelTest : AbstractBaseTest() {
         favoritePlayerRepository = mockk<FavoritePlayerRepository>()
         every { favoritePlayerRepository.getAll() } returns emptyList()
 
-
-
         viewModel = GamePlaySetupViewModel(
             _favoriteGameRepository = favoriteGameRepository,
             _playerRepository = favoritePlayerRepository,
@@ -44,10 +43,9 @@ class GameSetupViewModelTest : AbstractBaseTest() {
         )
     }
 
-
     @Test
     fun addRemoveSetPlayers() {
-        viewModel.setPlayers(listOf("Sheldon", "Leonard", "Penny"))
+        viewModel.onEvent(GamePlaySetupUiEvent.SetPlayers(listOf("Sheldon", "Leonard", "Penny")))
         var uiState = viewModel.uiState.value
 
         assertEquals(3, uiState.playerNames.size)
@@ -55,29 +53,29 @@ class GameSetupViewModelTest : AbstractBaseTest() {
         assertEquals("Leonard", uiState.playerNames[1])
         assertEquals("Penny", uiState.playerNames[2])
 
-        viewModel.removePlayer(1)
+        viewModel.onEvent(GamePlaySetupUiEvent.RemovePlayer(1))
         uiState = viewModel.uiState.value
         assertEquals(2, uiState.playerNames.size)
         assertEquals("Sheldon", uiState.playerNames[0])
         assertEquals("Penny", uiState.playerNames[1])
 
-        viewModel.removePlayer(1)
+        viewModel.onEvent(GamePlaySetupUiEvent.RemovePlayer(index = 1))
         uiState = viewModel.uiState.value
         assertEquals(1, uiState.playerNames.size)
         assertEquals("Sheldon", uiState.playerNames[0])
 
-        viewModel.addPlayer("Howard")
+        viewModel.onEvent(GamePlaySetupUiEvent.AddPlayer("Howard"))
         uiState = viewModel.uiState.value
         assertEquals(2, uiState.playerNames.size)
         assertEquals("Sheldon", uiState.playerNames[0])
         assertEquals("Howard", uiState.playerNames[1])
 
-        viewModel.removePlayer(1)
+        viewModel.onEvent(GamePlaySetupUiEvent.RemovePlayer(index = 1))
         uiState = viewModel.uiState.value
         assertEquals(1, uiState.playerNames.size)
         assertEquals("Sheldon", uiState.playerNames[0])
 
-        viewModel.removePlayer(0)
+        viewModel.onEvent(GamePlaySetupUiEvent.RemovePlayer(index = 0))
         uiState = viewModel.uiState.value
         assertEquals(0, uiState.playerNames.size)
     }

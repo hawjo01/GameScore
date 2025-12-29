@@ -22,6 +22,7 @@ import net.hawkins.gamescore.ui.AbstractViewModel
 import net.hawkins.gamescore.ui.gameplay.GamePlayScreen
 import net.hawkins.gamescore.ui.gameplay.GamePlayViewModel
 import net.hawkins.gamescore.ui.gameplaysetup.GamePlaySetupScreen
+import net.hawkins.gamescore.ui.gameplaysetup.GamePlaySetupUiEvent
 import net.hawkins.gamescore.ui.gameplaysetup.GamePlaySetupViewModel
 import net.hawkins.gamescore.ui.gamesetup.GameSetupScreen
 import net.hawkins.gamescore.ui.gamesetup.GameSetupUiEvent
@@ -125,7 +126,7 @@ fun GameScoreScreen(
                     onSaveNewGame = {
                         val game = gameSetupViewModel.saveGame()
                         gamePlaySetupViewModel.reloadGames()
-                        gamePlaySetupViewModel.setGame(game)
+                        gamePlaySetupViewModel.onEvent(GamePlaySetupUiEvent.SetGame(game))
                         navController.popBackStack()
                     }
                 )
