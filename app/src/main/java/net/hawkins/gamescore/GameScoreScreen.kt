@@ -24,6 +24,7 @@ import net.hawkins.gamescore.ui.gameplay.GamePlayViewModel
 import net.hawkins.gamescore.ui.gameplaysetup.GamePlaySetupScreen
 import net.hawkins.gamescore.ui.gameplaysetup.GamePlaySetupViewModel
 import net.hawkins.gamescore.ui.gamesetup.GameSetupScreen
+import net.hawkins.gamescore.ui.gamesetup.GameSetupUiEvent
 import net.hawkins.gamescore.ui.gamesetup.GameSetupUiState
 import net.hawkins.gamescore.ui.gamesetup.GameSetupViewModel
 
@@ -104,7 +105,7 @@ fun GameScoreScreen(
                     viewModel = gamePlayViewModel,
                     onShowGameDetails = { game ->
                         gameSetupViewModel.setGame(game)
-                        gameSetupViewModel.setMode(GameSetupUiState.Mode.VIEW)
+                        gameSetupViewModel.onEvent(GameSetupUiEvent.SetScreenMode(GameSetupUiState.Mode.VIEW))
                         navController.navigate(GameScoreScreen.GameSetup.name)
                     }
                 )

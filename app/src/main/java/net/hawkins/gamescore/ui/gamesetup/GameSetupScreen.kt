@@ -66,24 +66,8 @@ fun GameSetupScreen(
     val uiState by viewModel.uiState.collectAsState()
     GameSetupScreenContent(
         uiState = uiState,
-        onNameChange = { newName -> viewModel.setGameName(newName) },
-        onConstraintAllowNegativeChange = { newState ->
-            viewModel.setConstraintAllowNegative(
-                newState
-            )
-        },
-        onConstraintEqualHandSizesChange = { newState ->
-            viewModel.setConstraintEqualHandSizes(
-                newState
-            )
-        },
-        onGoalChange = { newGoal -> viewModel.setObjectiveGoal(newGoal) },
-        onObjectiveTypeChange = { newType -> viewModel.setObjectiveType(newType) },
-        onModulusChange = { newModulus -> viewModel.setConstraintModulus(newModulus) },
-        onDisplayNegativeChange = { newValue -> viewModel.setDisplayNegative(newValue) },
-        onDisplayPositiveChange = { newValue -> viewModel.setDisplayPositive(newValue) },
+        onEvent = { event: GameSetupUiEvent -> viewModel.onEvent(event) },
         onSaveGame = onSaveNewGame,
-        onEnableEdits = { viewModel.setMode(GameSetupUiState.Mode.EDIT) },
         onModifyGame = onModifyGame,
         onCancel = onCancel,
         modifier = modifier
@@ -93,16 +77,8 @@ fun GameSetupScreen(
 @Composable
 private fun GameSetupScreenContent(
     uiState: GameSetupUiState,
-    onNameChange: (String) -> Unit,
-    onConstraintAllowNegativeChange: (Boolean) -> Unit,
-    onConstraintEqualHandSizesChange: (Boolean) -> Unit,
-    onObjectiveTypeChange: (Game.Objective.Type) -> Unit,
-    onGoalChange: (Int?) -> Unit,
-    onModulusChange: (Int?) -> Unit,
-    onDisplayPositiveChange: (Game.Colors.Color) -> Unit,
-    onDisplayNegativeChange: (Game.Colors.Color) -> Unit,
+    onEvent: (GameSetupUiEvent) -> Unit,
     onSaveGame: () -> Unit,
-    onEnableEdits: () -> Unit,
     onModifyGame: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier
@@ -120,33 +96,29 @@ private fun GameSetupScreenContent(
         }
         NameCard(
             uiState = uiState,
-            onNameChange = onNameChange,
+            onEvent = onEvent,
             modifier = modifier
         )
         ObjectiveCard(
             uiState,
-            onObjectiveTypeChange = onObjectiveTypeChange,
-            onGoalChange = onGoalChange,
+            onEvent = onEvent,
             modifier = modifier
         )
         ConstraintCard(
             uiState = uiState,
-            onConstraintAllowNegativeChange = onConstraintAllowNegativeChange,
-            onModulusChange = onModulusChange,
-            onConstraintEqualHandSizesChange = onConstraintEqualHandSizesChange,
+            onEvent = onEvent,
             modifier = modifier
         )
         DisplayColorsCard(
             uiState = uiState,
-            onDisplayNegativeChange = onDisplayNegativeChange,
-            onDisplayPositiveChange = onDisplayPositiveChange,
+            onEvent = onEvent,
             modifier = modifier
         )
         ActionButtons(
             uiState = uiState,
+            onEvent = onEvent,
             onSaveGame = onSaveGame,
             onCancel = onCancel,
-            onEnableEdits = onEnableEdits,
             onModifyGame = onModifyGame,
             modifier = modifier
         )
@@ -156,9 +128,9 @@ private fun GameSetupScreenContent(
 @Composable
 private fun ActionButtons(
     uiState: GameSetupUiState,
+    onEvent: (GameSetupUiEvent) -> Unit,
     onSaveGame: () -> Unit,
     onCancel: () -> Unit,
-    onEnableEdits: () -> Unit,
     onModifyGame: () -> Unit,
     modifier: Modifier
 ) {
@@ -185,7 +157,7 @@ private fun ActionButtons(
             }
 
             else -> OutlinedButton(
-                onClick = onEnableEdits
+                onClick = { onEvent(GameSetupUiEvent.SetScreenMode(GameSetupUiState.Mode.EDIT)) }
             ) {
                 Text(stringResource(R.string.change))
             }
@@ -196,7 +168,7 @@ private fun ActionButtons(
 @Composable
 private fun NameCard(
     uiState: GameSetupUiState,
-    onNameChange: (String) -> Unit,
+    onEvent: (GameSetupUiEvent) -> Unit,
     modifier: Modifier
 ) {
     GameSectionCard(
@@ -211,7 +183,7 @@ private fun NameCard(
 
             OutlinedTextField(
                 value = uiState.game.name,
-                onValueChange = { newName -> onNameChange(newName) },
+                onValueChange = { newName -> onEvent(GameSetupUiEvent.SetGameName(newName)) },
                 label = { Text(text = stringResource(R.string.name)) },
                 singleLine = true,
                 shape = shapes.small,
@@ -234,8 +206,7 @@ private fun NameCard(
 @Composable
 private fun DisplayColorsCard(
     uiState: GameSetupUiState,
-    onDisplayNegativeChange: (Game.Colors.Color) -> Unit,
-    onDisplayPositiveChange: (Game.Colors.Color) -> Unit,
+    onEvent: (GameSetupUiEvent) -> Unit,
     modifier: Modifier
 ) {
     GameSectionCard(
@@ -246,14 +217,26 @@ private fun DisplayColorsCard(
         DisplayTypeDropMenu(
             label = stringResource(R.string.positive_score),
             value = uiState.game.color.positiveScore,
-            onChange = onDisplayPositiveChange,
+            onChange = { color: Game.Colors.Color ->
+                onEvent(
+                    GameSetupUiEvent.SetDisplayPositiveColor(
+                        color
+                    )
+                )
+            },
             readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
         DisplayTypeDropMenu(
             label = stringResource(R.string.negative_score),
             value = uiState.game.color.negativeScore,
-            onChange = onDisplayNegativeChange,
+            onChange = { color: Game.Colors.Color ->
+                onEvent(
+                    GameSetupUiEvent.SetDisplayNegativeColor(
+                        color
+                    )
+                )
+            },
             readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
@@ -263,9 +246,7 @@ private fun DisplayColorsCard(
 @Composable
 private fun ConstraintCard(
     uiState: GameSetupUiState,
-    onConstraintAllowNegativeChange: (Boolean) -> Unit,
-    onConstraintEqualHandSizesChange: (Boolean) -> Unit,
-    onModulusChange: (Int?) -> Unit,
+    onEvent: (GameSetupUiEvent) -> Unit,
     modifier: Modifier
 ) {
     GameSectionCard(
@@ -275,9 +256,10 @@ private fun ConstraintCard(
         SwitchWithLabel(
             label = stringResource(R.string.only_positive),
             initialState = uiState.game.constraints.positiveOnly,
-            onCheckedChange = { newCheckedState ->
-                onConstraintAllowNegativeChange(newCheckedState)
-            },
+            onCheckedChange =
+                { newCheckedState ->
+                    onEvent(GameSetupUiEvent.SetConstraintPostiveOnlyScores(newCheckedState))
+                },
             readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
@@ -285,7 +267,7 @@ private fun ConstraintCard(
             label = "Require Equal Hand Sizes",
             initialState = uiState.game.constraints.equalHandSizes,
             onCheckedChange = { newCheckedState ->
-                onConstraintEqualHandSizesChange(newCheckedState)
+                onEvent(GameSetupUiEvent.SetConstraintEqualHandSizes(newCheckedState))
             },
             readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
@@ -293,7 +275,13 @@ private fun ConstraintCard(
         NullableIntOutlinedTextField(
             label = stringResource(R.string.multiple_of),
             number = uiState.game.constraints.multipleOf,
-            onValueChange = onModulusChange,
+            onValueChange = { newValue ->
+                onEvent(
+                    GameSetupUiEvent.SetConstraintScoreModulus(
+                        newValue
+                    )
+                )
+            },
             readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
@@ -373,8 +361,7 @@ private fun GameSectionRow(
 @Composable
 private fun ObjectiveCard(
     uiState: GameSetupUiState,
-    onObjectiveTypeChange: (Game.Objective.Type) -> Unit,
-    onGoalChange: (Int?) -> Unit,
+    onEvent: (GameSetupUiEvent) -> Unit,
     modifier: Modifier
 ) {
     GameSectionCard(
@@ -382,15 +369,21 @@ private fun ObjectiveCard(
         modifier = modifier
     ) {
         ObjectiveTypeDropMenu(
-            uiState.game.objective.type,
-            onObjectiveTypeChange = onObjectiveTypeChange,
+            value = uiState.game.objective.type,
+            onObjectiveTypeChange = { type: Game.Objective.Type ->
+                onEvent(
+                    GameSetupUiEvent.SetObjectiveType(
+                        type
+                    )
+                )
+            },
             readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
         NullableIntOutlinedTextField(
             label = "Goal",
             number = uiState.game.objective.goal,
-            onValueChange = onGoalChange,
+            onValueChange = { goal: Int? -> onEvent(GameSetupUiEvent.SetObjectiveGoal(goal)) },
             readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
@@ -612,16 +605,8 @@ private fun GameSetupContentPreview() {
                 )
             )
         ),
-        onConstraintAllowNegativeChange = { _ -> },
-        onConstraintEqualHandSizesChange = { _ -> },
-        onNameChange = { _ -> },
-        onObjectiveTypeChange = { _ -> },
-        onGoalChange = { _ -> },
-        onModulusChange = { _ -> },
-        onDisplayNegativeChange = { _ -> },
-        onDisplayPositiveChange = { _ -> },
+        onEvent = { _ -> },
         onSaveGame = {},
-        onEnableEdits = {},
         onModifyGame = {},
         onCancel = {},
         modifier = Modifier
