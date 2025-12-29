@@ -604,15 +604,15 @@ private fun AppBarActions(
     modifier: Modifier
 ) {
 
-    var dropdownMenuExpanded by remember { mutableStateOf(false) }
-    var showManageGames by remember { mutableStateOf(false) }
+    val (dropdownMenuExpanded, setDropdownMenuExpanded) = remember { mutableStateOf(false) }
+    val (showManageGames, setShowManageGames) = remember { mutableStateOf(false) }
 
-    IconButton(onClick = { dropdownMenuExpanded = true }) {
+    IconButton(onClick = { setDropdownMenuExpanded(true) }) {
         Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu")
     }
     DropdownMenu(
         expanded = dropdownMenuExpanded,
-        onDismissRequest = { dropdownMenuExpanded = false }
+        onDismissRequest = { setDropdownMenuExpanded(false) }
     ) {
         DropdownMenuItem(
             text = {
@@ -622,15 +622,15 @@ private fun AppBarActions(
                 )
             },
             onClick = {
-                showManageGames = true
-                dropdownMenuExpanded = false
+                setShowManageGames(true)
+                setDropdownMenuExpanded(false)
             }
         )
     }
 
     if (showManageGames) {
         ManageGamesDialog(
-            onDismissRequest = { showManageGames = false },
+            onDismissRequest = { setShowManageGames(false) },
             uiState = uiState,
             onDeleteGame = onDeleteGame,
             modifier = modifier

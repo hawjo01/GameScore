@@ -479,16 +479,16 @@ private fun AppBarActions(
     saveFavoriteGame: (FavoriteGame) -> Unit
 ) {
 
-    var dropdownMenuExpanded by remember { mutableStateOf(false) }
-    var showSaveFavoriteGame by remember { mutableStateOf(false) }
-    var showResetGameDialog by remember { mutableStateOf(false) }
+    val (dropdownMenuExpanded, setDropdownMenuExpanded) = remember { mutableStateOf(false) }
+    val (showSaveFavoriteGame, setShowSaveFavoriteGame) = remember { mutableStateOf(false) }
+    val (showResetGameDialog, setShowResetGameDialog) = remember { mutableStateOf(false) }
 
-    IconButton(onClick = { dropdownMenuExpanded = true }) {
+    IconButton(onClick = { setDropdownMenuExpanded(true) }) {
         Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu")
     }
     DropdownMenu(
         expanded = dropdownMenuExpanded,
-        onDismissRequest = { dropdownMenuExpanded = false }
+        onDismissRequest = { setDropdownMenuExpanded(false) }
     ) {
         if (!gamePlay.hasWinningThreshold()) {
             DropdownMenuItem(
@@ -500,7 +500,7 @@ private fun AppBarActions(
                 },
                 onClick = {
                     gamePlay.determineWinner()
-                    dropdownMenuExpanded = false
+                    setDropdownMenuExpanded(false)
                 }
             )
         }
@@ -512,8 +512,8 @@ private fun AppBarActions(
                 )
             },
             onClick = {
-                showSaveFavoriteGame = true
-                dropdownMenuExpanded = false
+                setShowSaveFavoriteGame(true)
+                setDropdownMenuExpanded(false)
             }
         )
         DropdownMenuItem(
@@ -524,8 +524,8 @@ private fun AppBarActions(
                 )
             },
             onClick = {
-                showResetGameDialog = true
-                dropdownMenuExpanded = false
+                setShowResetGameDialog(true)
+                setDropdownMenuExpanded(false)
             }
         )
         DropdownMenuItem(
@@ -537,17 +537,17 @@ private fun AppBarActions(
             },
             onClick = {
                 onShowGameDetails(gamePlay.game)
-                dropdownMenuExpanded = false
+                setDropdownMenuExpanded(false)
             }
         )
     }
 
     if (showResetGameDialog) {
         ConfirmResetGame(
-            onDismissRequest = { showResetGameDialog = false },
+            onDismissRequest = { setShowResetGameDialog(false) },
             onConfirmation = {
                 gamePlay.resetGame()
-                showResetGameDialog = false
+                setShowResetGameDialog(false)
             }
         )
     }
@@ -555,7 +555,7 @@ private fun AppBarActions(
     if (showSaveFavoriteGame) {
         SaveFavoriteGame(
             gamePlay,
-            onDismissRequest = { showSaveFavoriteGame = false },
+            onDismissRequest = { setShowSaveFavoriteGame(false) },
             onConfirmation = { name ->
                 saveFavoriteGame(
                     FavoriteGame(
@@ -564,7 +564,7 @@ private fun AppBarActions(
                         game = gamePlay.game
                     )
                 )
-                showSaveFavoriteGame = false
+                setShowSaveFavoriteGame(false)
             }
         )
     }

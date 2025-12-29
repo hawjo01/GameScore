@@ -274,7 +274,7 @@ private fun ConstraintCard(
     ) {
         SwitchWithLabel(
             label = stringResource(R.string.only_positive),
-            initialChecked = uiState.game.constraints.positiveOnly,
+            initialState = uiState.game.constraints.positiveOnly,
             onCheckedChange = { newCheckedState ->
                 onConstraintAllowNegativeChange(newCheckedState)
             },
@@ -283,7 +283,7 @@ private fun ConstraintCard(
         )
         SwitchWithLabel(
             label = "Require Equal Hand Sizes",
-            initialChecked = uiState.game.constraints.equalHandSizes,
+            initialState = uiState.game.constraints.equalHandSizes,
             onCheckedChange = { newCheckedState ->
                 onConstraintEqualHandSizesChange(newCheckedState)
             },
@@ -441,7 +441,7 @@ private fun NullableIntOutlinedTextField(
 @Composable
 private fun SwitchWithLabel(
     label: String,
-    initialChecked: Boolean,
+    initialState: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     readOnly: Boolean,
     modifier: Modifier
@@ -450,17 +450,13 @@ private fun SwitchWithLabel(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
     ) {
-        var checkedState by remember { mutableStateOf(initialChecked) }
+        val (checkedState, setCheckedState) = remember { mutableStateOf(initialState) }
 
         Switch(
             checked = checkedState,
             onCheckedChange = {
-                if (readOnly) {
-                    null
-                } else {
-                    checkedState = it
-                    onCheckedChange(it)
-                }
+                setCheckedState(it)
+                onCheckedChange(it)
             },
             enabled = !readOnly
         )
@@ -484,14 +480,14 @@ private fun ObjectiveTypeDropMenu(
         modifier = modifier
     )
     {
-        var expanded by remember { mutableStateOf(false) }
+        val (expanded, setExpanded) = remember { mutableStateOf(false) }
         val selectedText = toDisplayName(value)
 
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = {
                 if (!readOnly) {
-                    expanded = !expanded
+                    setExpanded(!expanded)
                 }
             }
         ) {
@@ -510,14 +506,14 @@ private fun ObjectiveTypeDropMenu(
 
             ExposedDropdownMenu(
                 expanded = expanded,
-                onDismissRequest = { expanded = false }
+                onDismissRequest = { setExpanded(false) }
             ) {
                 Game.Objective.Type.entries.forEach { selectionOption ->
                     DropdownMenuItem(
                         text = { Text(toDisplayName(selectionOption)) },
                         onClick = {
                             onObjectiveTypeChange(selectionOption)
-                            expanded = false
+                            setExpanded(false)
                         }
                     )
                 }
@@ -556,14 +552,14 @@ private fun DisplayTypeDropMenu(
         modifier = modifier
     )
     {
-        var expanded by remember { mutableStateOf(false) }
+        val (expanded, setExpanded) = remember { mutableStateOf(false) }
         val selectedText = toDisplayName(value)
 
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = {
                 if (!readOnly) {
-                    expanded = !expanded
+                    setExpanded(!expanded)
                 }
             }
         ) {
@@ -582,14 +578,14 @@ private fun DisplayTypeDropMenu(
 
             ExposedDropdownMenu(
                 expanded = expanded,
-                onDismissRequest = { expanded = false }
+                onDismissRequest = { setExpanded(false) }
             ) {
                 Game.Colors.Color.entries.forEach { selectionOption ->
                     DropdownMenuItem(
                         text = { Text(toDisplayName(selectionOption)) },
                         onClick = {
                             onChange(selectionOption)
-                            expanded = false
+                            setExpanded(false)
                         }
                     )
                 }
