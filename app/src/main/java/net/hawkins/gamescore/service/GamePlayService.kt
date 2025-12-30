@@ -1,11 +1,11 @@
-package net.hawkins.gamescore.game
+package net.hawkins.gamescore.service
 
 import androidx.compose.ui.graphics.Color
 import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.ui.gameplay.Player
 import net.hawkins.gamescore.utils.isNegativeInt
 
-class GamePlay(val game: Game) {
+class GamePlayService(val game: Game) {
     fun determineWinner(players: List<Player>): String? {
 
         if (players.isEmpty()) {

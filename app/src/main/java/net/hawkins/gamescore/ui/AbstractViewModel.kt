@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 
 data class TopAppBar(
     val title: String = "",
+    val navigationIcon: @Composable (() -> Unit)? = null,
     val actions: @Composable (RowScope.() -> Unit)? = null
 )
 
@@ -18,7 +19,12 @@ abstract class AbstractViewModel() : ViewModel() {
 
     val topAppBar: State<TopAppBar> = _topAppBar
 
-    fun updateTopAppBar(newTitle: String = "", newActions: @Composable (RowScope.() -> Unit)?) {
-        _topAppBar.value = TopAppBar(title = newTitle, actions = newActions)
+    fun updateTopAppBar(
+        newTitle: String = "",
+        newNavigationIcon: @Composable (() -> Unit)? = null,
+        newActions: @Composable (RowScope.() -> Unit)? = null
+    ) {
+        _topAppBar.value =
+            TopAppBar(title = newTitle, navigationIcon = newNavigationIcon, actions = newActions)
     }
 }

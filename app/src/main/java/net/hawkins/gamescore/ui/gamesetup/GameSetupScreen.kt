@@ -17,7 +17,9 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,11 +27,12 @@ import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.shapes
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -40,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -59,28 +63,71 @@ fun GameSetupScreen(
     onSaveNewGame: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     LaunchedEffect(Unit) {
-        viewModel.updateTopAppBar { /* No AppBarActions */ }
+        viewModel.updateTopAppBar(
+            newNavigationIcon = {
+                NavigationIcon(onBack = onCancel)
+            },
+            newActions = {
+                AppBarActions(
+                    screenMode = uiState.mode,
+                    onEvent = { event: GameSetupUiEvent -> viewModel.onEvent(event) },
+                    onSaveNewGame = onSaveNewGame,
+                    onModifyGame = onModifyGame,
+                )
+            }
+        )
     }
 
-    val uiState by viewModel.uiState.collectAsState()
     GameSetupScreenContent(
         uiState = uiState,
         onEvent = { event: GameSetupUiEvent -> viewModel.onEvent(event) },
-        onSaveGame = onSaveNewGame,
-        onModifyGame = onModifyGame,
-        onCancel = onCancel,
         modifier = modifier
     )
+}
+
+@Composable
+private fun AppBarActions(
+    screenMode: GameSetupUiState.Mode,
+    onEvent: (GameSetupUiEvent) -> Unit,
+    onModifyGame: () -> Unit,
+    onSaveNewGame: () -> Unit,
+) {
+    val actionText: String
+    val action: () -> Unit
+    when (screenMode) {
+        GameSetupUiState.Mode.NEW -> {
+            actionText = stringResource(R.string.save)
+            action = onSaveNewGame
+        }
+
+        GameSetupUiState.Mode.EDIT -> {
+            actionText = stringResource(R.string.apply)
+            action = onModifyGame
+        }
+
+        GameSetupUiState.Mode.VIEW -> {
+            actionText = stringResource(R.string.edit)
+            action = { onEvent(GameSetupUiEvent.SetScreenMode(GameSetupUiState.Mode.EDIT)) }
+        }
+    }
+
+    TextButton(
+        onClick = action,
+        colors = ButtonDefaults.textButtonColors(
+            contentColor = Color.Blue
+        )
+    ) {
+        Text(actionText)
+    }
 }
 
 @Composable
 private fun GameSetupScreenContent(
     uiState: GameSetupUiState,
     onEvent: (GameSetupUiEvent) -> Unit,
-    onSaveGame: () -> Unit,
-    onModifyGame: () -> Unit,
-    onCancel: () -> Unit,
     modifier: Modifier
 ) {
     val scrollState = rememberScrollState()
@@ -114,54 +161,6 @@ private fun GameSetupScreenContent(
             onEvent = onEvent,
             modifier = modifier
         )
-        ActionButtons(
-            uiState = uiState,
-            onEvent = onEvent,
-            onSaveGame = onSaveGame,
-            onCancel = onCancel,
-            onModifyGame = onModifyGame,
-            modifier = modifier
-        )
-    }
-}
-
-@Composable
-private fun ActionButtons(
-    uiState: GameSetupUiState,
-    onEvent: (GameSetupUiEvent) -> Unit,
-    onSaveGame: () -> Unit,
-    onCancel: () -> Unit,
-    onModifyGame: () -> Unit,
-    modifier: Modifier
-) {
-    GameSectionRow(
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-        modifier = modifier
-    ) {
-        OutlinedButton(
-            onClick = onCancel,
-        ) {
-            Text(stringResource(R.string.cancel))
-        }
-        when (uiState.mode) {
-            GameSetupUiState.Mode.NEW -> OutlinedButton(
-                onClick = onSaveGame,
-            ) {
-                Text(stringResource(R.string.save))
-            }
-
-            GameSetupUiState.Mode.EDIT -> OutlinedButton(
-                onClick = onModifyGame
-            ) {
-                Text(stringResource(R.string.modify))
-            }
-
-            else -> OutlinedButton(
-                onClick = { onEvent(GameSetupUiEvent.SetScreenMode(GameSetupUiState.Mode.EDIT)) }
-            ) {
-                Text(stringResource(R.string.change))
-            }
-        }
     }
 }
 
@@ -296,7 +295,7 @@ private fun GameSectionCard(
     content: @Composable () -> Unit
 ) {
 
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(true) }
     val rotationState by animateFloatAsState(
         targetValue = if (expanded) 180f else 0f,
         label = "arrowRotation"
@@ -587,6 +586,13 @@ private fun DisplayTypeDropMenu(
     }
 }
 
+@Composable
+private fun NavigationIcon(onBack: () -> Unit) {
+    IconButton(onClick = { onBack() }) { // Or navigateUp()
+        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+    }
+}
+
 @Preview
 @Composable
 private fun GameSetupContentPreview() {
@@ -606,9 +612,6 @@ private fun GameSetupContentPreview() {
             )
         ),
         onEvent = { _ -> },
-        onSaveGame = {},
-        onModifyGame = {},
-        onCancel = {},
         modifier = Modifier
     )
 }

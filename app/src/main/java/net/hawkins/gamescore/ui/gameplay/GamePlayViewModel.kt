@@ -7,9 +7,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import net.hawkins.gamescore.data.FavoriteGameRepository
+import net.hawkins.gamescore.data.GameProgressRepository
 import net.hawkins.gamescore.data.model.FavoriteGame
 import net.hawkins.gamescore.data.model.Game
-import net.hawkins.gamescore.game.GamePlay
+import net.hawkins.gamescore.service.GamePlayService
+import net.hawkins.gamescore.service.GameProgressService
 import net.hawkins.gamescore.ui.AbstractViewModel
 import net.hawkins.gamescore.utils.removeElementAtIndex
 import net.hawkins.gamescore.utils.replaceElementAtIndex
@@ -19,11 +21,13 @@ import javax.inject.Inject
 @HiltViewModel
 class GamePlayViewModel @Inject constructor(
     private val _favoriteGameRepository: FavoriteGameRepository,
+    _gameProgressRepository: GameProgressRepository,
 ) : AbstractViewModel() {
+    private val _gameProgressService: GameProgressService = GameProgressService(_gameProgressRepository)
     private val _uiState = MutableStateFlow(GamePlayUiState(Game(name = ""), emptyList()))
     val uiState: StateFlow<GamePlayUiState> = _uiState.asStateFlow()
 
-    private var _gamePlay = GamePlay(Game(name = ""))
+    private var _gamePlayService = GamePlayService(Game(name = ""))
 
     fun onEvent(event: GamePlayUiEvent) {
         when (event) {
@@ -45,7 +49,7 @@ class GamePlayViewModel @Inject constructor(
 
     private fun startGame(game: Game, playerNames: List<String>) {
         val players = playerNames.map { playerName -> Player(playerName) }
-        _gamePlay = GamePlay(game)
+        _gamePlayService = GamePlayService(game)
         _uiState.update { currentState ->
             currentState.copy(game = game, players = players, winner = null)
         }
@@ -68,7 +72,7 @@ class GamePlayViewModel @Inject constructor(
             )
         }
         // TODO: This feels like a hack, there should be a better way to update gamePlay
-        _gamePlay = GamePlay(_uiState.value.game)
+        _gamePlayService = GamePlayService(_uiState.value.game)
     }
 
     private fun resetGame() {
@@ -118,17 +122,38 @@ class GamePlayViewModel @Inject constructor(
     }
 
     private fun determineWinner() {
-        val winner = _gamePlay.determineWinner(_uiState.value.players)
+        val winner = _gamePlayService.determineWinner(_uiState.value.players)
         _uiState.update { currentState ->
             currentState.copy(winner = winner)
         }
     }
 
     fun isValidScore(possibleScore: String): Boolean {
-        return _gamePlay.isValidScore(possibleScore)
+        return _gamePlayService.isValidScore(possibleScore)
     }
 
     fun getScoreColor(score: String): Color {
-        return _gamePlay.getScoreColor(score)
+        return _gamePlayService.getScoreColor(score)
+    }
+
+    fun saveGameProgress() {
+        _gameProgressService.saveGameProgress(_uiState.value)
+    }
+
+    fun isGameInProgress(): Boolean {
+        return _gameProgressService.isGameInProgress()
+    }
+
+    fun loadInProgressGame() {
+        val gameProgress = _gameProgressService.getGameProgress()
+        if (gameProgress != null) {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    game = gameProgress.game,
+                    players = gameProgress.players
+                )
+            }
+            _gamePlayService = GamePlayService(gameProgress.game)
+        }
     }
 }

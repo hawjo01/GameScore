@@ -53,7 +53,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.data.model.Game
-import net.hawkins.gamescore.ui.component.ConfirmAction
+import net.hawkins.gamescore.ui.component.ConfirmActionDialog
 import net.hawkins.gamescore.ui.favorites.SaveFavoriteGame
 import net.hawkins.gamescore.utils.isNegativeInt
 
@@ -61,6 +61,7 @@ import net.hawkins.gamescore.utils.isNegativeInt
 fun GamePlayScreen(
     viewModel: GamePlayViewModel,
     onShowGameDetails: (Game) -> Unit,
+    onStartNewGame: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -72,13 +73,23 @@ fun GamePlayScreen(
                     hasWinningThreshold = uiState.game.objective.goal != null,
                     determineWinner = { viewModel.onEvent(GamePlayUiEvent.DetermineWinner) },
                     onShowGameDetails = onShowGameDetails,
+                    onStartNewGame = onStartNewGame,
                     game = uiState.game,
                     players = uiState.players,
-                    saveFavoriteGame = { name -> viewModel.onEvent(GamePlayUiEvent.SaveFavoriteGame(name)) },
+                    saveFavoriteGame = { name ->
+                        viewModel.onEvent(
+                            GamePlayUiEvent.SaveFavoriteGame(
+                                name
+                            )
+                        )
+                    },
                     resetGame = { viewModel.onEvent(GamePlayUiEvent.ResetGame) }
                 )
             }
         )
+    }
+    LaunchedEffect(uiState) {
+        viewModel.saveGameProgress()
     }
 
     GamePlayScreenContent(
@@ -202,7 +213,14 @@ private fun PlayerHeader(
                 )
                 if (showNewScoreDialog) {
                     NewScoreDialog(
-                        onAddScore = { score: Int -> onEvent(GamePlayUiEvent.AddScore(seatIndex, score)) },
+                        onAddScore = { score: Int ->
+                            onEvent(
+                                GamePlayUiEvent.AddScore(
+                                    seatIndex,
+                                    score
+                                )
+                            )
+                        },
                         isValidScore = isValidScore,
                         playerName = player.name,
                         onDismissRequest = { showNewScoreDialog = false },
@@ -297,7 +315,15 @@ private fun Round(
             if (showChangeScoreDialog) {
                 ChangeScore(
                     currentScore = player.scores[round],
-                    onChangeScore = { newScore -> onEvent(GamePlayUiEvent.ChangeScore(seatIndex, round, newScore)) },
+                    onChangeScore = { newScore ->
+                        onEvent(
+                            GamePlayUiEvent.ChangeScore(
+                                seatIndex,
+                                round,
+                                newScore
+                            )
+                        )
+                    },
                     isValidScore = isValidScore,
                     onDismissRequest = { showChangeScoreDialog = false },
                     modifier = modifier
@@ -308,7 +334,7 @@ private fun Round(
                 DeleteScore(
                     playerName = player.name,
                     score = player.scores[round],
-                    onDeleteScore = { onEvent(GamePlayUiEvent.DeleteScore(round, seatIndex)) },
+                    onDeleteScore = { onEvent(GamePlayUiEvent.DeleteScore(seatIndex, round)) },
                     onDismissRequest = { showDeleteScoreDialog = false }
                 )
             }
@@ -355,12 +381,14 @@ private fun NewScoreDialog(
                             )
                         },
                         isError = warnInvalidScore,
-                        supportingText = { if (warnInvalidScore) {
-                            Text(
-                            text = stringResource(R.string.not_a_valid_score),
-                            color = MaterialTheme.colorScheme.error,
-                            )
-                        }},
+                        supportingText = {
+                            if (warnInvalidScore) {
+                                Text(
+                                    text = stringResource(R.string.not_a_valid_score),
+                                    color = MaterialTheme.colorScheme.error,
+                                )
+                            }
+                        },
                         textStyle = MaterialTheme.typography.labelSmall.plus(TextStyle(textAlign = TextAlign.Center)),
                         singleLine = true,
                         shape = shapes.small,
@@ -409,7 +437,7 @@ private fun DeleteScore(
     onDeleteScore: () -> Unit,
     onDismissRequest: () -> Unit
 ) {
-    ConfirmAction(
+    ConfirmActionDialog(
         title = stringResource(R.string.delete_score),
         description = stringResource(
             R.string.delete_score_for_player,
@@ -503,35 +531,23 @@ private fun ChangeScore(
 }
 
 @Composable
-private fun ConfirmResetGame(
-    onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit
-) {
-    ConfirmAction(
-        title = stringResource(R.string.new_game_confirm_title),
-        description = stringResource(R.string.new_game_confirm_description),
-        onConfirmation = onConfirmation,
-        onDismissRequest = onDismissRequest
-    )
-}
-
-@Composable
 private fun AppBarActions(
     hasWinningThreshold: Boolean,
     determineWinner: () -> Unit,
     game: Game,
     players: List<Player>,
     onShowGameDetails: (Game) -> Unit,
+    onStartNewGame: () -> Unit,
     saveFavoriteGame: (String) -> Unit,
     resetGame: () -> Unit,
 ) {
-
     val (dropdownMenuExpanded, setDropdownMenuExpanded) = remember { mutableStateOf(false) }
     val (showSaveFavoriteGame, setShowSaveFavoriteGame) = remember { mutableStateOf(false) }
-    val (showResetGameDialog, setShowResetGameDialog) = remember { mutableStateOf(false) }
+    val (confirmResetGame, setConfirmResetGame) = remember { mutableStateOf(false) }
+    val (confirmStartNewGame, setConfirmStartNewGame) = remember { mutableStateOf(false) }
 
     IconButton(onClick = { setDropdownMenuExpanded(true) }) {
-        Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu")
+        Icon(imageVector = Icons.Filled.Menu, contentDescription = stringResource(R.string.menu))
     }
     DropdownMenu(
         expanded = dropdownMenuExpanded,
@@ -554,7 +570,32 @@ private fun AppBarActions(
         DropdownMenuItem(
             text = {
                 Text(
-                    text = "Save Favorite Game",
+                    text = stringResource(R.string.reset_game),
+                    fontSize = 20.sp
+                )
+            },
+            onClick = {
+                setConfirmResetGame(true)
+                setDropdownMenuExpanded(false)
+            }
+        )
+        DropdownMenuItem(
+            text = {
+                Text(
+                    text = stringResource(R.string.new_game),
+                    fontSize = 20.sp
+                )
+            },
+            onClick = {
+                setConfirmStartNewGame(true)
+                setDropdownMenuExpanded(false)
+            }
+        )
+        HorizontalDivider()
+        DropdownMenuItem(
+            text = {
+                Text(
+                    text = stringResource(R.string.save_favorite_game),
                     fontSize = 20.sp
                 )
             },
@@ -566,19 +607,7 @@ private fun AppBarActions(
         DropdownMenuItem(
             text = {
                 Text(
-                    text = stringResource(R.string.reset_game),
-                    fontSize = 20.sp
-                )
-            },
-            onClick = {
-                setShowResetGameDialog(true)
-                setDropdownMenuExpanded(false)
-            }
-        )
-        DropdownMenuItem(
-            text = {
-                Text(
-                    text = "Details",
+                    text = stringResource(R.string.game_details),
                     fontSize = 20.sp
                 )
             },
@@ -589,12 +618,28 @@ private fun AppBarActions(
         )
     }
 
-    if (showResetGameDialog) {
-        ConfirmResetGame(
-            onDismissRequest = { setShowResetGameDialog(false) },
+    if (confirmResetGame) {
+        ConfirmActionDialog(
+            title = stringResource(R.string.new_game_confirm_title),
+            description = stringResource(R.string.new_game_confirm_description),
+            onDismissRequest = { setConfirmResetGame(false) },
             onConfirmation = {
-                setShowResetGameDialog(false)
+                setConfirmResetGame(false)
                 resetGame()
+            }
+        )
+    }
+
+    if (confirmStartNewGame) {
+        ConfirmActionDialog(
+            title = stringResource(R.string.start_new_game),
+            description = stringResource(R.string.start_a_different_game),
+            confirmLabel = stringResource(R.string.yes),
+            dismissLabel = stringResource(R.string.no),
+            onDismissRequest = { setConfirmStartNewGame(false) },
+            onConfirmation = {
+                setConfirmStartNewGame(false)
+                onStartNewGame()
             }
         )
     }
