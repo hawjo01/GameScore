@@ -42,7 +42,7 @@ class GamePlayViewModelTest {
 
         viewModel = GamePlayViewModel(
             _favoriteGameRepository = favoriteGameRepository,
-            _gameProgressRepository = gameProgressRepository
+            gameProgressRepository = gameProgressRepository
         )
     }
 

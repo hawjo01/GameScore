@@ -33,6 +33,8 @@ class GameSetupViewModel @Inject constructor(
             is GameSetupUiEvent.SetDisplayNegativeColor -> setDisplayNegative(event.color)
             is GameSetupUiEvent.SetDisplayPositiveColor -> setDisplayPositive(event.color)
             is GameSetupUiEvent.SetScreenMode -> setMode(event.mode)
+            is GameSetupUiEvent.ResetGame -> resetGame()
+            is GameSetupUiEvent.SetGame -> setGame(event.game)
         }
     }
 
@@ -131,7 +133,7 @@ class GameSetupViewModel @Inject constructor(
         }
     }
 
-    fun setGame(newGame: Game) {
+    private fun setGame(newGame: Game) {
         _uiState.update { currentState ->
             currentState.copy(
                 game = newGame
@@ -147,7 +149,7 @@ class GameSetupViewModel @Inject constructor(
         }
     }
 
-    fun resetGame() {
+    private fun resetGame() {
         _uiState.value = GameSetupUiState()
     }
 

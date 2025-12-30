@@ -21,9 +21,9 @@ import javax.inject.Inject
 @HiltViewModel
 class GamePlayViewModel @Inject constructor(
     private val _favoriteGameRepository: FavoriteGameRepository,
-    _gameProgressRepository: GameProgressRepository,
+    gameProgressRepository: GameProgressRepository,
 ) : AbstractViewModel() {
-    private val _gameProgressService: GameProgressService = GameProgressService(_gameProgressRepository)
+    private val _gameProgressService: GameProgressService = GameProgressService(gameProgressRepository)
     private val _uiState = MutableStateFlow(GamePlayUiState(Game(name = ""), emptyList()))
     val uiState: StateFlow<GamePlayUiState> = _uiState.asStateFlow()
 
