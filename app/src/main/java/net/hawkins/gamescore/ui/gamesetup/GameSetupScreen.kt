@@ -258,7 +258,7 @@ private fun ConstraintCard(
             initialState = uiState.game.constraints.positiveOnly,
             onCheckedChange =
                 { newCheckedState ->
-                    onEvent(GameSetupUiEvent.SetConstraintPostiveOnlyScores(newCheckedState))
+                    onEvent(GameSetupUiEvent.SetConstraintPositiveOnlyScores(newCheckedState))
                 },
             readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier

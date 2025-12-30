@@ -6,7 +6,7 @@ import net.hawkins.gamescore.data.model.Game
 @Stable
 sealed interface GameSetupUiEvent {
     data class SetGameName(val name: String) : GameSetupUiEvent
-    data class SetConstraintPostiveOnlyScores(val positiveOnly: Boolean) : GameSetupUiEvent
+    data class SetConstraintPositiveOnlyScores(val positiveOnly: Boolean) : GameSetupUiEvent
     data class SetConstraintEqualHandSizes(val requireEqualHandSizes: Boolean) : GameSetupUiEvent
     data class SetConstraintScoreModulus(val modulus: Int?) : GameSetupUiEvent
     data class SetObjectiveGoal(val goal: Int?) : GameSetupUiEvent

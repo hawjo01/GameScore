@@ -52,13 +52,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
-import net.hawkins.gamescore.Utils
-import net.hawkins.gamescore.data.model.FavoriteGame
 import net.hawkins.gamescore.data.model.Game
-import net.hawkins.gamescore.game.GamePlay
-import net.hawkins.gamescore.game.GamePlay.Player
 import net.hawkins.gamescore.ui.component.ConfirmAction
 import net.hawkins.gamescore.ui.favorites.SaveFavoriteGame
+import net.hawkins.gamescore.utils.isNegativeInt
 
 @Composable
 fun GamePlayScreen(
@@ -69,22 +66,36 @@ fun GamePlayScreen(
     val uiState by viewModel.uiState.collectAsState()
     LaunchedEffect(Unit) {
         viewModel.updateTopAppBar(
-            newTitle = uiState.gamePlay.getGameName(),
+            newTitle = uiState.game.name,
             newActions = {
                 AppBarActions(
-                    gamePlay = uiState.gamePlay,
+                    hasWinningThreshold = uiState.game.objective.goal != null,
+                    determineWinner = { viewModel.onEvent(GamePlayUiEvent.DetermineWinner) },
                     onShowGameDetails = onShowGameDetails,
-                    saveFavoriteGame = { favoriteGame -> viewModel.saveFavoriteGame(favoriteGame) })
+                    game = uiState.game,
+                    players = uiState.players,
+                    saveFavoriteGame = { name -> viewModel.onEvent(GamePlayUiEvent.SaveFavoriteGame(name)) },
+                    resetGame = { viewModel.onEvent(GamePlayUiEvent.ResetGame) }
+                )
             }
         )
     }
 
-    GamePlayScreenContent(uiState.gamePlay, modifier)
+    GamePlayScreenContent(
+        uiState = uiState,
+        onEvent = { event: GamePlayUiEvent -> viewModel.onEvent(event) },
+        isValidScore = { possibleScore -> viewModel.isValidScore(possibleScore) },
+        getScoreColor = { score -> viewModel.getScoreColor(score) },
+        modifier = modifier
+    )
 }
 
 @Composable
 private fun GamePlayScreenContent(
-    gamePlay: GamePlay,
+    uiState: GamePlayUiState,
+    onEvent: (GamePlayUiEvent) -> Unit,
+    isValidScore: (String) -> Boolean,
+    getScoreColor: (String) -> Color,
     modifier: Modifier
 ) {
     Column(
@@ -95,26 +106,28 @@ private fun GamePlayScreenContent(
             horizontalArrangement = Arrangement.Center,
 
             ) {
-            Winner(gamePlay)
+            Winner(uiState.winner)
         }
         Row(
             modifier = modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
         ) {
-            Game(gamePlay, modifier)
+            Game(
+                uiState = uiState,
+                onEvent = onEvent,
+                isValidScore = isValidScore,
+                getScoreColor = getScoreColor,
+                modifier = modifier
+            )
         }
     }
 }
 
 @Composable
-private fun Winner(gamePlay: GamePlay) {
-    if (gamePlay.hasWinningThreshold()) {
-        gamePlay.determineWinner()
-    }
-    val winner = gamePlay.getWinner()
+private fun Winner(winner: String?) {
     if (winner != null) {
         Text(
-            text = stringResource(R.string.player_wins, winner.name),
+            text = stringResource(R.string.player_wins, winner),
             color = Color.Red,
             style = MaterialTheme.typography.headlineLarge
         )
@@ -123,21 +136,33 @@ private fun Winner(gamePlay: GamePlay) {
 
 @Composable
 private fun Game(
-    gamePlay: GamePlay,
+    uiState: GamePlayUiState,
+    onEvent: (GamePlayUiEvent) -> Unit,
+    isValidScore: (String) -> Boolean,
+    getScoreColor: (String) -> Color,
     modifier: Modifier
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxWidth()
     ) {
-        PlayerHeader(gamePlay, modifier)
-        Rounds(gamePlay, modifier)
+        PlayerHeader(uiState.players, onEvent, isValidScore, modifier)
+        Rounds(
+            players = uiState.players,
+            onEvent = onEvent,
+            numberOfRounds = uiState.numberOfRounds(),
+            isValidScore = isValidScore,
+            getScoreColor = getScoreColor,
+            modifier = modifier
+        )
     }
 }
 
 @Composable
 private fun PlayerHeader(
-    gamePlay: GamePlay,
+    players: List<Player>,
+    onEvent: (GamePlayUiEvent) -> Unit,
+    isValidScore: (String) -> Boolean,
     modifier: Modifier
 ) {
     Row(
@@ -145,7 +170,7 @@ private fun PlayerHeader(
             .fillMaxWidth()
             .padding(horizontal = 10.dp)
     ) {
-        gamePlay.players.forEach { player ->
+        players.forEachIndexed { seatIndex, player ->
             var showNewScoreDialog by remember { mutableStateOf(false) }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -177,8 +202,9 @@ private fun PlayerHeader(
                 )
                 if (showNewScoreDialog) {
                     NewScoreDialog(
-                        gamePlay = gamePlay,
-                        player = player,
+                        onAddScore = { score: Int -> onEvent(GamePlayUiEvent.AddScore(seatIndex, score)) },
+                        isValidScore = isValidScore,
+                        playerName = player.name,
                         onDismissRequest = { showNewScoreDialog = false },
                         modifier = modifier
                     )
@@ -189,24 +215,45 @@ private fun PlayerHeader(
 }
 
 @Composable
-private fun Rounds(gamePlay: GamePlay, modifier: Modifier) {
+private fun Rounds(
+    players: List<Player>,
+    onEvent: (GamePlayUiEvent) -> Unit,
+    numberOfRounds: Int,
+    isValidScore: (String) -> Boolean,
+    getScoreColor: (String) -> Color,
+    modifier: Modifier
+) {
     val scrollState = rememberLazyListState()
-    LaunchedEffect(gamePlay.numberOfRounds()) {
-        if (gamePlay.numberOfRounds() != 0) scrollState.scrollToItem(gamePlay.numberOfRounds() - 1)
+    LaunchedEffect(numberOfRounds) {
+        if (numberOfRounds != 0) scrollState.scrollToItem(numberOfRounds - 1)
     }
     LazyColumn(
         state = scrollState,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxWidth()
     ) {
-        items(gamePlay.numberOfRounds()) { round ->
-            Round(gamePlay, round, modifier)
+        items(numberOfRounds) { round ->
+            Round(
+                round = round,
+                players = players,
+                onEvent = onEvent,
+                isValidScore = isValidScore,
+                getScoreColor = getScoreColor,
+                modifier = modifier
+            )
         }
     }
 }
 
 @Composable
-private fun Round(gamePlay: GamePlay, round: Int, modifier: Modifier) {
+private fun Round(
+    round: Int,
+    players: List<Player>,
+    onEvent: (GamePlayUiEvent) -> Unit,
+    isValidScore: (String) -> Boolean,
+    getScoreColor: (String) -> Color,
+    modifier: Modifier
+) {
     Row(
         horizontalArrangement = Arrangement.Center,
         modifier = modifier
@@ -224,7 +271,7 @@ private fun Round(gamePlay: GamePlay, round: Int, modifier: Modifier) {
                 }
             )
     ) {
-        gamePlay.players.forEach { player ->
+        players.forEachIndexed { seatIndex, player ->
             var showChangeScoreDialog by remember { mutableStateOf(false) }
             var showDeleteScoreDialog by remember { mutableStateOf(false) }
 
@@ -237,7 +284,7 @@ private fun Round(gamePlay: GamePlay, round: Int, modifier: Modifier) {
                 text = score.padStart(player.totalScore().toString().length, ' '),
                 style = MaterialTheme.typography.displayMedium,
                 textAlign = TextAlign.Center,
-                color = gamePlay.getScoreColor(score),
+                color = getScoreColor(score),
                 modifier = modifier
                     .weight(1f)
                     .combinedClickable(onLongClick = {
@@ -249,9 +296,9 @@ private fun Round(gamePlay: GamePlay, round: Int, modifier: Modifier) {
 
             if (showChangeScoreDialog) {
                 ChangeScore(
-                    gamePlay = gamePlay,
-                    player = player,
-                    round = round,
+                    currentScore = player.scores[round],
+                    onChangeScore = { newScore -> onEvent(GamePlayUiEvent.ChangeScore(seatIndex, round, newScore)) },
+                    isValidScore = isValidScore,
                     onDismissRequest = { showChangeScoreDialog = false },
                     modifier = modifier
                 )
@@ -259,20 +306,21 @@ private fun Round(gamePlay: GamePlay, round: Int, modifier: Modifier) {
 
             if (showDeleteScoreDialog) {
                 DeleteScore(
-                    player = player,
-                    round = round,
+                    playerName = player.name,
+                    score = player.scores[round],
+                    onDeleteScore = { onEvent(GamePlayUiEvent.DeleteScore(round, seatIndex)) },
                     onDismissRequest = { showDeleteScoreDialog = false }
                 )
             }
-
         }
     }
 }
 
 @Composable
 private fun NewScoreDialog(
-    gamePlay: GamePlay,
-    player: Player,
+    onAddScore: (Int) -> Unit,
+    playerName: String,
+    isValidScore: (String) -> Boolean,
     onDismissRequest: () -> Unit,
     modifier: Modifier
 ) {
@@ -311,11 +359,11 @@ private fun NewScoreDialog(
                         value = newScore,
                         onValueChange = {
                             newScore = it
-                            if (gamePlay.isValidScore(newScore)) warnInvalidScore = false
+                            if (isValidScore(newScore)) warnInvalidScore = false
                         },
                         label = {
                             Text(
-                                text = stringResource(R.string.score_for, player.name),
+                                text = stringResource(R.string.score_for, playerName),
                                 style = MaterialTheme.typography.labelSmall
                             )
                         },
@@ -328,9 +376,9 @@ private fun NewScoreDialog(
                         ),
                         keyboardActions = KeyboardActions(
                             onDone = {
-                                if (gamePlay.isValidScore(newScore)) {
+                                if (isValidScore(newScore)) {
                                     warnInvalidScore = false
-                                    player.addScore(newScore.toInt())
+                                    onAddScore(newScore.toInt())
                                     newScore = ""
                                     hideKeyboard.invoke()
                                     onDismissRequest()
@@ -344,8 +392,8 @@ private fun NewScoreDialog(
                             }
                         ),
                         colors = TextFieldDefaults.colors(
-                            focusedTextColor = if (Utils.isNegativeInt(newScore) || newScore == "-") Color.Red else Color.Unspecified,
-                            unfocusedTextColor = if (Utils.isNegativeInt(newScore) || newScore == "-") Color.Red else Color.Unspecified
+                            focusedTextColor = if (newScore.isNegativeInt() || newScore == "-") Color.Red else Color.Unspecified,
+                            unfocusedTextColor = if (newScore.isNegativeInt() || newScore == "-") Color.Red else Color.Unspecified
                         ),
                         modifier = modifier
                             .focusRequester(focusRequester)
@@ -362,19 +410,20 @@ private fun NewScoreDialog(
 
 @Composable
 private fun DeleteScore(
-    player: Player,
-    round: Int,
+    playerName: String,
+    score: Int,
+    onDeleteScore: () -> Unit,
     onDismissRequest: () -> Unit
 ) {
     ConfirmAction(
         title = stringResource(R.string.delete_score),
         description = stringResource(
             R.string.delete_score_for_player,
-            player.scores[round],
-            player.name
+            score,
+            playerName
         ),
         onConfirmation = {
-            player.deleteScore(round)
+            onDeleteScore()
             onDismissRequest()
         },
         onDismissRequest = onDismissRequest
@@ -383,9 +432,9 @@ private fun DeleteScore(
 
 @Composable
 private fun ChangeScore(
-    gamePlay: GamePlay,
-    player: Player,
-    round: Int,
+    currentScore: Int,
+    isValidScore: (String) -> Boolean,
+    onChangeScore: (Int) -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier
 ) {
@@ -394,7 +443,7 @@ private fun ChangeScore(
             modifier = modifier.padding(16.dp),
             shape = RoundedCornerShape(16.dp),
         ) {
-            var newScore by remember { mutableStateOf(player.scores[round].toString()) }
+            var newScore by remember { mutableStateOf(currentScore.toString()) }
             val keyboardController = LocalSoftwareKeyboardController.current
             val hideKeyboard = { keyboardController?.hide() }
 
@@ -426,8 +475,8 @@ private fun ChangeScore(
                         }
                     ),
                     colors = TextFieldDefaults.colors(
-                        focusedTextColor = if (Utils.isNegativeInt(newScore) || newScore == "-") Color.Red else Color.Unspecified,
-                        unfocusedTextColor = if (Utils.isNegativeInt(newScore) || newScore == "-") Color.Red else Color.Unspecified
+                        focusedTextColor = if (newScore.isNegativeInt() || newScore == "-") Color.Red else Color.Unspecified,
+                        unfocusedTextColor = if (newScore.isNegativeInt() || newScore == "-") Color.Red else Color.Unspecified
                     ),
                     modifier = modifier.padding(top = 10.dp)
                 )
@@ -444,12 +493,12 @@ private fun ChangeScore(
                 }
                 TextButton(
                     onClick = {
-                        if (gamePlay.isValidScore(newScore)) {
-                            player.changeScore(newScore = newScore.toInt(), scoreIndex = round)
+                        if (isValidScore(newScore)) {
+                            onChangeScore(newScore.toInt())
                             onDismissRequest()
                         }
                     },
-                    enabled = gamePlay.isValidScore(newScore),
+                    enabled = isValidScore(newScore),
                     modifier = modifier.padding(8.dp),
                 ) {
                     Text(stringResource(R.string.update))
@@ -474,9 +523,13 @@ private fun ConfirmResetGame(
 
 @Composable
 private fun AppBarActions(
-    gamePlay: GamePlay,
+    hasWinningThreshold: Boolean,
+    determineWinner: () -> Unit,
+    game: Game,
+    players: List<Player>,
     onShowGameDetails: (Game) -> Unit,
-    saveFavoriteGame: (FavoriteGame) -> Unit
+    saveFavoriteGame: (String) -> Unit,
+    resetGame: () -> Unit,
 ) {
 
     val (dropdownMenuExpanded, setDropdownMenuExpanded) = remember { mutableStateOf(false) }
@@ -490,7 +543,7 @@ private fun AppBarActions(
         expanded = dropdownMenuExpanded,
         onDismissRequest = { setDropdownMenuExpanded(false) }
     ) {
-        if (!gamePlay.hasWinningThreshold()) {
+        if (!hasWinningThreshold) {
             DropdownMenuItem(
                 text = {
                     Text(
@@ -499,8 +552,8 @@ private fun AppBarActions(
                     )
                 },
                 onClick = {
-                    gamePlay.determineWinner()
                     setDropdownMenuExpanded(false)
+                    determineWinner()
                 }
             )
         }
@@ -536,8 +589,8 @@ private fun AppBarActions(
                 )
             },
             onClick = {
-                onShowGameDetails(gamePlay.game)
                 setDropdownMenuExpanded(false)
+                onShowGameDetails(game)
             }
         )
     }
@@ -546,24 +599,19 @@ private fun AppBarActions(
         ConfirmResetGame(
             onDismissRequest = { setShowResetGameDialog(false) },
             onConfirmation = {
-                gamePlay.resetGame()
                 setShowResetGameDialog(false)
+                resetGame()
             }
         )
     }
 
     if (showSaveFavoriteGame) {
         SaveFavoriteGame(
-            gamePlay,
+            game,
+            players,
             onDismissRequest = { setShowSaveFavoriteGame(false) },
             onConfirmation = { name ->
-                saveFavoriteGame(
-                    FavoriteGame(
-                        name = name.trim(),
-                        players = gamePlay.players.map { player -> player.name },
-                        game = gamePlay.game
-                    )
-                )
+                saveFavoriteGame(name)
                 setShowSaveFavoriteGame(false)
             }
         )
@@ -573,28 +621,26 @@ private fun AppBarActions(
 @Preview
 @Composable
 private fun GamePlayScreenContentPreview() {
-    val gamePlay = GamePlay(
-        Game(
-            name = "2500",
-            constraints = Game.Constraints(
-                multipleOf = 5,
-                equalHandSizes = true
-            ),
-            objective = Game.Objective(
-                goal = 2500
-            ),
-            color = Game.Colors(
-                negativeScore = Game.Colors.Color.RED
-            )
-        ), listOf("Sheldon", "Leonard")
+    val game = Game(
+        name = "2500",
+        constraints = Game.Constraints(
+            multipleOf = 5,
+            equalHandSizes = true
+        ),
+        objective = Game.Objective(
+            goal = 2500
+        ),
+        color = Game.Colors(
+            negativeScore = Game.Colors.Color.RED
+        )
     )
-    gamePlay.players[0].addScore(90)
-    gamePlay.players[0].addScore(25)
-    gamePlay.players[1].addScore(-20)
-    gamePlay.players[1].addScore(40)
-    gamePlay.players[1].addScore(235)
+    val players = listOf(Player("Sheldon", listOf(90, 25)), Player("Leonard", listOf(-20, 40, 235)))
+    val uiState = GamePlayUiState(game = game, players = players)
     GamePlayScreenContent(
-        gamePlay,
-        Modifier
+        uiState = uiState,
+        onEvent = { _ -> },
+        isValidScore = { _ -> false },
+        getScoreColor = { _ -> Color.Transparent },
+        modifier = Modifier
     )
 }

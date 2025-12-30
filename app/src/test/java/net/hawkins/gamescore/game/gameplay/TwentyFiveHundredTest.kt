@@ -2,6 +2,7 @@ package net.hawkins.gamescore.game.gameplay
 
 import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.game.GamePlay
+import net.hawkins.gamescore.ui.gameplay.Player
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -26,7 +27,7 @@ class TwentyFiveHundredTest {
 
     @Test
     fun isValidScore_true() {
-        val gamePlay = GamePlay(game, listOf())
+        val gamePlay = GamePlay(game)
         assertTrue(gamePlay.isValidScore("0"))
         assertTrue(gamePlay.isValidScore("5"))
         assertTrue(gamePlay.isValidScore("-5"))
@@ -34,7 +35,7 @@ class TwentyFiveHundredTest {
 
     @Test
     fun isValidScore_false() {
-        val gamePlay = GamePlay(game, listOf())
+        val gamePlay = GamePlay(game)
         assertFalse(gamePlay.isValidScore(""))
         assertFalse(gamePlay.isValidScore("1"))
         assertFalse(gamePlay.isValidScore("-1"))
@@ -43,94 +44,72 @@ class TwentyFiveHundredTest {
     }
 
     @Test
-    fun hasWinningThreshold() {
-        val gamePlay = GamePlay(game, listOf())
-        assertTrue(gamePlay.hasWinningThreshold())
-    }
-
-    @Test
     fun findWinner_zeroPlayers() {
-        val gamePlay = GamePlay(game, listOf())
-        assertNull(gamePlay.determineWinner())
+        val gamePlay = GamePlay(game)
+        assertNull(gamePlay.determineWinner(emptyList()))
     }
 
     @Test
     fun findWinner_differentScores() {
-        val gamePlay = GamePlay(game, listOf("Sheldon", "Penny"))
-        val player1 = gamePlay.players[0]
-        player1.addScore(20)
+        val gamePlay = GamePlay(game)
+        val player1 = Player("Sheldon", listOf(20))
+        val player2 = Player("Penny")
+        val players = listOf(player1, player2)
 
-        assertNull(gamePlay.determineWinner())
+        assertNull(gamePlay.determineWinner(players))
     }
 
     @Test
     fun findWinner_ThresholdNotMet() {
-        val gamePlay = GamePlay(game, listOf("Sheldon", "Penny"))
-        val player1 = gamePlay.players[0]
-        player1.addScore(20)
+        val gamePlay = GamePlay(game)
+        val player1 = Player("Sheldon", listOf(20))
+        val player2 = Player("Penny", listOf(50))
+        val players = listOf(player1, player2)
 
-        val player2 = gamePlay.players[1]
-        player2.addScore(50)
-
-        assertNull(gamePlay.determineWinner())
+        assertNull(gamePlay.determineWinner(players))
     }
 
     @Test
     fun findWinner_ThresholdMet() {
-        val gamePlay = GamePlay(game, listOf("Sheldon", "Penny"))
-        val player1 = gamePlay.players[0]
-        player1.addScore(20)
+        val gamePlay = GamePlay(game)
+        val player1 = Player("Sheldon", listOf(20))
+        val player2 = Player("Penny", listOf(2500))
+        val players = listOf(player1, player2)
 
-        val player2 = gamePlay.players[1]
-        player2.addScore(2500)
-
-        val winner = gamePlay.determineWinner()
-        assertEquals(player2, winner)
+        val winner = gamePlay.determineWinner(players)
+        assertEquals(player2.name, winner)
     }
 
     @Test
     fun findWinner_ThresholdMet_UnequalHands() {
-        val gamePlay = GamePlay(game, listOf("Sheldon", "Penny"))
-        val player1 = gamePlay.players[0]
-        player1.addScore(20)
+        val gamePlay = GamePlay(game)
+        val player1 = Player("Sheldon", listOf(20))
+        val player2 = Player("Penny", listOf(1000, 1500))
+        val players = listOf(player1, player2)
 
-        val player2 = gamePlay.players[1]
-        player2.addScore(1000)
-        player2.addScore(1500)
-
-        val winner = gamePlay.determineWinner()
+        val winner = gamePlay.determineWinner(players)
         assertNull(winner)
     }
 
     @Test
     fun findWinner_ThresholdExceeded() {
-        val gamePlay = GamePlay(game, listOf("Sheldon", "Penny"))
-        val player1 = gamePlay.players[0]
-        player1.addScore(2600)
+        val gamePlay = GamePlay(game)
+        val player1 = Player("Sheldon", listOf(2600))
+        val player2 = Player("Penny", listOf(2505))
+        val players = listOf(player1, player2)
 
-        val player2 = gamePlay.players[1]
-        player2.addScore(2505)
-
-        val winner = gamePlay.determineWinner()
-        assertEquals(player1, winner)
+        val winner = gamePlay.determineWinner(players)
+        assertEquals(player1.name, winner)
     }
 
     @Test
     fun findWinner_ThresholdMet_EqualsScores() {
-        val gamePlay = GamePlay(game, listOf("Sheldon", "Penny"))
-        val player1 = gamePlay.players[0]
-        player1.addScore(2600)
+        val gamePlay = GamePlay(game)
+        val player1 = Player("Sheldon", listOf(2600))
+        val player2 = Player("Penny", listOf(2600))
+        val players = listOf(player1, player2)
 
-        val player2 = gamePlay.players[1]
-        player2.addScore(2600)
-
-        val winner = gamePlay.determineWinner()
+        val winner = gamePlay.determineWinner(players)
         assertNull(winner)
-    }
-
-    @Test
-    fun getScoreColor() {
-        val gamePlay = GamePlay(game, listOf())
-        assertTrue(gamePlay.highlightNegativeScore())
     }
 }

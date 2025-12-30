@@ -10,6 +10,7 @@ import net.hawkins.gamescore.data.FavoritePlayerRepository
 import net.hawkins.gamescore.data.GameRepository
 import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.ui.AbstractViewModel
+import net.hawkins.gamescore.utils.removeElementAtIndex
 import javax.inject.Inject
 
 @HiltViewModel
@@ -57,8 +58,9 @@ class GamePlaySetupViewModel @Inject constructor(
     }
 
     private fun removePlayer(position: Int) {
+        val updatedPlayerNames= _uiState.value.playerNames.removeElementAtIndex(position)
         _uiState.update { currentState ->
-            currentState.copy(playerNames = currentState.playerNames.filterIndexed { index, _ -> index != position })
+            currentState.copy(playerNames = updatedPlayerNames )
         }
     }
 
