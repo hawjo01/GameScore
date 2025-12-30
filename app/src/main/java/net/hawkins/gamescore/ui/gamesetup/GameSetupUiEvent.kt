@@ -14,4 +14,6 @@ sealed interface GameSetupUiEvent {
     data class SetDisplayNegativeColor(val color: Game.Colors.Color) : GameSetupUiEvent
     data class SetDisplayPositiveColor(val color: Game.Colors.Color) : GameSetupUiEvent
     data class SetScreenMode(val mode: GameSetupUiState.Mode) : GameSetupUiEvent
+    object ResetGame : GameSetupUiEvent
+    data class SetGame(val game: Game) : GameSetupUiEvent
 }

@@ -116,7 +116,7 @@ fun GameScoreScreen(
                         navController.navigate(GameScoreScreen.GamePlay.name)
                     },
                     onNewGameSetup = {
-                        gameSetupViewModel.resetGame()
+                        gameSetupViewModel.onEvent(GameSetupUiEvent.ResetGame)
                         navController.navigate(GameScoreScreen.GameSetup.name)
                     }
                 )
@@ -132,7 +132,7 @@ fun GameScoreScreen(
                         navController.navigate(GameScoreScreen.GamePlaySetup.name)
                     },
                     onShowGameDetails = { game ->
-                        gameSetupViewModel.setGame(game)
+                        gameSetupViewModel.onEvent(GameSetupUiEvent.SetGame(game))
                         gameSetupViewModel.onEvent(GameSetupUiEvent.SetScreenMode(GameSetupUiState.Mode.VIEW))
                         navController.navigate(GameScoreScreen.GameSetup.name)
                     }
