@@ -338,19 +338,6 @@ private fun NewScoreDialog(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (warnInvalidScore) {
-                    Row(
-                        modifier = modifier.padding(horizontal = 10.dp),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = stringResource(R.string.not_a_valid_score),
-                            color = Color.Red,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                }
-
                 Row(
                     modifier = modifier.padding(horizontal = 10.dp),
                     horizontalArrangement = Arrangement.Center
@@ -367,6 +354,13 @@ private fun NewScoreDialog(
                                 style = MaterialTheme.typography.labelSmall
                             )
                         },
+                        isError = warnInvalidScore,
+                        supportingText = { if (warnInvalidScore) {
+                            Text(
+                            text = stringResource(R.string.not_a_valid_score),
+                            color = MaterialTheme.colorScheme.error,
+                            )
+                        }},
                         textStyle = MaterialTheme.typography.labelSmall.plus(TextStyle(textAlign = TextAlign.Center)),
                         singleLine = true,
                         shape = shapes.small,
