@@ -1,5 +1,6 @@
 package net.hawkins.gamescore.ui.gameplay
 
+import androidx.compose.ui.graphics.Color
 import net.hawkins.gamescore.data.model.Game
 
 data class GamePlayUiState(
@@ -12,8 +13,10 @@ data class GamePlayUiState(
     }
 }
 
-data class Player(val name: String, val scores: List<Int> = emptyList()) {
+data class Score(val value: Int, val color: Color = Color.Unspecified)
+
+data class Player(val name: String, val scores: List<Score> = emptyList()) {
     fun totalScore(): Int {
-        return scores.sum()
+        return scores.sumOf { it.value }
     }
 }

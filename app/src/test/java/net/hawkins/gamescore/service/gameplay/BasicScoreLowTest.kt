@@ -2,14 +2,13 @@ package net.hawkins.gamescore.service.gameplay
 
 import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.service.GamePlayService
-import net.hawkins.gamescore.ui.gameplay.Player
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class BasicScoreLowTest {
+class BasicScoreLowTest : AbstractGamePlayTest() {
 
     val game = Game(
         name = "Basic Scoring - Low",
@@ -54,8 +53,8 @@ class BasicScoreLowTest {
     @Test
     fun findWinner_differentScores() {
         val gamePlayService = GamePlayService(game)
-        val player1 = Player("Howard", listOf(20))
-        val player2 = Player("Rajesh")
+        val player1 = createPlayer("Howard", listOf(20))
+        val player2 = createPlayer("Rajesh")
         val players = listOf(player1, player2)
 
         val winner = gamePlayService.determineWinner(players)
@@ -65,8 +64,8 @@ class BasicScoreLowTest {
     @Test
     fun findWinner_LowScore() {
         val gamePlayService = GamePlayService(game)
-        val player1 = Player("Howard", listOf(20))
-        val player2 = Player("Rajesh", listOf(50))
+        val player1 = createPlayer("Howard", listOf(20))
+        val player2 = createPlayer("Rajesh", listOf(50))
         val players = listOf(player1, player2)
 
         val winner = gamePlayService.determineWinner(players)
@@ -76,8 +75,8 @@ class BasicScoreLowTest {
     @Test
     fun findWinner_EqualScores() {
         val gamePlayService = GamePlayService(game)
-        val player1 = Player("Howard", listOf(20))
-        val player2 = Player("Rajesh", listOf(20))
+        val player1 = createPlayer("Howard", listOf(20))
+        val player2 = createPlayer("Rajesh", listOf(20))
         val players = listOf(player1, player2)
 
         val winner = gamePlayService.determineWinner(players)

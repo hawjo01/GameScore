@@ -2,14 +2,13 @@ package net.hawkins.gamescore.service.gameplay
 
 import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.service.GamePlayService
-import net.hawkins.gamescore.ui.gameplay.Player
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class TwentyFiveHundredTest {
+class TwentyFiveHundredTest : AbstractGamePlayTest() {
 
     val game = Game(
         name = "2500",
@@ -58,8 +57,8 @@ class TwentyFiveHundredTest {
     @Test
     fun findWinner_differentScores() {
         val gamePlayService = GamePlayService(game)
-        val player1 = Player("Sheldon", listOf(20))
-        val player2 = Player("Penny")
+        val player1 = createPlayer("Sheldon", listOf(20))
+        val player2 = createPlayer("Penny")
         val players = listOf(player1, player2)
 
         assertNull(gamePlayService.determineWinner(players))
@@ -68,8 +67,8 @@ class TwentyFiveHundredTest {
     @Test
     fun findWinner_ThresholdNotMet() {
         val gamePlayService = GamePlayService(game)
-        val player1 = Player("Sheldon", listOf(20))
-        val player2 = Player("Penny", listOf(50))
+        val player1 = createPlayer("Sheldon", listOf(20))
+        val player2 = createPlayer("Penny", listOf(50))
         val players = listOf(player1, player2)
 
         assertNull(gamePlayService.determineWinner(players))
@@ -78,8 +77,8 @@ class TwentyFiveHundredTest {
     @Test
     fun findWinner_ThresholdMet() {
         val gamePlayService = GamePlayService(game)
-        val player1 = Player("Sheldon", listOf(20))
-        val player2 = Player("Penny", listOf(2500))
+        val player1 = createPlayer("Sheldon", listOf(20))
+        val player2 = createPlayer("Penny", listOf(2500))
         val players = listOf(player1, player2)
 
         val winner = gamePlayService.determineWinner(players)
@@ -89,8 +88,8 @@ class TwentyFiveHundredTest {
     @Test
     fun findWinner_ThresholdMet_UnequalHands() {
         val gamePlayService = GamePlayService(game)
-        val player1 = Player("Sheldon", listOf(20))
-        val player2 = Player("Penny", listOf(1000, 1500))
+        val player1 = createPlayer("Sheldon", listOf(20))
+        val player2 = createPlayer("Penny", listOf(1000, 1500))
         val players = listOf(player1, player2)
 
         val winner = gamePlayService.determineWinner(players)
@@ -100,8 +99,8 @@ class TwentyFiveHundredTest {
     @Test
     fun findWinner_ThresholdExceeded() {
         val gamePlayService = GamePlayService(game)
-        val player1 = Player("Sheldon", listOf(2600))
-        val player2 = Player("Penny", listOf(2505))
+        val player1 = createPlayer("Sheldon", listOf(2600))
+        val player2 = createPlayer("Penny", listOf(2505))
         val players = listOf(player1, player2)
 
         val winner = gamePlayService.determineWinner(players)
@@ -111,8 +110,8 @@ class TwentyFiveHundredTest {
     @Test
     fun findWinner_ThresholdMet_EqualsScores() {
         val gamePlayService = GamePlayService(game)
-        val player1 = Player("Sheldon", listOf(2600))
-        val player2 = Player("Penny", listOf(2600))
+        val player1 = createPlayer("Sheldon", listOf(2600))
+        val player2 = createPlayer("Penny", listOf(2600))
         val players = listOf(player1, player2)
 
         val winner = gamePlayService.determineWinner(players)

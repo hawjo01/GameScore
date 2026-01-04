@@ -1,6 +1,5 @@
 package net.hawkins.gamescore.ui.gameplay
 
-import androidx.compose.ui.graphics.Color
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -66,13 +65,32 @@ class GamePlayViewModel @Inject constructor(
     }
 
     private fun updateGame(newGame: Game) {
+        val rebuildScores = newGame.color.positiveScore != _uiState.value.game.color.positiveScore || newGame.color.negativeScore != _uiState.value.game.color.negativeScore
+
+        // TODO: This feels like a hack, there should be a better way to update gamePlay
+        _gamePlayService = GamePlayService(newGame)
+        val updatedPlayers: List<Player>
+        if (rebuildScores) {
+            updatedPlayers = mutableListOf()
+            for (player in _uiState.value.players) {
+                val updatedScores = mutableListOf<Score>()
+                for (score in player.scores) {
+                    val updatedScore = _gamePlayService.buildScore(score.value)
+                    updatedScores.add(updatedScore)
+                }
+                val updatedPlayer = Player(player.name, updatedScores)
+                updatedPlayers.add(updatedPlayer)
+            }
+        } else {
+            updatedPlayers = _uiState.value.players
+        }
+
         _uiState.update { currentState ->
             currentState.copy(
+                players = updatedPlayers,
                 game = newGame
             )
         }
-        // TODO: This feels like a hack, there should be a better way to update gamePlay
-        _gamePlayService = GamePlayService(_uiState.value.game)
     }
 
     private fun resetGame() {
@@ -87,7 +105,8 @@ class GamePlayViewModel @Inject constructor(
 
     private fun addScore(seatIndex: Int, score: Int) {
         val player = _uiState.value.players[seatIndex]
-        val updatedScores = player.scores.plus(score)
+        val newScore = _gamePlayService.buildScore(score)
+        val updatedScores = player.scores.plus(newScore)
         val updatedPlayer = Player(player.name, updatedScores)
         val updatedPlayers = _uiState.value.players.replaceElementAtIndex(seatIndex, updatedPlayer)
         _uiState.update { currentState ->
@@ -99,9 +118,12 @@ class GamePlayViewModel @Inject constructor(
         }
     }
 
+
+
     private fun changeScore(seatIndex: Int, roundNumber: Int, newScore: Int) {
         val player = _uiState.value.players[seatIndex]
-        val updatedScores = player.scores.replaceElementAtIndex(roundNumber, newScore)
+        val updatedScore = _gamePlayService.buildScore(newScore)
+        val updatedScores = player.scores.replaceElementAtIndex(roundNumber, updatedScore)
         val updatedPlayer = Player(player.name, updatedScores)
         val updatedPlayers = _uiState.value.players.replaceElementAtIndex(seatIndex, updatedPlayer)
         _uiState.update { currentState ->
@@ -136,10 +158,6 @@ class GamePlayViewModel @Inject constructor(
 
     fun isValidScore(possibleScore: String): Boolean {
         return _gamePlayService.isValidScore(possibleScore)
-    }
-
-    fun getScoreColor(score: String): Color {
-        return _gamePlayService.getScoreColor(score)
     }
 
     fun saveGameProgress() {

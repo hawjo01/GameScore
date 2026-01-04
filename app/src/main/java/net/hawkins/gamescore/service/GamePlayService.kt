@@ -3,7 +3,7 @@ package net.hawkins.gamescore.service
 import androidx.compose.ui.graphics.Color
 import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.ui.gameplay.Player
-import net.hawkins.gamescore.utils.isNegativeInt
+import net.hawkins.gamescore.ui.gameplay.Score
 
 class GamePlayService(val game: Game) {
     fun determineWinner(players: List<Player>): String? {
@@ -61,8 +61,8 @@ class GamePlayService(val game: Game) {
         return true
     }
 
-    fun getScoreColor(score: String): Color {
-        return if (score.isNegativeInt()) {
+    fun getScoreColor(score: Int): Color {
+        return if (score < 0) {
             when (game.color.negativeScore) {
                 Game.Colors.Color.DEFAULT -> Color.Unspecified
                 Game.Colors.Color.RED -> Color.Red
@@ -80,5 +80,10 @@ class GamePlayService(val game: Game) {
 
     fun isManualWinner(): Boolean {
         return game.objective.goal == null
+    }
+
+    fun buildScore(score: Int): Score {
+        val color = getScoreColor(score)
+        return Score(value = score, color = color)
     }
 }
