@@ -70,12 +70,12 @@ class GamePlayViewModelTest {
 
         val uiState = viewModel.uiState
         assertEquals(1, uiState.value.players[0].scores.size)
-        assertEquals(21, uiState.value.players[0].scores[0])
+        assertEquals(21, uiState.value.players[0].scores[0].value)
 
         viewModel.onEvent(GamePlayUiEvent.AddScore(0, -14))
         assertEquals(2, uiState.value.players[0].scores.size)
-        assertEquals(21, uiState.value.players[0].scores[0])
-        assertEquals(-14, uiState.value.players[0].scores[1])
+        assertEquals(21, uiState.value.players[0].scores[0].value)
+        assertEquals(-14, uiState.value.players[0].scores[1].value)
     }
 
     @Test
@@ -96,7 +96,7 @@ class GamePlayViewModelTest {
 
         val uiState = viewModel.uiState
         assertEquals(2, uiState.value.players[0].scores.size)
-        assertEquals(-28, uiState.value.players[0].scores[1])
+        assertEquals(-28, uiState.value.players[0].scores[1].value)
     }
 
     @Test
@@ -111,7 +111,7 @@ class GamePlayViewModelTest {
 
         val uiState = viewModel.uiState.value
         assertEquals(1, uiState.players[0].scores.size)
-        assertEquals(-14, uiState.players[0].scores[0])
+        assertEquals(-14, uiState.players[0].scores[0].value)
     }
 
     @Test
@@ -138,17 +138,18 @@ class GamePlayViewModelTest {
     fun updateGame() {
         val playerNames = listOf("Leonard", "Penny")
         viewModel.onEvent(GamePlayUiEvent.StartGame(game = sevens, playerNames))
-
-        assertEquals(Color.Unspecified, viewModel.getScoreColor("5"))
+        viewModel.onEvent(GamePlayUiEvent.AddScore(0, 5))
 
         val uiState = viewModel.uiState
+        assertEquals(Color.Unspecified, uiState.value.players[0].scores[0].color)
+
         val currentGame = uiState.value.game
         val currentColors = currentGame.color
         val newColors = currentColors.copy(positiveScore = Game.Colors.Color.GREEN)
         val updatedGame = currentGame.copy(color = newColors)
 
         viewModel.onEvent(GamePlayUiEvent.UpdateGame(updatedGame))
-        assertEquals(Color.Green, viewModel.getScoreColor("5"))
+        assertEquals(Color.Green, uiState.value.players[0].scores[0].color)
     }
 
     @Test
