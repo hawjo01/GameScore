@@ -80,6 +80,15 @@ class GameSetupViewModelTest {
     }
 
     @Test
+    fun setObjectiveRounds() {
+        val uiState = viewModel.uiState
+        assertNull(uiState.value.game.objective.rounds)
+
+        viewModel.onEvent(GameSetupUiEvent.SetObjectiveRounds(11))
+        assertEquals(11, uiState.value.game.objective.rounds)
+    }
+
+    @Test
     fun setDisplayNegative() {
         val uiState = viewModel.uiState
         assertEquals(Game.Colors.Color.DEFAULT, uiState.value.game.color.negativeScore)
@@ -116,7 +125,8 @@ class GameSetupViewModelTest {
             name = "Game Name",
             objective = Game.Objective(
                 type = Game.Objective.Type.LOW_SCORE,
-                goal = 500
+                goal = 500,
+                rounds = 5
             ),
             constraints = Game.Constraints(
                 positiveOnly = true,
@@ -135,6 +145,7 @@ class GameSetupViewModelTest {
         assertEquals("Game Name", storedGame.name)
         assertEquals(Game.Objective.Type.LOW_SCORE, storedGame.objective.type)
         assertEquals(500, storedGame.objective.goal)
+        assertEquals(5, storedGame.objective.rounds)
         assertTrue(storedGame.constraints.positiveOnly)
         assertEquals(4, storedGame.constraints.multipleOf)
         assertFalse(storedGame.constraints.equalHandSizes)
@@ -147,6 +158,7 @@ class GameSetupViewModelTest {
         assertEquals("", uiState.value.game.name)
         assertEquals(Game.Objective.Type.HIGH_SCORE, uiState.value.game.objective.type)
         assertNull(uiState.value.game.objective.goal)
+        assertNull(uiState.value.game.objective.rounds)
         assertFalse(uiState.value.game.constraints.positiveOnly)
         assertNull(uiState.value.game.constraints.multipleOf)
         assertTrue(uiState.value.game.constraints.equalHandSizes)

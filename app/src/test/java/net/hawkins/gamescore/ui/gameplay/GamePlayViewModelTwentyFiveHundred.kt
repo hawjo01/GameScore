@@ -13,7 +13,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-class GamePlayViewModelFiveCrownsTest {
+class GamePlayViewModelTwentyFiveHundred {
 
     @MockK
     lateinit var favoriteGameRepository: FavoriteGameRepository
@@ -23,22 +23,22 @@ class GamePlayViewModelFiveCrownsTest {
 
     lateinit var viewModel: GamePlayViewModel
 
-    lateinit var fiveCrowns: Game
+    lateinit var twentyFiveHundred: Game
 
     @Before
     fun setUp() {
         favoriteGameRepository = mockk<FavoriteGameRepository>()
         gameProgressRepository = mockk<GameProgressRepository>()
 
-        fiveCrowns = Game(
-            name = "Five Crowns",
+        twentyFiveHundred = Game(
+            name = "2500",
             objective = Game.Objective(
-                type = Game.Objective.Type.LOW_SCORE,
-                rounds = 11
+                type = Game.Objective.Type.HIGH_SCORE,
+                goal = 2500
 
             ),
             constraints = Game.Constraints(
-                positiveOnly = true
+                multipleOf = 5
             )
         )
 
@@ -51,11 +51,11 @@ class GamePlayViewModelFiveCrownsTest {
     @Test
     fun determineWinner() {
         val playerNames = listOf("Leonard", "Penny")
-        viewModel.onEvent(GamePlayUiEvent.StartGame(fiveCrowns, playerNames))
+        viewModel.onEvent(GamePlayUiEvent.StartGame(twentyFiveHundred, playerNames))
 
         val uiState = viewModel.uiState
         assertNotNull(uiState.value.game)
-        assertEquals("Five Crowns", uiState.value.game.name)
+        assertEquals("2500", uiState.value.game.name)
         assertEquals(2, uiState.value.players.size)
         assertEquals("Leonard", uiState.value.players[0].name)
         assertTrue(uiState.value.players[0].scores.isEmpty())
@@ -65,7 +65,7 @@ class GamePlayViewModelFiveCrownsTest {
         viewModel.onEvent(GamePlayUiEvent.AddScore(0, 0))
         assertNull(uiState.value.winner)
 
-        viewModel.onEvent(GamePlayUiEvent.AddScore(1, 0))
+        viewModel.onEvent(GamePlayUiEvent.AddScore(1, 6))
         assertNull(uiState.value.winner)
 
         viewModel.onEvent(GamePlayUiEvent.AddScore(0, 10))
@@ -75,43 +75,31 @@ class GamePlayViewModelFiveCrownsTest {
         assertNull(uiState.value.winner)
 
         // Round 3
-        viewModel.onEvent(GamePlayUiEvent.AddScore(0, 5))
-        viewModel.onEvent(GamePlayUiEvent.AddScore(1, 10))
+        viewModel.onEvent(GamePlayUiEvent.AddScore(0, 230))
+        viewModel.onEvent(GamePlayUiEvent.AddScore(1, 130))
         // Round 4
-        viewModel.onEvent(GamePlayUiEvent.AddScore(0, 5))
-        viewModel.onEvent(GamePlayUiEvent.AddScore(1, 10))
+        viewModel.onEvent(GamePlayUiEvent.AddScore(0, 240))
+        viewModel.onEvent(GamePlayUiEvent.AddScore(1, 130))
         // Round 5
-        viewModel.onEvent(GamePlayUiEvent.AddScore(0, 0))
-        viewModel.onEvent(GamePlayUiEvent.AddScore(1, 0))
+        viewModel.onEvent(GamePlayUiEvent.AddScore(0, 350))
+        viewModel.onEvent(GamePlayUiEvent.AddScore(1, -25))
         // Round 6
-        viewModel.onEvent(GamePlayUiEvent.AddScore(0, 3))
-        viewModel.onEvent(GamePlayUiEvent.AddScore(1, 16))
-        // Round 7
-        viewModel.onEvent(GamePlayUiEvent.AddScore(0, 0))
-        viewModel.onEvent(GamePlayUiEvent.AddScore(1, 0))
-        // Round 8
-        viewModel.onEvent(GamePlayUiEvent.AddScore(0, 6))
-        viewModel.onEvent(GamePlayUiEvent.AddScore(1, 0))
-        // Round 9
-        viewModel.onEvent(GamePlayUiEvent.AddScore(0, 5))
-        viewModel.onEvent(GamePlayUiEvent.AddScore(1, 2))
-        // Round 10
-        viewModel.onEvent(GamePlayUiEvent.AddScore(0, 23))
-        viewModel.onEvent(GamePlayUiEvent.AddScore(1, 0))
+        viewModel.onEvent(GamePlayUiEvent.AddScore(0, 1000))
+        viewModel.onEvent(GamePlayUiEvent.AddScore(1, 50))
 
         assertNull(uiState.value.winner)
 
-        // Round 11
-        viewModel.onEvent(GamePlayUiEvent.AddScore(0, 5))
-        viewModel.onEvent(GamePlayUiEvent.AddScore(1, 4))
+        // Round 7
+        viewModel.onEvent(GamePlayUiEvent.AddScore(0, 1000))
+        viewModel.onEvent(GamePlayUiEvent.AddScore(1, 56))
 
-        assertEquals("Penny", uiState.value.winner)
+        assertEquals("Leonard", uiState.value.winner)
     }
 
     @Test
     fun isManualWinner() {
-        val playerNames = listOf("Rajesh", "Howard")
-        viewModel.onEvent(GamePlayUiEvent.StartGame(game = fiveCrowns, playerNames))
+        val playerNames = listOf("Penny", "Amy")
+        viewModel.onEvent(GamePlayUiEvent.StartGame(game = twentyFiveHundred, playerNames))
 
         assertFalse(viewModel.isManualWinner())
     }

@@ -181,4 +181,12 @@ class GamePlayViewModelTest {
         assertEquals("Favorite Name", slot.captured.name)
         assertEquals(sevens.name, slot.captured.game.name)
     }
+
+    @Test
+    fun isManualWinner() {
+        val playerNames = listOf("Leonard", "Penny")
+        viewModel.onEvent(GamePlayUiEvent.StartGame(game = sevens, playerNames))
+
+        assertTrue(viewModel.isManualWinner())
+    }
 }
