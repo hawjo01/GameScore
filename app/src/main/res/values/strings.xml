@@ -39,6 +39,9 @@
     <string name="display_colors">Display Colors</string>
     <string name="new_game">New Game</string>
     <string name="objective">Objective</string>
+    <string name="round_objective">Round Objective</string>
+    <string name="game_objective">Game Objective</string>
+    <string name="goal">Goal</string>
     <string name="type">Type</string>
     <string name="yes">Yes</string>
     <string name="resume_the_game_in_progress">Resume the game in progress?</string>
@@ -51,4 +54,8 @@
     <string name="menu">Menu</string>
     <string name="edit">Edit</string>
     <string name="apply">Apply</string>
+    <string name="rounds">Rounds</string>
+    <string name="display_value">Display Value</string>
+    <string name="display_color">Display Color</string>
+    <string name="back">Back</string>
 </resources>

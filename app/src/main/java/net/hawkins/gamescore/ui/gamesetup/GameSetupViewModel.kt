@@ -31,6 +31,9 @@ class GameSetupViewModel @Inject constructor(
             is GameSetupUiEvent.SetObjectiveGoal -> setObjectiveGoal(event.goal)
             is GameSetupUiEvent.SetObjectiveType -> setObjectiveType(event.type)
             is GameSetupUiEvent.SetObjectiveRounds -> setObjectiveRounds(event.rounds)
+            is GameSetupUiEvent.SetRoundObjectiveGoal -> setRoundObjectiveGoal(event.goal)
+            is GameSetupUiEvent.SetRoundObjectiveDisplayValue -> setRoundObjectiveDisplayValue(event.value)
+            is GameSetupUiEvent.SetRoundObjectiveDisplayColor -> setRoundObjectiveDisplayColor(event.color)
             is GameSetupUiEvent.SetDisplayNegativeColor -> setDisplayNegative(event.color)
             is GameSetupUiEvent.SetDisplayPositiveColor -> setDisplayPositive(event.color)
             is GameSetupUiEvent.SetScreenMode -> setMode(event.mode)
@@ -109,6 +112,30 @@ class GameSetupViewModel @Inject constructor(
         }
     }
 
+    private fun setRoundObjectiveGoal(goal: Int?) {
+        val currentGame = _uiState.value.game
+        val currentRoundObjective = currentGame.roundObjective
+        val newRoundObjective = currentRoundObjective.copy(goal = goal)
+        val newGame = currentGame.copy(roundObjective = newRoundObjective)
+        _uiState.update { currentState ->
+            currentState.copy(
+                game = newGame
+            )
+        }
+    }
+
+    private fun setRoundObjectiveDisplayValue(displayValue: String?) {
+        val currentGame = _uiState.value.game
+        val currentRoundObjective = currentGame.roundObjective
+        val newRoundObjective = currentRoundObjective.copy(displayValue = displayValue)
+        val newGame = currentGame.copy(roundObjective = newRoundObjective)
+        _uiState.update { currentState ->
+            currentState.copy(
+                game = newGame
+            )
+        }
+    }
+
     private fun setObjectiveGoal(newGoal: Int?) {
         val currentGame = _uiState.value.game
         val currentObjective = currentGame.objective
@@ -121,6 +148,17 @@ class GameSetupViewModel @Inject constructor(
         }
     }
 
+    private fun setRoundObjectiveDisplayColor(newColor: Game.Colors.Color) {
+        val currentGame = _uiState.value.game
+        val currentRoundObjective = currentGame.roundObjective
+        val newRoundObjective = currentRoundObjective.copy(displayColor = newColor)
+        val newGame = currentGame.copy(roundObjective = newRoundObjective)
+        _uiState.update { currentState ->
+            currentState.copy(
+                game = newGame
+            )
+        }
+    }
 
     private fun setDisplayNegative(newColor: Game.Colors.Color) {
         val currentGame = _uiState.value.game

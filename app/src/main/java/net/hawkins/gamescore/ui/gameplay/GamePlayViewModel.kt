@@ -66,25 +66,18 @@ class GamePlayViewModel @Inject constructor(
     }
 
     private fun updateGame(newGame: Game) {
-        val rebuildScores =
-            newGame.color.positiveScore != _uiState.value.game.color.positiveScore || newGame.color.negativeScore != _uiState.value.game.color.negativeScore
-
         // TODO: This feels like a hack, there should be a better way to update gamePlay
         _gamePlayService = GamePlayService(newGame)
-        val updatedPlayers: List<Player>
-        if (rebuildScores) {
-            updatedPlayers = mutableListOf()
-            for (player in _uiState.value.players) {
-                val updatedScores = mutableListOf<Score>()
-                for (score in player.scores) {
-                    val updatedScore = _gamePlayService.buildScore(score.value)
-                    updatedScores.add(updatedScore)
-                }
-                val updatedPlayer = Player(player.name, updatedScores)
-                updatedPlayers.add(updatedPlayer)
+
+        val updatedPlayers = mutableListOf<Player>()
+        for (player in _uiState.value.players) {
+            val updatedScores = mutableListOf<Score>()
+            for (score in player.scores) {
+                val updatedScore = _gamePlayService.buildScore(score.value)
+                updatedScores.add(updatedScore)
             }
-        } else {
-            updatedPlayers = _uiState.value.players
+            val updatedPlayer = Player(player.name, updatedScores)
+            updatedPlayers.add(updatedPlayer)
         }
 
         _uiState.update { currentState ->
@@ -172,13 +165,26 @@ class GamePlayViewModel @Inject constructor(
     fun loadInProgressGame() {
         val gameProgress = _gameProgressService.getGameProgress()
         if (gameProgress != null) {
+
+            _gamePlayService = GamePlayService(gameProgress.game)
+
+            val updatedPlayers = mutableListOf<Player>()
+            for (player in gameProgress.players) {
+                val updatedScores = mutableListOf<Score>()
+                for (score in player.scores) {
+                    val updatedScore = _gamePlayService.buildScore(score.value)
+                    updatedScores.add(updatedScore)
+                }
+                val updatedPlayer = Player(player.name, updatedScores)
+                updatedPlayers.add(updatedPlayer)
+            }
+
             _uiState.update { currentState ->
                 currentState.copy(
                     game = gameProgress.game,
-                    players = gameProgress.players
+                    players = updatedPlayers
                 )
             }
-            _gamePlayService = GamePlayService(gameProgress.game)
         }
     }
 

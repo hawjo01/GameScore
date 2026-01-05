@@ -47,7 +47,8 @@ class GamePlayService(val game: Game) {
             return true
         }
 
-        val playersWithAllRounds = players.filter { player -> player.scores.size == game.objective.rounds }
+        val playersWithAllRounds =
+            players.filter { player -> player.scores.size == game.objective.rounds }
         return playersWithAllRounds.size == players.size
     }
 
@@ -75,12 +76,19 @@ class GamePlayService(val game: Game) {
     }
 
     fun getScoreColor(score: Int): Color {
+        if (game.roundObjective.goal != null && game.roundObjective.goal == score) {
+            return when (game.roundObjective.displayColor) {
+                Game.Colors.Color.DEFAULT -> Color.Unspecified
+                Game.Colors.Color.RED -> Color.Red
+                Game.Colors.Color.GREEN -> Color.Green
+            }
+        }
+
         return if (score < 0) {
             when (game.color.negativeScore) {
                 Game.Colors.Color.DEFAULT -> Color.Unspecified
                 Game.Colors.Color.RED -> Color.Red
                 Game.Colors.Color.GREEN -> Color.Green
-
             }
         } else {
             when (game.color.positiveScore) {
@@ -95,8 +103,17 @@ class GamePlayService(val game: Game) {
         return game.objective.goal == null && game.objective.rounds == null
     }
 
+    private fun getDisplayValue(score: Int): String? {
+        if (game.roundObjective.goal != null && game.roundObjective.goal == score) {
+            return game.roundObjective.displayValue
+        } else {
+            return null
+        }
+    }
+
     fun buildScore(score: Int): Score {
         val color = getScoreColor(score)
-        return Score(value = score, color = color)
+        val displayValue = getDisplayValue(score)
+        return Score(value = score, color = color, displayValue = displayValue)
     }
 }

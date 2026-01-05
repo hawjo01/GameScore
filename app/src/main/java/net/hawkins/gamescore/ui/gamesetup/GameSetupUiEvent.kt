@@ -17,4 +17,7 @@ sealed interface GameSetupUiEvent {
     object ResetGame : GameSetupUiEvent
     data class SetGame(val game: Game) : GameSetupUiEvent
     data class SetObjectiveRounds(val rounds: Int?) : GameSetupUiEvent
+    data class SetRoundObjectiveGoal(val goal: Int?) : GameSetupUiEvent
+    data class SetRoundObjectiveDisplayValue(val value: String?) : GameSetupUiEvent
+    data class SetRoundObjectiveDisplayColor(val color: Game.Colors.Color) : GameSetupUiEvent
 }
