@@ -71,7 +71,7 @@ fun GamePlayScreen(
             newTitle = uiState.game.name,
             newActions = {
                 AppBarActions(
-                    hasWinningThreshold = uiState.game.objective.goal != null,
+                    showFindWinner = viewModel.isManualWinner(),
                     determineWinner = { viewModel.onEvent(GamePlayUiEvent.DetermineWinner) },
                     onShowGameDetails = onShowGameDetails,
                     onStartNewGame = onStartNewGame,
@@ -529,7 +529,7 @@ private fun ChangeScore(
 
 @Composable
 private fun AppBarActions(
-    hasWinningThreshold: Boolean,
+    showFindWinner: Boolean,
     determineWinner: () -> Unit,
     game: Game,
     players: List<Player>,
@@ -550,7 +550,7 @@ private fun AppBarActions(
         expanded = dropdownMenuExpanded,
         onDismissRequest = { setDropdownMenuExpanded(false) }
     ) {
-        if (!hasWinningThreshold) {
+        if (showFindWinner) {
             DropdownMenuItem(
                 text = {
                     Text(

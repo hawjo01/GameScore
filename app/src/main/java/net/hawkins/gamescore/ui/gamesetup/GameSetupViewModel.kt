@@ -30,6 +30,7 @@ class GameSetupViewModel @Inject constructor(
             is GameSetupUiEvent.SetConstraintScoreModulus -> setConstraintModulus(event.modulus)
             is GameSetupUiEvent.SetObjectiveGoal -> setObjectiveGoal(event.goal)
             is GameSetupUiEvent.SetObjectiveType -> setObjectiveType(event.type)
+            is GameSetupUiEvent.SetObjectiveRounds -> setObjectiveRounds(event.rounds)
             is GameSetupUiEvent.SetDisplayNegativeColor -> setDisplayNegative(event.color)
             is GameSetupUiEvent.SetDisplayPositiveColor -> setDisplayPositive(event.color)
             is GameSetupUiEvent.SetScreenMode -> setMode(event.mode)
@@ -88,6 +89,18 @@ class GameSetupViewModel @Inject constructor(
         val currentGame = _uiState.value.game
         val currentObjective = currentGame.objective
         val newObjective = currentObjective.copy(type = newType)
+        val newGame = currentGame.copy(objective = newObjective)
+        _uiState.update { currentState ->
+            currentState.copy(
+                game = newGame
+            )
+        }
+    }
+
+    private fun setObjectiveRounds(rounds: Int?) {
+        val currentGame = _uiState.value.game
+        val currentObjective = currentGame.objective
+        val newObjective = currentObjective.copy(rounds = rounds)
         val newGame = currentGame.copy(objective = newObjective)
         _uiState.update { currentState ->
             currentState.copy(

@@ -10,7 +10,8 @@ data class Game(
 
     data class Objective(
         val type: Type = Type.HIGH_SCORE,
-        val goal: Int? = null
+        val goal: Int? = null,
+        val rounds: Int? = null
     ) {
         enum class Type {
             HIGH_SCORE,

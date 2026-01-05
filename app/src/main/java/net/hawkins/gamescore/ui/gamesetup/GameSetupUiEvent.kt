@@ -16,4 +16,5 @@ sealed interface GameSetupUiEvent {
     data class SetScreenMode(val mode: GameSetupUiState.Mode) : GameSetupUiEvent
     object ResetGame : GameSetupUiEvent
     data class SetGame(val game: Game) : GameSetupUiEvent
+    data class SetObjectiveRounds(val rounds: Int?) : GameSetupUiEvent
 }

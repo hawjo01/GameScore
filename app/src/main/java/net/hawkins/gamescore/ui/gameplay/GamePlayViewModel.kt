@@ -22,7 +22,8 @@ class GamePlayViewModel @Inject constructor(
     private val _favoriteGameRepository: FavoriteGameRepository,
     gameProgressRepository: GameProgressRepository,
 ) : AbstractViewModel() {
-    private val _gameProgressService: GameProgressService = GameProgressService(gameProgressRepository)
+    private val _gameProgressService: GameProgressService =
+        GameProgressService(gameProgressRepository)
     private val _uiState = MutableStateFlow(GamePlayUiState(Game(name = ""), emptyList()))
     val uiState: StateFlow<GamePlayUiState> = _uiState.asStateFlow()
 
@@ -65,7 +66,8 @@ class GamePlayViewModel @Inject constructor(
     }
 
     private fun updateGame(newGame: Game) {
-        val rebuildScores = newGame.color.positiveScore != _uiState.value.game.color.positiveScore || newGame.color.negativeScore != _uiState.value.game.color.negativeScore
+        val rebuildScores =
+            newGame.color.positiveScore != _uiState.value.game.color.positiveScore || newGame.color.negativeScore != _uiState.value.game.color.negativeScore
 
         // TODO: This feels like a hack, there should be a better way to update gamePlay
         _gamePlayService = GamePlayService(newGame)
@@ -117,7 +119,6 @@ class GamePlayViewModel @Inject constructor(
             determineWinner()
         }
     }
-
 
 
     private fun changeScore(seatIndex: Int, roundNumber: Int, newScore: Int) {
@@ -179,5 +180,9 @@ class GamePlayViewModel @Inject constructor(
             }
             _gamePlayService = GamePlayService(gameProgress.game)
         }
+    }
+
+    fun isManualWinner(): Boolean {
+        return _gamePlayService.isManualWinner()
     }
 }

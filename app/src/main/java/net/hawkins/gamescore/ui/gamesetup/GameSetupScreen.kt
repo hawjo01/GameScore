@@ -386,6 +386,13 @@ private fun ObjectiveCard(
             readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
+        NullableIntOutlinedTextField(
+            label = "Rounds",
+            number = uiState.game.objective.rounds,
+            onValueChange = { rounds: Int? -> onEvent(GameSetupUiEvent.SetObjectiveRounds(rounds)) },
+            readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
+            modifier = modifier
+        )
     }
 }
 

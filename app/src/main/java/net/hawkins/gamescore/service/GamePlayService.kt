@@ -16,6 +16,10 @@ class GamePlayService(val game: Game) {
             return null
         }
 
+        if (!isRoundsObjectiveMet(players)) {
+            return null
+        }
+
         val candidate = when (game.objective.type) {
             Game.Objective.Type.HIGH_SCORE -> players.maxBy { player -> player.totalScore() }
             Game.Objective.Type.LOW_SCORE -> players.minBy { player -> player.totalScore() }
@@ -36,6 +40,15 @@ class GamePlayService(val game: Game) {
 
     private fun equalNumberOfHands(players: List<Player>): Boolean {
         return players.all { player -> player.scores.size == players[0].scores.size }
+    }
+
+    private fun isRoundsObjectiveMet(players: List<Player>): Boolean {
+        if (game.objective.rounds == null) {
+            return true
+        }
+
+        val playersWithAllRounds = players.filter { player -> player.scores.size == game.objective.rounds }
+        return playersWithAllRounds.size == players.size
     }
 
     private fun isGoalMet(totalScore: Int): Boolean {
@@ -79,7 +92,7 @@ class GamePlayService(val game: Game) {
     }
 
     fun isManualWinner(): Boolean {
-        return game.objective.goal == null
+        return game.objective.goal == null && game.objective.rounds == null
     }
 
     fun buildScore(score: Int): Score {
