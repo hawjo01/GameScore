@@ -41,6 +41,12 @@ class BasicScoreHighTest {
     }
 
     @Test
+    fun isManualWinner() {
+        val gamePlayService = GamePlayService(game)
+        assertTrue(gamePlayService.isManualWinner())
+    }
+
+    @Test
     fun findWinner_zeroPlayers() {
         val gamePlayService = GamePlayService(game)
         assertNull(gamePlayService.determineWinner(emptyList()))

@@ -94,7 +94,9 @@ class GamePlayViewModel @Inject constructor(
             currentState.copy(players = updatedPlayers)
         }
 
-        determineWinner()
+        if (!_gamePlayService.isManualWinner()) {
+            determineWinner()
+        }
     }
 
     private fun changeScore(seatIndex: Int, roundNumber: Int, newScore: Int) {
@@ -106,7 +108,9 @@ class GamePlayViewModel @Inject constructor(
             currentState.copy(players = updatedPlayers)
         }
 
-        determineWinner()
+        if (!_gamePlayService.isManualWinner()) {
+            determineWinner()
+        }
     }
 
     private fun deleteScore(seatIndex: Int, roundNumber: Int) {
@@ -118,7 +122,9 @@ class GamePlayViewModel @Inject constructor(
             currentState.copy(players = updatedPlayers)
         }
 
-        determineWinner()
+        if (!_gamePlayService.isManualWinner()) {
+            determineWinner()
+        }
     }
 
     private fun determineWinner() {

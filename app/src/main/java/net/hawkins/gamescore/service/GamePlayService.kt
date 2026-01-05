@@ -77,4 +77,8 @@ class GamePlayService(val game: Game) {
             }
         }
     }
+
+    fun isManualWinner(): Boolean {
+        return game.objective.goal == null
+    }
 }
