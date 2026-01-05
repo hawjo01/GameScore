@@ -1,5 +1,6 @@
 package net.hawkins.gamescore.ui.gameplay
 
+import androidx.compose.ui.graphics.Color
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import net.hawkins.gamescore.data.FavoriteGameRepository
@@ -37,6 +38,11 @@ class GamePlayViewModelFiveCrownsTest {
                 rounds = 11
 
             ),
+            roundObjective = Game.RoundObjective(
+                goal = 0,
+                displayValue = "Win",
+                displayColor = Game.Colors.Color.GREEN
+            ),
             constraints = Game.Constraints(
                 positiveOnly = true
             )
@@ -64,14 +70,19 @@ class GamePlayViewModelFiveCrownsTest {
 
         viewModel.onEvent(GamePlayUiEvent.AddScore(0, 0))
         assertNull(uiState.value.winner)
+        assertEquals("Win", uiState.value.players[0].scores[0].displayValue)
+        assertEquals(Color.Green, uiState.value.players[0].scores[0].color)
 
-        viewModel.onEvent(GamePlayUiEvent.AddScore(1, 0))
+        viewModel.onEvent(GamePlayUiEvent.AddScore(1, 5))
         assertNull(uiState.value.winner)
+        assertNull(uiState.value.players[1].scores[0].displayValue)
+        assertEquals(Color.Unspecified, uiState.value.players[1].scores[0].color)
+
 
         viewModel.onEvent(GamePlayUiEvent.AddScore(0, 10))
         assertNull(uiState.value.winner)
 
-        viewModel.onEvent(GamePlayUiEvent.AddScore(1, 5))
+        viewModel.onEvent(GamePlayUiEvent.AddScore(1, 0))
         assertNull(uiState.value.winner)
 
         // Round 3

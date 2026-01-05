@@ -147,7 +147,12 @@ private fun GameSetupScreenContent(
             modifier = modifier
         )
         ObjectiveCard(
-            uiState,
+            uiState = uiState,
+            onEvent = onEvent,
+            modifier = modifier
+        )
+        RoundObjectiveCard(
+            uiState = uiState,
             onEvent = onEvent,
             modifier = modifier
         )
@@ -213,7 +218,7 @@ private fun DisplayColorsCard(
         modifier = modifier
     )
     {
-        DisplayTypeDropMenu(
+        ColorTypeDropMenu(
             label = stringResource(R.string.positive_score),
             value = uiState.game.color.positiveScore,
             onChange = { color: Game.Colors.Color ->
@@ -226,7 +231,7 @@ private fun DisplayColorsCard(
             readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
-        DisplayTypeDropMenu(
+        ColorTypeDropMenu(
             label = stringResource(R.string.negative_score),
             value = uiState.game.color.negativeScore,
             onChange = { color: Game.Colors.Color ->
@@ -271,7 +276,7 @@ private fun ConstraintCard(
             readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
-        NullableIntOutlinedTextField(
+        NullableIntOutlinedTextFieldRow(
             label = stringResource(R.string.multiple_of),
             number = uiState.game.constraints.multipleOf,
             onValueChange = { newValue ->
@@ -291,11 +296,12 @@ private fun ConstraintCard(
 @Composable
 private fun GameSectionCard(
     title: String = "",
+    initialExpanded: Boolean = true,
     modifier: Modifier,
     content: @Composable () -> Unit
 ) {
 
-    var expanded by remember { mutableStateOf(true) }
+    var expanded by remember { mutableStateOf(initialExpanded) }
     val rotationState by animateFloatAsState(
         targetValue = if (expanded) 180f else 0f,
         label = "arrowRotation"
@@ -364,7 +370,7 @@ private fun ObjectiveCard(
     modifier: Modifier
 ) {
     GameSectionCard(
-        title = stringResource(R.string.objective),
+        title = stringResource(R.string.game_objective),
         modifier = modifier
     ) {
         ObjectiveTypeDropMenu(
@@ -379,21 +385,111 @@ private fun ObjectiveCard(
             readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
-        NullableIntOutlinedTextField(
-            label = "Goal",
+        NullableIntOutlinedTextFieldRow(
+            label = stringResource(R.string.goal),
             number = uiState.game.objective.goal,
             onValueChange = { goal: Int? -> onEvent(GameSetupUiEvent.SetObjectiveGoal(goal)) },
             readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
-        NullableIntOutlinedTextField(
-            label = "Rounds",
+        NullableIntOutlinedTextFieldRow(
+            label = stringResource(R.string.rounds),
             number = uiState.game.objective.rounds,
             onValueChange = { rounds: Int? -> onEvent(GameSetupUiEvent.SetObjectiveRounds(rounds)) },
             readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
     }
+}
+
+@Composable
+private fun RoundObjectiveCard(
+    uiState: GameSetupUiState,
+    onEvent: (GameSetupUiEvent) -> Unit,
+    modifier: Modifier
+) {
+    GameSectionCard(
+        title = stringResource(R.string.round_objective),
+        initialExpanded = uiState.game.roundObjective.goal != null,
+        modifier = modifier
+    ) {
+        NullableIntOutlinedTextFieldRow(
+            label = stringResource(R.string.goal),
+            number = uiState.game.roundObjective.goal,
+            onValueChange = { value -> onEvent(GameSetupUiEvent.SetRoundObjectiveGoal(value)) },
+            readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
+            modifier = modifier
+        )
+        NullableStringOutlinedTextFieldRow(
+            label = stringResource(R.string.display_value),
+            value = uiState.game.roundObjective.displayValue,
+            onValueChange = { value -> onEvent(GameSetupUiEvent.SetRoundObjectiveDisplayValue(value)) },
+            readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
+            modifier = modifier
+        )
+        ColorTypeDropMenu(
+            label = stringResource(R.string.display_color),
+            value = uiState.game.roundObjective.displayColor,
+            onChange = { color: Game.Colors.Color ->
+                onEvent(
+                    GameSetupUiEvent.SetRoundObjectiveDisplayColor(
+                        color
+                    )
+                )
+            },
+            readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
+            modifier = modifier
+        )
+    }
+}
+
+@Composable
+private fun NullableStringOutlinedTextFieldRow(
+    label: String,
+    value: String?,
+    onValueChange: (String?) -> Unit,
+    readOnly: Boolean,
+    modifier: Modifier
+) {
+    GameSectionRow(modifier = modifier) {
+        NullableStringOutlinedTextField(
+            label = label,
+            value = value,
+            onValueChange = onValueChange,
+            readOnly = readOnly,
+            modifier = modifier
+        )
+    }
+}
+
+@Composable
+private fun NullableStringOutlinedTextField(
+    label: String,
+    value: String?,
+    onValueChange: (String?) -> Unit,
+    readOnly: Boolean,
+    modifier: Modifier
+) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val hideKeyboard = { keyboardController?.hide() }
+
+    OutlinedTextField(
+        value = value ?: "",
+        onValueChange = { newValue -> onValueChange(newValue) },
+        label = { Text(text = label) },
+        singleLine = true,
+        shape = shapes.small,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Ascii,
+            imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                hideKeyboard.invoke()
+            }),
+        readOnly = readOnly,
+        modifier = modifier
+    )
 }
 
 @Composable
@@ -404,33 +500,50 @@ private fun NullableIntOutlinedTextField(
     readOnly: Boolean,
     modifier: Modifier
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val hideKeyboard = { keyboardController?.hide() }
+
+    val value = number?.toString() ?: ""
+    OutlinedTextField(
+        value = value,
+        onValueChange = { newValue ->
+            // Only update the state if the new value consists only of digits
+            if (newValue.all { it.isDigit() }) {
+                onValueChange(newValue.toIntOrNull())
+            }
+        },
+        label = { Text(text = label) },
+        singleLine = true,
+        shape = shapes.small,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                hideKeyboard.invoke()
+            }),
+        readOnly = readOnly,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun NullableIntOutlinedTextFieldRow(
+    label: String,
+    number: Int?,
+    onValueChange: (Int?) -> Unit,
+    readOnly: Boolean,
+    modifier: Modifier
+) {
     GameSectionRow(
         modifier = modifier
     )
     {
-        val keyboardController = LocalSoftwareKeyboardController.current
-        val hideKeyboard = { keyboardController?.hide() }
-
-        val value = number?.toString() ?: ""
-        OutlinedTextField(
-            value = value,
-            onValueChange = { newValue ->
-                // Only update the state if the new value consists only of digits
-                if (newValue.all { it.isDigit() }) {
-                    onValueChange(newValue.toIntOrNull())
-                }
-            },
-            label = { Text(text = label) },
-            singleLine = true,
-            shape = shapes.small,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    hideKeyboard.invoke()
-                }),
+        NullableIntOutlinedTextField(
+            label = label,
+            number = number,
+            onValueChange = onValueChange,
             readOnly = readOnly,
             modifier = modifier
         )
@@ -540,7 +653,7 @@ private fun toDisplayName(color: Game.Colors.Color): String {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DisplayTypeDropMenu(
+private fun ColorTypeDropMenu(
     label: String,
     value: Game.Colors.Color,
     onChange: (Game.Colors.Color) -> Unit,
@@ -596,7 +709,7 @@ private fun DisplayTypeDropMenu(
 @Composable
 private fun NavigationIcon(onBack: () -> Unit) {
     IconButton(onClick = { onBack() }) { // Or navigateUp()
-        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
     }
 }
 

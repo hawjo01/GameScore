@@ -13,7 +13,7 @@ data class GamePlayUiState(
     }
 }
 
-data class Score(val value: Int, val color: Color = Color.Unspecified)
+data class Score(val value: Int, @Transient val color: Color = Color.Unspecified, @Transient val displayValue: String? = null)
 
 data class Player(val name: String, val scores: List<Score> = emptyList()) {
     fun totalScore(): Int {

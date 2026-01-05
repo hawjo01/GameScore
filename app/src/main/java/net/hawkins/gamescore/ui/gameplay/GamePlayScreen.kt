@@ -288,8 +288,11 @@ private fun Round(
                 var showChangeScoreDialog by remember { mutableStateOf(false) }
                 var showDeleteScoreDialog by remember { mutableStateOf(false) }
 
-                val scoreText =
+                val scoreText = if (score.displayValue != null) {
+                    score.displayValue
+                } else {
                     score.value.toString().padStart(player.totalScore().toString().length, ' ')
+                }
 
                 Text(
                     text = scoreText,

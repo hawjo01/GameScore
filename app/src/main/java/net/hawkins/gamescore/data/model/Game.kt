@@ -4,6 +4,7 @@ data class Game(
     override var id: Int? = null,
     val name: String = "",
     val objective: Objective = Objective(),
+    val roundObjective: RoundObjective = RoundObjective(),
     val constraints: Constraints = Constraints(),
     val color: Colors = Colors()
 ) : Idable {
@@ -18,6 +19,12 @@ data class Game(
             LOW_SCORE
         }
     }
+
+    data class RoundObjective(
+        val goal: Int? = null,
+        val displayValue: String? = null,
+        val displayColor: Colors.Color = Colors.Color.DEFAULT
+    )
 
     data class Constraints(
         val positiveOnly: Boolean = false,
