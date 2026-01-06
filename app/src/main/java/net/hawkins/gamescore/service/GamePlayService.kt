@@ -76,7 +76,7 @@ class GamePlayService(val game: Game) {
     }
 
     fun getScoreColor(score: Int): Color {
-        if (game.roundObjective.goal != null && game.roundObjective.goal == score) {
+        if (game.roundObjective.goal?.compareTo(score) == 0) {
             return when (game.roundObjective.displayColor) {
                 Game.Colors.Color.DEFAULT -> Color.Unspecified
                 Game.Colors.Color.RED -> Color.Red
