@@ -1,21 +1,6 @@
 [
   {
     "color": {
-      "negativeScore": "DEFAULT",
-      "positiveScore": "DEFAULT"
-    },
-    "constraints": {
-      "equalHandSizes": false,
-      "positiveOnly": false
-    },
-    "id": 1,
-    "name": "Basic Scoring - High",
-    "objective": {
-      "type": "HIGH_SCORE"
-    }
-  },
-  {
-    "color": {
       "negativeScore": "RED",
       "positiveScore": "DEFAULT"
     },
@@ -37,13 +22,19 @@
       "positiveScore": "DEFAULT"
     },
     "constraints": {
-      "equalHandSizes": false,
-      "positiveOnly": false
+      "equalHandSizes": true,
+      "positiveOnly": true
     },
-    "id": 3,
-    "name": "Basic Scoring - Low",
+    "id": 4,
+    "name": "Five Crowns",
     "objective": {
-      "type": "LOW_SCORE"
+      "type": "LOW_SCORE",
+      "rounds": 11
+    },
+    "roundObjective": {
+      "goal": 0,
+      "displayValue": "Win",
+      "displayColor": "GREEN"
     }
   }
 ]
