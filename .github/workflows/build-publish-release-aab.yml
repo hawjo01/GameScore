@@ -1,0 +1,57 @@
+name: Build and Publish AAB-Release
+
+permissions:
+  contents: read
+
+env:
+  # The name of the main module repository
+  main_project_module: app
+
+on:
+  # Only run on demand
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      # Set Current Date As Env Variable
+      - name: Set current date as env variable
+        run: echo "date_today=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
+      # Set Repository Name As Env Variable
+      - name: Set repository name as env variable
+        run: echo "repository_name=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
+
+      - name: Set Up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'corretto' # See 'Supported distributions' for available options
+          java-version: '21'
+          cache: 'gradle'
+
+      - name: Change wrapper permissions
+        run: chmod +x ./gradlew
+
+      - name: Decode Keystore
+        run: echo "${{ secrets.KEY_STORE_BASE64 }}" | base64 -d > app/signing_keystore.jks
+
+      # Run Tests Build
+      - name: Run gradle tests
+        run: ./gradlew test
+
+      # Create APK Release
+      - name: Build aab release project (AAB) - ${{ env.main_project_module }} module
+        env:
+          VERSION_CODE: ${{ github.run_number }}
+        run: ./gradlew bundleRelease
+
+      - name: Upload Signed Artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: signed-release-bundle
+          path: app/build/outputs/bundle/release/app-release.aab
