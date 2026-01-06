@@ -21,6 +21,7 @@ abstract class AbstractBaseTest {
         return tempFile
     }
 
+    @Suppress("unused")
     fun randomTempDir(create: Boolean = false): File {
         val tempDir = File(tempDir.root, "testfile_" + UUID.randomUUID().toString())
         assertFalse(tempDir.exists())

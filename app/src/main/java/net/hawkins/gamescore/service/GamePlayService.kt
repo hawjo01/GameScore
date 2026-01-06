@@ -104,10 +104,10 @@ class GamePlayService(val game: Game) {
     }
 
     private fun getDisplayValue(score: Int): String? {
-        if (game.roundObjective.goal != null && game.roundObjective.goal == score) {
-            return game.roundObjective.displayValue
+        return if (game.roundObjective.goal != null && game.roundObjective.goal == score) {
+            game.roundObjective.displayValue
         } else {
-            return null
+            null
         }
     }
 
