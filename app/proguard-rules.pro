@@ -19,3 +19,8 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Preserve all class names and their members' names
+# This is required for the classes that are serialized/deserialized using GSON
+# Can probably reduce this to just the POJO classes, but for now, don't obfuscate names.
+-keepnames class ** { *; }
