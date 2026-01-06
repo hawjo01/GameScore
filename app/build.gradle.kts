@@ -8,6 +8,8 @@ plugins {
     alias(libs.plugins.google.devtools.ksp)
 }
 
+val signing_keystore = file("signing_keystore.jks")
+
 android {
     namespace = "net.hawkins.gamescore"
     compileSdk = 36
@@ -21,7 +23,14 @@ android {
         versionName = "2.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
+    signingConfigs {
+        create("release") {
+            storeFile = signing_keystore
+            storePassword = System.getenv ("KEY_STORE_PASSWORD" )
+            keyAlias = System.getenv ( "KEY_ALIAS" )
+            keyPassword = System.getenv ("KEY_PASSWORD" )
+        }
+    }
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -30,6 +39,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            if (signing_keystore.exists()) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
     compileOptions {
