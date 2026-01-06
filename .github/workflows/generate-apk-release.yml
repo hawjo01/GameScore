@@ -46,6 +46,8 @@ jobs:
 
       # Run Build Project
       - name: Build gradle project
+        env:
+          VERSION_CODE: ${{ github.run_number }}
         run: ./gradlew build
 
       # Create APK Release

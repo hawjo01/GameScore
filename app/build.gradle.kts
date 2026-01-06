@@ -16,8 +16,9 @@ android {
         applicationId = "net.hawkins.gamescore"
         minSdk = 34
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        val versionCodeFromCI = System.getenv ("VERSION_CODE") ?: "1"
+        versionCode = versionCodeFromCI.toInt()
+        versionName = "2.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
