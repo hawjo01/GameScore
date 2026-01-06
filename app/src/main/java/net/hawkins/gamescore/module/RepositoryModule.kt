@@ -79,7 +79,7 @@ object RepositoryModule {
         return GameProgressRepository(dataSource = FileGameProgressDataSource(dataFile))
     }
 
-    private fun copyAssetFile(context: Context, assetFileName: String, destinationFile: File) {
+    private fun copyAssetFile(context: Context, @Suppress("SameParameterValue") assetFileName: String, destinationFile: File) {
         try {
             val assets = context.assets
             assets.open(assetFileName).use { inputStream ->
