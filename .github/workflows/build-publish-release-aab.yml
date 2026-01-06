@@ -48,6 +48,9 @@ jobs:
       - name: Build aab release project (AAB) - ${{ env.main_project_module }} module
         env:
           VERSION_CODE: ${{ github.run_number }}
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: ./gradlew bundleRelease
 
       - name: Upload Signed Artifact
