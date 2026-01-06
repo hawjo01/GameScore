@@ -44,15 +44,11 @@ jobs:
       - name: Run gradle tests
         run: ./gradlew test
 
-      # Run Build Project
-      - name: Build gradle project
-        env:
-          VERSION_CODE: ${{ github.run_number }}
-        run: ./gradlew build
-
       # Create APK Release
       - name: Build apk release project (APK) - ${{ env.main_project_module }} module
-        run: ./gradlew assemble
+        env:
+          VERSION_CODE: ${{ github.run_number }}
+        run: ./gradlew assembleRelease
 
       # Noted For Output [main_project_module]/build/outputs/apk/release/
       - name: Upload APK Release - ${{ env.repository_name }}
