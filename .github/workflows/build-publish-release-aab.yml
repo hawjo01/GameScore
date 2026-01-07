@@ -44,7 +44,7 @@ jobs:
       - name: Run gradle tests
         run: ./gradlew test
 
-      # Create APK Release
+      # Create AAB Release
       - name: Build aab release project (AAB) - ${{ env.main_project_module }} module
         env:
           VERSION_CODE: ${{ github.run_number }}
@@ -53,8 +53,17 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: ./gradlew bundleRelease
 
-      - name: Upload Signed Artifact
+      - name: Upload Signed Artifact to Github
         uses: actions/upload-artifact@v6
         with:
           name: gamescore-release-bundle-signed
           path: app/build/outputs/bundle/release/app-release.aab
+
+      - name: Publish to Google Play Store
+        uses: r0adkll/upload-google-play@v1.1.3
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          packageName: net.hawkins.gamescore
+          releaseFiles: app/build/outputs/bundle/release/app-release.aab # Use the output from the signing step
+          track: qa # e.g., internal, alpha, beta, production
+          status: inProgress
