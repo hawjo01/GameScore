@@ -56,5 +56,5 @@ jobs:
       - name: Upload Signed Artifact
         uses: actions/upload-artifact@v6
         with:
-          name: signed-release-bundle
+          name: gamescore-release-bundle-signed
           path: app/build/outputs/bundle/release/app-release.aab
