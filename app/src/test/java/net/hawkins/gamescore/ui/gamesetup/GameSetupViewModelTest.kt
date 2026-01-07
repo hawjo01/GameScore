@@ -107,6 +107,24 @@ class GameSetupViewModelTest {
     }
 
     @Test
+    fun setRoundObjectiveDisplayValue_EmptyStringToNull() {
+        val uiState = viewModel.uiState
+        assertNull(uiState.value.game.roundObjective.displayValue)
+
+        viewModel.onEvent(GameSetupUiEvent.SetRoundObjectiveDisplayValue(""))
+        assertNull(uiState.value.game.roundObjective.displayValue)
+    }
+
+    @Test
+    fun setRoundObjectiveDisplayValue_Null() {
+        val uiState = viewModel.uiState
+        assertNull(uiState.value.game.roundObjective.displayValue)
+
+        viewModel.onEvent(GameSetupUiEvent.SetRoundObjectiveDisplayValue(null))
+        assertNull(uiState.value.game.roundObjective.displayValue)
+    }
+
+    @Test
     fun setRoundObjectiveDisplayColor() {
         val uiState = viewModel.uiState
         assertEquals(Game.Colors.Color.DEFAULT, uiState.value.game.roundObjective.displayColor)
