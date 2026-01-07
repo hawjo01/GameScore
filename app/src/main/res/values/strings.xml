@@ -57,4 +57,5 @@
     <string name="display_value">Display Value</string>
     <string name="display_color">Display Color</string>
     <string name="back">Back</string>
+    <string name="create_new_game">Create New Game</string>
 </resources>

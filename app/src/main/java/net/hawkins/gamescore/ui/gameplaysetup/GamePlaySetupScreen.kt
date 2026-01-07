@@ -83,6 +83,7 @@ fun GamePlaySetupScreen(
             AppBarActions(
                 uiState = uiState,
                 onDeleteGame = { gameId -> viewModel.onEvent(GamePlaySetupUiEvent.DeleteGame(gameId)) },
+                createNewGame = onNewGameSetup,
                 modifier = modifier
             )
         }
@@ -92,7 +93,6 @@ fun GamePlaySetupScreen(
         uiState = uiState,
         onEvent = { event: GamePlaySetupUiEvent -> viewModel.onEvent(event) },
         onStartGame = onStartGame,
-        onNewGameSetup = onNewGameSetup,
         modifier = modifier
     )
 }
@@ -102,7 +102,6 @@ private fun GamePlaySetupScreenContent(
     uiState: GamePlaySetupUiState,
     onEvent: (GamePlaySetupUiEvent) -> Unit,
     onStartGame: (Game, List<String>) -> Unit,
-    onNewGameSetup: () -> Unit,
     modifier: Modifier
 ) {
     Column {
@@ -111,7 +110,6 @@ private fun GamePlaySetupScreenContent(
             game = uiState.selectedGame,
             onEvent = onEvent,
             playerNames = uiState.playerNames,
-            onNewGameSetup = onNewGameSetup,
             onStartGame = onStartGame,
             modifier = modifier
         )
@@ -170,7 +168,6 @@ private fun GameCard(
     games: List<Game>,
     game: Game,
     onEvent: (GamePlaySetupUiEvent) -> Unit,
-    onNewGameSetup: () -> Unit,
     playerNames: List<String>,
     onStartGame: (Game, List<String>) -> Unit,
     modifier: Modifier
@@ -206,7 +203,6 @@ private fun GameCard(
             if (showGameSelectionDialog) {
                 GameSelectionDialog(
                     games = games,
-                    onNewGameSetup = onNewGameSetup,
                     onClickAction = { game ->
                         onEvent(GamePlaySetupUiEvent.SetGame(game))
                         showGameSelectionDialog = false
@@ -443,7 +439,6 @@ private fun ConfirmDeleteSavedPlayer(
 @Composable
 private fun GameSelectionDialog(
     games: List<Game>,
-    onNewGameSetup: () -> Unit,
     onClickAction: (Game) -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier
@@ -466,20 +461,6 @@ private fun GameSelectionDialog(
                         fontWeight = FontWeight.Bold
                     )
                 }
-                Text(
-                    text = "New Game",
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 10.dp)
-                        .clickable(
-                            onClick = onNewGameSetup
-                        ),
-                    style = MaterialTheme.typography.labelMedium.plus(
-                        TextStyle(
-                            color = SkyBlue, textDecoration = TextDecoration.Underline
-                        )
-                    )
-                )
                 games.sortedBy { game -> game.name }.forEach { game ->
                     Text(
                         text = game.name,
@@ -577,6 +558,7 @@ private fun ManageGamesDialog(
 @Composable
 private fun AppBarActions(
     uiState: GamePlaySetupUiState,
+    createNewGame: () -> Unit,
     onDeleteGame: (Int) -> Unit,
     modifier: Modifier
 ) {
@@ -585,12 +567,23 @@ private fun AppBarActions(
     val (showManageGames, setShowManageGames) = remember { mutableStateOf(false) }
 
     IconButton(onClick = { setDropdownMenuExpanded(true) }) {
-        Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu")
+        Icon(imageVector = Icons.Filled.Menu, contentDescription = stringResource(R.string.menu))
     }
     DropdownMenu(
         expanded = dropdownMenuExpanded,
         onDismissRequest = { setDropdownMenuExpanded(false) }
     ) {
+        DropdownMenuItem(
+            text = {
+                Text(
+                    text = stringResource(R.string.create_new_game),
+                    fontSize = 20.sp
+                )
+            },
+            onClick = {
+                createNewGame()
+            }
+        )
         DropdownMenuItem(
             text = {
                 Text(
@@ -624,7 +617,6 @@ private fun GamePlaySetupScreenContentPreview() {
         uiState = uiState,
         onEvent = { _ -> },
         onStartGame = { _, _ -> },
-        onNewGameSetup = {},
         modifier = Modifier,
     )
 }
