@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.update
 import net.hawkins.gamescore.data.GameRepository
 import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.ui.AbstractViewModel
+import net.hawkins.gamescore.utils.trimToNull
 import javax.inject.Inject
 
 @HiltViewModel
@@ -127,7 +128,7 @@ class GameSetupViewModel @Inject constructor(
     private fun setRoundObjectiveDisplayValue(displayValue: String?) {
         val currentGame = _uiState.value.game
         val currentRoundObjective = currentGame.roundObjective
-        val newRoundObjective = currentRoundObjective.copy(displayValue = displayValue)
+        val newRoundObjective = currentRoundObjective.copy(displayValue = displayValue?.trimToNull())
         val newGame = currentGame.copy(roundObjective = newRoundObjective)
         _uiState.update { currentState ->
             currentState.copy(

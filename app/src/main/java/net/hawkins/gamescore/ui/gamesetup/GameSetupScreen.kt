@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.ui.theme.Typography
+import net.hawkins.gamescore.utils.trimToNull
 
 @Composable
 fun GameSetupScreen(
@@ -475,7 +476,7 @@ private fun NullableStringOutlinedTextField(
 
     OutlinedTextField(
         value = value ?: "",
-        onValueChange = { newValue -> onValueChange(newValue) },
+        onValueChange = { newValue -> onValueChange(newValue.trimToNull()) },
         label = { Text(text = label) },
         singleLine = true,
         shape = shapes.small,
