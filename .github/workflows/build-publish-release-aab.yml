@@ -65,5 +65,5 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: net.hawkins.gamescore
           releaseFiles: app/build/outputs/bundle/release/app-release.aab # Use the output from the signing step
-          track: qa # e.g., internal, alpha, beta, production
+          track: internal # e.g., internal, alpha, beta, production
           status: completed
