@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import net.hawkins.gamescore.data.FavoriteGameRepository
 import net.hawkins.gamescore.data.GameProgressRepository
+import net.hawkins.gamescore.data.GameRepository
 import net.hawkins.gamescore.data.model.FavoriteGame
 import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.service.GamePlayService
@@ -20,13 +21,13 @@ import javax.inject.Inject
 @HiltViewModel
 class GamePlayViewModel @Inject constructor(
     private val _favoriteGameRepository: FavoriteGameRepository,
+    private val _gameRepository: GameRepository,
     gameProgressRepository: GameProgressRepository,
 ) : AbstractViewModel() {
-    private val _gameProgressService: GameProgressService =
-        GameProgressService(gameProgressRepository)
     private val _uiState = MutableStateFlow(GamePlayUiState(Game(name = ""), emptyList()))
     val uiState: StateFlow<GamePlayUiState> = _uiState.asStateFlow()
-
+    private val _gameProgressService: GameProgressService =
+        GameProgressService(gameProgressRepository)
     private var _gamePlayService = GamePlayService(Game(name = ""))
 
     fun onEvent(event: GamePlayUiEvent) {
@@ -38,11 +39,10 @@ class GamePlayViewModel @Inject constructor(
                 event.roundIndex,
                 event.newScore
             )
-
             is GamePlayUiEvent.SaveFavoriteGame -> saveFavoriteGame(event.name)
             is GamePlayUiEvent.StartGame -> startGame(event.game, event.playerNames)
-            is GamePlayUiEvent.UpdateGame -> updateGame(event.game)
             is GamePlayUiEvent.ResetGame -> resetGame()
+            is GamePlayUiEvent.RefreshState -> refreshState()
             is GamePlayUiEvent.DetermineWinner -> determineWinner()
         }
     }
@@ -53,7 +53,6 @@ class GamePlayViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(game = game, players = players, winner = null)
         }
-
     }
 
     private fun saveFavoriteGame(name: String) {
@@ -63,29 +62,6 @@ class GamePlayViewModel @Inject constructor(
             game = _uiState.value.game
         )
         _favoriteGameRepository.save(favoriteGame)
-    }
-
-    private fun updateGame(newGame: Game) {
-        // TODO: This feels like a hack, there should be a better way to update gamePlay
-        _gamePlayService = GamePlayService(newGame)
-
-        val updatedPlayers = mutableListOf<Player>()
-        for (player in _uiState.value.players) {
-            val updatedScores = mutableListOf<Score>()
-            for (score in player.scores) {
-                val updatedScore = _gamePlayService.buildScore(score.value)
-                updatedScores.add(updatedScore)
-            }
-            val updatedPlayer = Player(player.name, updatedScores)
-            updatedPlayers.add(updatedPlayer)
-        }
-
-        _uiState.update { currentState ->
-            currentState.copy(
-                players = updatedPlayers,
-                game = newGame
-            )
-        }
     }
 
     private fun resetGame() {
@@ -103,36 +79,25 @@ class GamePlayViewModel @Inject constructor(
         val newScore = _gamePlayService.buildScore(score)
         val updatedScores = player.scores.plus(newScore)
         val updatedPlayer = Player(player.name, updatedScores)
-        val updatedPlayers = _uiState.value.players.replaceElementAtIndex(seatIndex, updatedPlayer)
-        _uiState.update { currentState ->
-            currentState.copy(players = updatedPlayers)
-        }
-
-        if (!_gamePlayService.isManualWinner()) {
-            determineWinner()
-        }
+        updatePlayer(seatIndex, updatedPlayer)
     }
-
 
     private fun changeScore(seatIndex: Int, roundNumber: Int, newScore: Int) {
         val player = _uiState.value.players[seatIndex]
         val updatedScore = _gamePlayService.buildScore(newScore)
         val updatedScores = player.scores.replaceElementAtIndex(roundNumber, updatedScore)
         val updatedPlayer = Player(player.name, updatedScores)
-        val updatedPlayers = _uiState.value.players.replaceElementAtIndex(seatIndex, updatedPlayer)
-        _uiState.update { currentState ->
-            currentState.copy(players = updatedPlayers)
-        }
-
-        if (!_gamePlayService.isManualWinner()) {
-            determineWinner()
-        }
+        updatePlayer(seatIndex, updatedPlayer)
     }
 
     private fun deleteScore(seatIndex: Int, roundNumber: Int) {
         val player = _uiState.value.players[seatIndex]
         val updatedScores = player.scores.removeElementAtIndex(roundNumber)
         val updatedPlayer = Player(player.name, updatedScores)
+        updatePlayer(seatIndex, updatedPlayer)
+    }
+
+    private fun updatePlayer(seatIndex: Int, updatedPlayer: Player) {
         val updatedPlayers = _uiState.value.players.replaceElementAtIndex(seatIndex, updatedPlayer)
         _uiState.update { currentState ->
             currentState.copy(players = updatedPlayers)
@@ -165,30 +130,43 @@ class GamePlayViewModel @Inject constructor(
     fun loadInProgressGame() {
         val gameProgress = _gameProgressService.getGameProgress()
         if (gameProgress != null) {
-
-            _gamePlayService = GamePlayService(gameProgress.game)
-
-            val updatedPlayers = mutableListOf<Player>()
-            for (player in gameProgress.players) {
-                val updatedScores = mutableListOf<Score>()
-                for (score in player.scores) {
-                    val updatedScore = _gamePlayService.buildScore(score.value)
-                    updatedScores.add(updatedScore)
-                }
-                val updatedPlayer = Player(player.name, updatedScores)
-                updatedPlayers.add(updatedPlayer)
-            }
-
-            _uiState.update { currentState ->
-                currentState.copy(
-                    game = gameProgress.game,
-                    players = updatedPlayers
-                )
-            }
+            refreshState(gameProgress.game, gameProgress.players)
         }
     }
 
     fun isManualWinner(): Boolean {
         return _gamePlayService.isManualWinner()
+    }
+
+    private fun refreshState() {
+        val gameId = _uiState.value.game.id?: return
+        val game = _gameRepository.getById(gameId)?: return
+
+        refreshState(game, _uiState.value.players)
+    }
+
+    private fun refreshState(game: Game, players: List<Player>) {
+        _gamePlayService = GamePlayService(game)
+
+        val updatedPlayers = mutableListOf<Player>()
+        for (player in players) {
+            val updatedScores = mutableListOf<Score>()
+            for (score in player.scores) {
+                val updatedScore = _gamePlayService.buildScore(score.value)
+                updatedScores.add(updatedScore)
+            }
+            val updatedPlayer = Player(player.name, updatedScores)
+            updatedPlayers.add(updatedPlayer)
+        }
+
+        val updatedWinner = _gamePlayService.determineWinner(updatedPlayers)
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                game = game,
+                players = updatedPlayers,
+                winner = updatedWinner
+            )
+        }
     }
 }

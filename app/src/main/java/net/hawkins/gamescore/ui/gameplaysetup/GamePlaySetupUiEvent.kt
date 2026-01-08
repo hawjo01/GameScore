@@ -10,7 +10,7 @@ sealed interface GamePlaySetupUiEvent {
     data class AddFavoritePlayer(val name: String) : GamePlaySetupUiEvent
     data class DeleteFavoritePlayer(val name: String) : GamePlaySetupUiEvent
     data class DeleteFavoriteGame(val favoriteGameId: Int) : GamePlaySetupUiEvent
+    object RefreshState : GamePlaySetupUiEvent
     data class SetGame(val game: Game) : GamePlaySetupUiEvent
     data class SetPlayers(val players: List<String>) : GamePlaySetupUiEvent
-    data class DeleteGame(val id: Int) : GamePlaySetupUiEvent
 }

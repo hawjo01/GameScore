@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,13 +17,10 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,6 +32,7 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -73,7 +70,7 @@ enum class GameSetupType(val labelId: Int) {
 fun GamePlaySetupScreen(
     viewModel: GamePlaySetupViewModel,
     onStartGame: (Game, List<String>) -> Unit,
-    onNewGameSetup: () -> Unit,
+    onManageGames: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -81,12 +78,11 @@ fun GamePlaySetupScreen(
     LaunchedEffect(Unit) {
         viewModel.updateTopAppBar {
             AppBarActions(
-                uiState = uiState,
-                onDeleteGame = { gameId -> viewModel.onEvent(GamePlaySetupUiEvent.DeleteGame(gameId)) },
-                createNewGame = onNewGameSetup,
+                onManageGames = onManageGames,
                 modifier = modifier
             )
         }
+        viewModel.onEvent(GamePlaySetupUiEvent.RefreshState)
     }
 
     GamePlaySetupScreenContent(
@@ -482,132 +478,20 @@ private fun GameSelectionDialog(
 }
 
 @Composable
-private fun ConfirmDeleteGame(
-    game: Game,
-    onDismissRequest: () -> Unit,
-    onConfirmation: (Int) -> Unit
-) {
-    ConfirmActionDialog(
-        title = "Delete Game",
-        description = "Delete '" + game.name + "'?",
-        onConfirmation = { onConfirmation(game.id!!) },
-        onDismissRequest = onDismissRequest
-    )
-}
-
-@Composable
-private fun ManageGamesDialog(
-    onDismissRequest: () -> Unit,
-    uiState: GamePlaySetupUiState,
-    onDeleteGame: (Int) -> Unit,
-    modifier: Modifier
-) {
-    Dialog(
-        onDismissRequest = { onDismissRequest() },
-    ) {
-        Card(
-            modifier = modifier.padding(50.dp),
-            shape = RoundedCornerShape(16.dp),
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                modifier = modifier.fillMaxWidth()
-            ) {
-                Text("Manage Games")
-            }
-            LazyColumn {
-                items(items = uiState.savedGames.sortedBy { game -> game.name }) { game ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .padding(start = 20.dp, end = 20.dp, top = 10.dp)
-                    ) {
-                        var showConfirmDeleteGame by remember { mutableStateOf(false) }
-                        Text(text = game.name)
-                        Spacer(modifier = Modifier.weight(1f))
-                        IconButton(onClick = {
-                            if (game.id != null) {
-                                showConfirmDeleteGame = true
-                            }
-                        }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = "Delete",
-                                tint = Color.Red
-                            )
-                        }
-
-                        if (showConfirmDeleteGame) {
-                            ConfirmDeleteGame(
-                                game = game,
-                                onDismissRequest = { showConfirmDeleteGame = false },
-                                onConfirmation = { gameId ->
-                                    onDeleteGame(gameId)
-                                    showConfirmDeleteGame = false
-                                })
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
 private fun AppBarActions(
-    uiState: GamePlaySetupUiState,
-    createNewGame: () -> Unit,
-    onDeleteGame: (Int) -> Unit,
+    onManageGames: () -> Unit,
     modifier: Modifier
 ) {
-
-    val (dropdownMenuExpanded, setDropdownMenuExpanded) = remember { mutableStateOf(false) }
-    val (showManageGames, setShowManageGames) = remember { mutableStateOf(false) }
-
-    IconButton(onClick = { setDropdownMenuExpanded(true) }) {
-        Icon(imageVector = Icons.Filled.Menu, contentDescription = stringResource(R.string.menu))
-    }
-    DropdownMenu(
-        expanded = dropdownMenuExpanded,
-        onDismissRequest = { setDropdownMenuExpanded(false) }
+    TextButton(
+        onClick = onManageGames,
+        colors = ButtonDefaults.textButtonColors(
+            contentColor = Color.Blue
+        ),
+        modifier = modifier
     ) {
-        DropdownMenuItem(
-            text = {
-                Text(
-                    text = stringResource(R.string.create_new_game),
-                    fontSize = 20.sp
-                )
-            },
-            onClick = {
-                createNewGame()
-            }
-        )
-        DropdownMenuItem(
-            text = {
-                Text(
-                    text = "Manage Games",
-                    fontSize = 20.sp
-                )
-            },
-            onClick = {
-                setShowManageGames(true)
-                setDropdownMenuExpanded(false)
-            }
-        )
-    }
-
-    if (showManageGames) {
-        ManageGamesDialog(
-            onDismissRequest = { setShowManageGames(false) },
-            uiState = uiState,
-            onDeleteGame = onDeleteGame,
-            modifier = modifier
-        )
+        Text(text = stringResource(R.string.games), fontSize = 20.sp)
     }
 }
-
 
 @Preview
 @Composable

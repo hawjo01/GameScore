@@ -32,11 +32,14 @@ import net.hawkins.gamescore.ui.gamesetup.GameSetupScreen
 import net.hawkins.gamescore.ui.gamesetup.GameSetupUiEvent
 import net.hawkins.gamescore.ui.gamesetup.GameSetupUiState
 import net.hawkins.gamescore.ui.gamesetup.GameSetupViewModel
+import net.hawkins.gamescore.ui.managegames.GameManagementScreen
+import net.hawkins.gamescore.ui.managegames.GameManagementViewModel
 
 enum class GameScoreScreen() {
     GamePlaySetup,
     GamePlay,
-    GameSetup
+    GameSetup,
+    ManageGames
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,6 +75,7 @@ fun GameScoreScreen(
     gamePlaySetupViewModel: GamePlaySetupViewModel = viewModel(),
     gamePlayViewModel: GamePlayViewModel = viewModel(),
     gameSetupViewModel: GameSetupViewModel = viewModel(),
+    gameManagementViewModel: GameManagementViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
     Scaffold(
@@ -115,9 +119,8 @@ fun GameScoreScreen(
                         )
                         navController.navigate(GameScoreScreen.GamePlay.name)
                     },
-                    onNewGameSetup = {
-                        gameSetupViewModel.onEvent(GameSetupUiEvent.ResetGame)
-                        navController.navigate(GameScoreScreen.GameSetup.name)
+                    onManageGames = {
+                        navController.navigate(GameScoreScreen.ManageGames.name)
                     }
                 )
             }
@@ -145,16 +148,28 @@ fun GameScoreScreen(
                     onCancel = {
                         navController.popBackStack()
                     },
-                    onModifyGame = {
-                        val game = gameSetupViewModel.getGame()
-                        gamePlayViewModel.onEvent(GamePlayUiEvent.UpdateGame(game))
-                        navController.popBackStack()
-                    },
                     onSaveNewGame = {
                         val game = gameSetupViewModel.saveGame()
-                        gamePlaySetupViewModel.reloadGames()
                         gamePlaySetupViewModel.onEvent(GamePlaySetupUiEvent.SetGame(game))
                         navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(route = GameScoreScreen.ManageGames.name) {
+                GameManagementScreen(
+                    viewModel = gameManagementViewModel,
+                    onBack = {
+                        navController.popBackStack()
+                    },
+                    onCreateNewGame = {
+                        gameSetupViewModel.onEvent(GameSetupUiEvent.NewGame)
+                        navController.navigate(GameScoreScreen.GameSetup.name)
+                    },
+                    onViewGame = { game ->
+                        gameSetupViewModel.onEvent(GameSetupUiEvent.SetScreenMode(GameSetupUiState.Mode.VIEW))
+                        gameSetupViewModel.onEvent(GameSetupUiEvent.SetGame(game))
+                        navController.navigate(GameScoreScreen.GameSetup.name)
                     }
                 )
             }

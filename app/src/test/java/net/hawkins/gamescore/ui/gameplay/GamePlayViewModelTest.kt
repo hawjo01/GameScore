@@ -9,6 +9,7 @@ import io.mockk.verify
 import junit.framework.TestCase.assertEquals
 import net.hawkins.gamescore.data.FavoriteGameRepository
 import net.hawkins.gamescore.data.GameProgressRepository
+import net.hawkins.gamescore.data.GameRepository
 import net.hawkins.gamescore.data.model.FavoriteGame
 import net.hawkins.gamescore.data.model.Game
 import org.junit.Assert.assertFalse
@@ -26,23 +27,27 @@ class GamePlayViewModelTest {
     @MockK
     lateinit var gameProgressRepository: GameProgressRepository
 
+    @MockK
+    lateinit var gameRepository: GameRepository
     lateinit var sevens: Game
-
     lateinit var viewModel: GamePlayViewModel
 
     @Before
     fun setUp() {
         sevens = Game(
+            id = -1,
             name = "Sevens",
             constraints = Game.Constraints(multipleOf = 7)
         )
 
         favoriteGameRepository = mockk<FavoriteGameRepository>()
         gameProgressRepository = mockk<GameProgressRepository>()
+        gameRepository = mockk<GameRepository>()
 
         viewModel = GamePlayViewModel(
             _favoriteGameRepository = favoriteGameRepository,
-            gameProgressRepository = gameProgressRepository
+            gameProgressRepository = gameProgressRepository,
+            _gameRepository = gameRepository
         )
     }
 
@@ -135,7 +140,7 @@ class GamePlayViewModelTest {
     }
 
     @Test
-    fun updateGame() {
+    fun refreshState() {
         val playerNames = listOf("Leonard", "Penny")
         viewModel.onEvent(GamePlayUiEvent.StartGame(game = sevens, playerNames))
         viewModel.onEvent(GamePlayUiEvent.AddScore(0, 5))
@@ -146,9 +151,10 @@ class GamePlayViewModelTest {
         val currentGame = uiState.value.game
         val currentColors = currentGame.color
         val newColors = currentColors.copy(positiveScore = Game.Colors.Color.GREEN)
-        val updatedGame = currentGame.copy(color = newColors)
+        val updatedGame = currentGame.copy(id = -1, color = newColors)
 
-        viewModel.onEvent(GamePlayUiEvent.UpdateGame(updatedGame))
+        every { gameRepository.getById(any()) } returns updatedGame
+        viewModel.onEvent(GamePlayUiEvent.RefreshState)
         assertEquals(Color.Green, uiState.value.players[0].scores[0].color)
     }
 

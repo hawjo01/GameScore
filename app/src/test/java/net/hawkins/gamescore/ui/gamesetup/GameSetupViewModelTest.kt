@@ -154,7 +154,7 @@ class GameSetupViewModelTest {
     @Test
     fun setMode() {
         val uiState = viewModel.uiState
-        assertEquals(GameSetupUiState.Mode.NEW, uiState.value.mode)
+        assertEquals(GameSetupUiState.Mode.EDIT, uiState.value.mode)
 
         viewModel.onEvent(GameSetupUiEvent.SetScreenMode(GameSetupUiState.Mode.VIEW))
         assertEquals(GameSetupUiState.Mode.VIEW, uiState.value.mode)
@@ -205,7 +205,7 @@ class GameSetupViewModelTest {
         assertEquals(Game.Colors.Color.GREEN, storedGame.color.negativeScore)
         assertEquals(Game.Colors.Color.RED, storedGame.color.positiveScore)
 
-        viewModel.onEvent(GameSetupUiEvent.ResetGame)
+        viewModel.onEvent(GameSetupUiEvent.NewGame)
         val uiState = viewModel.uiState
         assertNull(uiState.value.game.id)
         assertEquals("", uiState.value.game.name)
