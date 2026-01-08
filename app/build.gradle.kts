@@ -8,7 +8,7 @@ plugins {
     alias(libs.plugins.google.devtools.ksp)
 }
 
-val signing_keystore = file("signing_keystore.jks")
+val signingKeystore = file("signing_keystore.jks")
 
 android {
     namespace = "net.hawkins.gamescore"
@@ -25,7 +25,7 @@ android {
     }
     signingConfigs {
         create("release") {
-            storeFile = signing_keystore
+            storeFile = signingKeystore
             storePassword = System.getenv ("KEY_STORE_PASSWORD" )
             keyAlias = System.getenv ( "KEY_ALIAS" )
             keyPassword = System.getenv ("KEY_PASSWORD" )
@@ -33,13 +33,14 @@ android {
     }
     buildTypes {
         release {
+            ndk.debugSymbolLevel = "FULL"
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            if (signing_keystore.exists()) {
+            if (signingKeystore.exists()) {
                 signingConfig = signingConfigs.getByName("release")
             }
         }
