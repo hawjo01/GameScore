@@ -66,4 +66,4 @@ jobs:
           packageName: net.hawkins.gamescore
           releaseFiles: app/build/outputs/bundle/release/app-release.aab # Use the output from the signing step
           track: internal # e.g., internal, alpha, beta, production
-          status: completed
+          status: draft
