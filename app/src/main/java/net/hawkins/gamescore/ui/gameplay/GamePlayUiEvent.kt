@@ -12,7 +12,7 @@ sealed interface GamePlayUiEvent {
 
     data class SaveFavoriteGame(val name: String) : GamePlayUiEvent
     data class StartGame(val game: Game, val playerNames: List<String>) : GamePlayUiEvent
-    data class UpdateGame(val game: Game) : GamePlayUiEvent
+    object RefreshState : GamePlayUiEvent
     object ResetGame : GamePlayUiEvent
     object DetermineWinner : GamePlayUiEvent
 }

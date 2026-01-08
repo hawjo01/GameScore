@@ -67,6 +67,9 @@ fun GamePlayScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     LaunchedEffect(Unit) {
+
+        viewModel.onEvent(GamePlayUiEvent.RefreshState)
+
         viewModel.updateTopAppBar(
             newTitle = uiState.game.name,
             newActions = {
@@ -289,7 +292,8 @@ private fun Round(
                 var showDeleteScoreDialog by remember { mutableStateOf(false) }
 
                 val scoreText =
-                    score.displayValue ?: score.value.toString().padStart(player.totalScore().toString().length, ' ')
+                    score.displayValue ?: score.value.toString()
+                        .padStart(player.totalScore().toString().length, ' ')
 
                 Text(
                     text = scoreText,

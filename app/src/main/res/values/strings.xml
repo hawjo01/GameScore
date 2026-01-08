@@ -6,6 +6,7 @@
     <string name="new_game_confirm_description">All current scores will be lost if you start a new game!</string>
     <string name="reset_game">Reset Game</string>
     <string name="player_wins">%1$s Wins!</string>
+    <string name="delete_name_question">Delete \'%1$s\'?</string>
     <string name="find_winner">Find Winner</string>
     <string name="start_game">Start Game</string>
     <string name="players">Players</string>
@@ -14,6 +15,7 @@
     <string name="update">Update</string>
     <string name="cancel">Cancel</string>
     <string name="game">Game</string>
+    <string name="games">Games</string>
     <string name="change_score">Change Score</string>
     <string name="not_a_valid_score">Not a valid score</string>
     <string name="score_for">Score for %1$s</string>
@@ -52,10 +54,10 @@
     <string name="start_a_different_game">Start a different Game?</string>
     <string name="menu">Menu</string>
     <string name="edit">Edit</string>
-    <string name="apply">Apply</string>
     <string name="rounds">Rounds</string>
     <string name="display_value">Display Value</string>
     <string name="display_color">Display Color</string>
     <string name="back">Back</string>
-    <string name="create_new_game">Create New Game</string>
+    <string name="delete_game">Delete Game</string>
+    <string name="delete">Delete</string>
 </resources>

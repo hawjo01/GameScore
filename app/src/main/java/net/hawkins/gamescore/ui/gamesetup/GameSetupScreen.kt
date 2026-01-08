@@ -17,7 +17,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -27,7 +26,6 @@ import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
@@ -51,8 +49,10 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.data.model.Game
+import net.hawkins.gamescore.ui.component.BackNavigationIcon
 import net.hawkins.gamescore.ui.theme.Typography
 import net.hawkins.gamescore.utils.trimToNull
 
@@ -60,7 +60,6 @@ import net.hawkins.gamescore.utils.trimToNull
 fun GameSetupScreen(
     viewModel: GameSetupViewModel,
     onCancel: () -> Unit,
-    onModifyGame: () -> Unit,
     onSaveNewGame: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -69,14 +68,13 @@ fun GameSetupScreen(
     LaunchedEffect(Unit) {
         viewModel.updateTopAppBar(
             newNavigationIcon = {
-                NavigationIcon(onBack = onCancel)
+                BackNavigationIcon(onBack = onCancel)
             },
             newActions = {
                 AppBarActions(
                     screenMode = uiState.mode,
                     onEvent = { event: GameSetupUiEvent -> viewModel.onEvent(event) },
                     onSaveNewGame = onSaveNewGame,
-                    onModifyGame = onModifyGame,
                 )
             }
         )
@@ -93,20 +91,14 @@ fun GameSetupScreen(
 private fun AppBarActions(
     screenMode: GameSetupUiState.Mode,
     onEvent: (GameSetupUiEvent) -> Unit,
-    onModifyGame: () -> Unit,
     onSaveNewGame: () -> Unit,
 ) {
     val actionText: String
     val action: () -> Unit
     when (screenMode) {
-        GameSetupUiState.Mode.NEW -> {
+        GameSetupUiState.Mode.EDIT -> {
             actionText = stringResource(R.string.save)
             action = onSaveNewGame
-        }
-
-        GameSetupUiState.Mode.EDIT -> {
-            actionText = stringResource(R.string.apply)
-            action = onModifyGame
         }
 
         GameSetupUiState.Mode.VIEW -> {
@@ -121,7 +113,7 @@ private fun AppBarActions(
             contentColor = Color.Blue
         )
     ) {
-        Text(actionText)
+        Text(actionText, fontSize = 20.sp)
     }
 }
 
@@ -139,9 +131,6 @@ private fun GameSetupScreenContent(
             .verticalScroll(scrollState)
             .padding(horizontal = 10.dp)
     ) {
-        if (uiState.mode == GameSetupUiState.Mode.NEW) {
-            Text(stringResource(R.string.new_game), style = Typography.headlineLarge)
-        }
         NameCard(
             uiState = uiState,
             onEvent = onEvent,
@@ -707,12 +696,6 @@ private fun ColorTypeDropMenu(
     }
 }
 
-@Composable
-private fun NavigationIcon(onBack: () -> Unit) {
-    IconButton(onClick = { onBack() }) { // Or navigateUp()
-        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
-    }
-}
 
 @Preview
 @Composable

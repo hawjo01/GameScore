@@ -39,9 +39,9 @@ class GamePlaySetupViewModel @Inject constructor(
             is GamePlaySetupUiEvent.AddFavoritePlayer -> addFavoritePlayer(event.name)
             is GamePlaySetupUiEvent.DeleteFavoritePlayer -> deleteFavoritePlayer(event.name)
             is GamePlaySetupUiEvent.DeleteFavoriteGame -> deleteFavoriteGame(event.favoriteGameId)
+            is GamePlaySetupUiEvent.RefreshState -> refreshState()
             is GamePlaySetupUiEvent.SetGame -> setGame(event.game)
             is GamePlaySetupUiEvent.SetPlayers -> setPlayers(event.players)
-            is GamePlaySetupUiEvent.DeleteGame -> deleteSavedGame(event.id)
         }
     }
 
@@ -58,9 +58,9 @@ class GamePlaySetupViewModel @Inject constructor(
     }
 
     private fun removePlayer(position: Int) {
-        val updatedPlayerNames= _uiState.value.playerNames.removeElementAtIndex(position)
+        val updatedPlayerNames = _uiState.value.playerNames.removeElementAtIndex(position)
         _uiState.update { currentState ->
-            currentState.copy(playerNames = updatedPlayerNames )
+            currentState.copy(playerNames = updatedPlayerNames)
         }
     }
 
@@ -93,27 +93,24 @@ class GamePlaySetupViewModel @Inject constructor(
         }
     }
 
-    fun reloadGames() {
+    private fun reloadGames() {
+        val selectedGameId = _uiState.value.selectedGame.id
         val newGames = _gameRepository.getAll()
-        _uiState.update { currentState ->
-            currentState.copy(savedGames = newGames)
-        }
-    }
 
-    private fun deleteSavedGame(id: Int) {
-        _gameRepository.deleteById(id)
-        val selectedGame = if (_uiState.value.selectedGame.id == id) {
-            Game(name = "")
-        } else {
+        val selectedGame = if (newGames.firstOrNull { game -> game.id == selectedGameId } != null) {
             _uiState.value.selectedGame
+        } else {
+            Game(name = "")
         }
-
-        val newGames = _gameRepository.getAll()
         _uiState.update { currentState ->
             currentState.copy(
                 selectedGame = selectedGame,
                 savedGames = newGames
             )
         }
+    }
+
+    private fun refreshState() {
+        reloadGames()
     }
 }

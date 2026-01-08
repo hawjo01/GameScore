@@ -5,6 +5,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import net.hawkins.gamescore.data.FavoriteGameRepository
 import net.hawkins.gamescore.data.GameProgressRepository
+import net.hawkins.gamescore.data.GameRepository
 import net.hawkins.gamescore.data.model.Game
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -18,18 +19,18 @@ class GamePlayViewModelFiveCrownsTest {
 
     @MockK
     lateinit var favoriteGameRepository: FavoriteGameRepository
-
     @MockK
     lateinit var gameProgressRepository: GameProgressRepository
-
+    @MockK
+    lateinit var gameRepository: GameRepository
     lateinit var viewModel: GamePlayViewModel
-
     lateinit var fiveCrowns: Game
 
     @Before
     fun setUp() {
         favoriteGameRepository = mockk<FavoriteGameRepository>()
         gameProgressRepository = mockk<GameProgressRepository>()
+        gameRepository = mockk<GameRepository>()
 
         fiveCrowns = Game(
             name = "Five Crowns",
@@ -50,7 +51,8 @@ class GamePlayViewModelFiveCrownsTest {
 
         viewModel = GamePlayViewModel(
             _favoriteGameRepository = favoriteGameRepository,
-            gameProgressRepository = gameProgressRepository
+            gameProgressRepository = gameProgressRepository,
+            _gameRepository = gameRepository
         )
     }
 
