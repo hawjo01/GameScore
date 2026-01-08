@@ -5,6 +5,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -21,6 +21,9 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,22 +48,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.ui.component.ConfirmActionDialog
 import net.hawkins.gamescore.ui.favorites.FavoriteGamesCard
 import net.hawkins.gamescore.ui.theme.GoGreen
-import net.hawkins.gamescore.ui.theme.SkyBlue
 
 enum class GameSetupType(val labelId: Int) {
     FAVORITE(R.string.favorite), MANUAL(R.string.manual)
@@ -103,7 +101,7 @@ private fun GamePlaySetupScreenContent(
     Column {
         GameCard(
             games = uiState.savedGames,
-            game = uiState.selectedGame,
+            selectedGame = uiState.selectedGame,
             onEvent = onEvent,
             playerNames = uiState.playerNames,
             onStartGame = onStartGame,
@@ -162,13 +160,12 @@ private fun GamePlaySetupScreenContent(
 @Composable
 private fun GameCard(
     games: List<Game>,
-    game: Game,
+    selectedGame: Game,
     onEvent: (GamePlaySetupUiEvent) -> Unit,
     playerNames: List<String>,
     onStartGame: (Game, List<String>) -> Unit,
     modifier: Modifier
 ) {
-    var showGameSelectionDialog by remember { mutableStateOf(false) }
     Card(
         modifier = modifier.padding(all = 20.dp)
     ) {
@@ -184,25 +181,11 @@ private fun GameCard(
                     style = MaterialTheme.typography.labelMedium,
                     modifier = modifier.padding(end = 30.dp)
                 )
-                Text(
-                    text = if (game.name != "") game.name else stringResource(R.string.select_game),
-                    style = MaterialTheme.typography.bodyMedium.plus(
-                        TextStyle(
-                            color = SkyBlue, textDecoration = TextDecoration.Underline
-                        )
-                    ),
-                    modifier = modifier.clickable(
-                        onClick = { showGameSelectionDialog = true })
-                )
-            }
-
-            if (showGameSelectionDialog) {
-                GameSelectionDialog(
+                GameDropdownMenu(
                     games = games,
-                    onClickAction = { game ->
-                        onEvent(GamePlaySetupUiEvent.SetGame(game))
-                        showGameSelectionDialog = false
-                    }, onDismissRequest = { showGameSelectionDialog = false }, modifier = modifier
+                    selectedGame = selectedGame,
+                    onEvent = onEvent,
+                    modifier = modifier
                 )
             }
 
@@ -252,14 +235,14 @@ private fun GameCard(
             ) {
                 IconButton(
                     onClick = {
-                        onStartGame(game, playerNames)
+                        onStartGame(selectedGame, playerNames)
                     },
-                    enabled = game.name.isNotEmpty() && playerNames.isNotEmpty()
+                    enabled = selectedGame.name.isNotEmpty() && playerNames.isNotEmpty()
                 ) {
                     Icon(
                         imageVector = Icons.Filled.PlayArrow,
                         contentDescription = stringResource(R.string.start_game),
-                        tint = if (game.name.isNotEmpty() && playerNames.isNotEmpty()) {
+                        tint = if (selectedGame.name.isNotEmpty() && playerNames.isNotEmpty()) {
                             GoGreen
                         } else {
                             Color.Transparent
@@ -268,6 +251,55 @@ private fun GameCard(
 
                     )
                 }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun GameDropdownMenu(
+    games: List<Game>,
+    selectedGame: Game,
+    onEvent: (GamePlaySetupUiEvent) -> Unit,
+    modifier: Modifier
+) {
+    val (expanded, setExpanded) = remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { setExpanded(!expanded) },
+        modifier = modifier.fillMaxWidth(.9f)
+    ) {
+        val displayText =
+            if (selectedGame.name != "") selectedGame.name else stringResource(R.string.select_game)
+
+        TextButton(
+            onClick = { setExpanded(true) },
+            contentPadding = PaddingValues(0.dp),
+            colors = ButtonDefaults.textButtonColors(
+                contentColor = Color.Blue
+            ),
+        ) {
+            Text(
+                text = displayText,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { setExpanded(false) },
+            modifier = modifier.exposedDropdownSize()
+        ) {
+            games.sortedBy { game -> game.name }.forEach { game ->
+                DropdownMenuItem(
+                    text = { Text(text = game.name) },
+                    onClick = {
+                        onEvent(GamePlaySetupUiEvent.SetGame(game))
+                        setExpanded(false)
+                    }
+                )
             }
         }
     }
@@ -406,8 +438,6 @@ private fun PlayerSelection(
             }
         }
     }
-
-
 }
 
 @Composable
@@ -430,51 +460,6 @@ private fun ConfirmDeleteSavedPlayer(
         onConfirmation = onConfirmation,
         onDismissRequest = onDismissRequest
     )
-}
-
-@Composable
-private fun GameSelectionDialog(
-    games: List<Game>,
-    onClickAction: (Game) -> Unit,
-    onDismissRequest: () -> Unit,
-    modifier: Modifier
-) {
-    Dialog(onDismissRequest = { onDismissRequest() }) {
-        Card(
-            modifier = modifier.padding(16.dp),
-            shape = RoundedCornerShape(16.dp),
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = modifier.padding(top = 10.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.select_game),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                games.sortedBy { game -> game.name }.forEach { game ->
-                    Text(
-                        text = game.name,
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp, vertical = 10.dp)
-                            .clickable(
-                                onClick = { onClickAction(game) }),
-                        style = MaterialTheme.typography.labelMedium.plus(
-                            TextStyle(
-                                color = SkyBlue, textDecoration = TextDecoration.Underline
-                            )
-                        )
-                    )
-                }
-            }
-        }
-    }
 }
 
 @Composable

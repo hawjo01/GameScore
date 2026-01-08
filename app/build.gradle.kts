@@ -82,6 +82,7 @@ dependencies {
     implementation(libs.google.dagger.hilt)
     implementation(libs.androidx.compose.animation)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.foundation.layout)
     testImplementation(kotlin("test"))
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
