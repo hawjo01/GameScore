@@ -12,4 +12,3 @@ val Pink40 = Color(0xFF7D5260)
 
 val GoGreen = Color(red = 0, green = 128, blue = 0)
 val DeleteRed = Color(red = 255, green = 0, blue = 0)
-val SkyBlue = Color(red = 0, green = 150, blue = 255)
