@@ -60,4 +60,6 @@
     <string name="back">Back</string>
     <string name="delete_game">Delete Game</string>
     <string name="delete">Delete</string>
+    <string name="delete_favorite_game">Delete Favorite Game</string>
+    <string name="no_favorite_games">No Favorite Games</string>
 </resources>

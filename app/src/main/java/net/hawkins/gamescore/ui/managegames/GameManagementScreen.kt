@@ -98,7 +98,10 @@ private fun GameManagementScreenContent(
                     TextButton(
                         onClick = {
                             onViewGame(game)
-                        }
+                        },
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = Color.Blue
+                        ),
                     )
                     {
                         Text(

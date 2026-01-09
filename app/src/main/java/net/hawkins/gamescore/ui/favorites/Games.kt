@@ -1,6 +1,5 @@
 package net.hawkins.gamescore.ui.favorites
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +10,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -31,10 +31,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import net.hawkins.gamescore.R
@@ -44,7 +42,6 @@ import net.hawkins.gamescore.ui.component.ConfirmActionDialog
 import net.hawkins.gamescore.ui.gameplay.Player
 import net.hawkins.gamescore.ui.gameplaysetup.GamePlaySetupUiEvent
 import net.hawkins.gamescore.ui.theme.DeleteRed
-import net.hawkins.gamescore.ui.theme.SkyBlue
 import net.hawkins.gamescore.ui.theme.Typography
 
 @Composable
@@ -70,35 +67,34 @@ fun FavoriteGamesCard(
                     modifier = modifier.fillMaxWidth()
                 ) {
                     Column {
-                        Text(
-                            text = favorite.name,
-                            modifier = modifier
-                                .padding(horizontal = 20.dp, vertical = 10.dp)
-                                .clickable(
-                                    onClick = { onFavoriteSelected(favorite) }
-                                ),
-                            style = MaterialTheme.typography.labelMedium.plus(
-                                TextStyle(
-                                    color = SkyBlue,
-                                    textDecoration = TextDecoration.Underline
-                                )
+                        TextButton(
+                            onClick = { onFavoriteSelected(favorite) },
+                            colors = ButtonDefaults.textButtonColors(
+                                contentColor = Color.Blue
+                            ),
+                        ) {
+                            Text(
+                                text = favorite.name,
+                                modifier = modifier
+                                    .padding(horizontal = 20.dp, vertical = 10.dp),
+                                style = MaterialTheme.typography.labelMedium
                             )
-                        )
+                        }
                     }
                     Column {
-                        IconButton(onClick = { showDeleteFavoriteGame = true}) {
+                        IconButton(onClick = { showDeleteFavoriteGame = true }) {
                             Icon(
                                 Icons.Filled.Delete,
                                 tint = DeleteRed,
-                                contentDescription = "Delete ${favorite.name}"
+                                contentDescription = stringResource(R.string.delete_name_question, favorite.name)
                             )
                         }
                     }
                 }
                 if (showDeleteFavoriteGame) {
                     ConfirmActionDialog(
-                        title = "Delete Favorite Game",
-                        description = "Delete '" + favorite.name + "'",
+                        title = stringResource(R.string.delete_favorite_game),
+                        description = stringResource(R.string.delete_name_question, favorite.name),
                         onConfirmation = {
                             onEvent(GamePlaySetupUiEvent.DeleteFavoriteGame(favorite.id!!))
                             showDeleteFavoriteGame = false
@@ -113,7 +109,7 @@ fun FavoriteGamesCard(
                 modifier = modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "No Favorite Games",
+                    text = stringResource(R.string.no_favorite_games),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -145,7 +141,7 @@ fun SaveFavoriteGame(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "Save Favorite Game?",
+                    text = stringResource(R.string.save_favorite_game),
                     style = Typography.titleMedium
                 )
             }
