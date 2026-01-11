@@ -174,6 +174,15 @@ fun SaveFavoriteGame(
                         focusedTextColor = Color.Unspecified,
                         unfocusedTextColor = Color.Unspecified
                     ),
+                    isError = favoriteName.isBlank(),
+                    supportingText = {
+                        if (favoriteName.isBlank()) {
+                            Text(
+                                text = stringResource(R.string.required),
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    },
                     modifier = Modifier.padding(top = 10.dp)
                 )
             }
