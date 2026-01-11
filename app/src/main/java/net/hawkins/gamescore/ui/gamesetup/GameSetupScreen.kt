@@ -60,7 +60,7 @@ import net.hawkins.gamescore.utils.trimToNull
 fun GameSetupScreen(
     viewModel: GameSetupViewModel,
     onCancel: () -> Unit,
-    onSaveNewGame: () -> Unit,
+    onSaveGame: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -72,9 +72,7 @@ fun GameSetupScreen(
             },
             newActions = {
                 AppBarActions(
-                    screenMode = uiState.mode,
-                    onEvent = { event: GameSetupUiEvent -> viewModel.onEvent(event) },
-                    onSaveNewGame = onSaveNewGame,
+                    onSaveGame = onSaveGame,
                 )
             }
         )
@@ -89,31 +87,15 @@ fun GameSetupScreen(
 
 @Composable
 private fun AppBarActions(
-    screenMode: GameSetupUiState.Mode,
-    onEvent: (GameSetupUiEvent) -> Unit,
-    onSaveNewGame: () -> Unit,
+    onSaveGame: () -> Unit,
 ) {
-    val actionText: String
-    val action: () -> Unit
-    when (screenMode) {
-        GameSetupUiState.Mode.EDIT -> {
-            actionText = stringResource(R.string.save)
-            action = onSaveNewGame
-        }
-
-        GameSetupUiState.Mode.VIEW -> {
-            actionText = stringResource(R.string.edit)
-            action = { onEvent(GameSetupUiEvent.SetScreenMode(GameSetupUiState.Mode.EDIT)) }
-        }
-    }
-
     TextButton(
-        onClick = action,
+        onClick = onSaveGame,
         colors = ButtonDefaults.textButtonColors(
             contentColor = Color.Blue
         )
     ) {
-        Text(actionText, fontSize = 20.sp)
+        Text(stringResource(R.string.save), fontSize = 20.sp)
     }
 }
 
@@ -190,7 +172,6 @@ private fun NameCard(
                     onDone = {
                         hideKeyboard.invoke()
                     }),
-                readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
                 modifier = modifier
             )
         }
@@ -218,7 +199,6 @@ private fun DisplayColorsCard(
                     )
                 )
             },
-            readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
         ColorTypeDropMenu(
@@ -231,7 +211,6 @@ private fun DisplayColorsCard(
                     )
                 )
             },
-            readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
     }
@@ -254,7 +233,6 @@ private fun ConstraintCard(
                 { newCheckedState ->
                     onEvent(GameSetupUiEvent.SetConstraintPositiveOnlyScores(newCheckedState))
                 },
-            readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
         SwitchWithLabel(
@@ -263,7 +241,6 @@ private fun ConstraintCard(
             onCheckedChange = { newCheckedState ->
                 onEvent(GameSetupUiEvent.SetConstraintEqualHandSizes(newCheckedState))
             },
-            readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
         NullableIntOutlinedTextFieldRow(
@@ -276,7 +253,6 @@ private fun ConstraintCard(
                     )
                 )
             },
-            readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
     }
@@ -372,21 +348,18 @@ private fun ObjectiveCard(
                     )
                 )
             },
-            readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
         NullableIntOutlinedTextFieldRow(
             label = stringResource(R.string.goal),
             number = uiState.game.objective.goal,
             onValueChange = { goal: Int? -> onEvent(GameSetupUiEvent.SetObjectiveGoal(goal)) },
-            readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
         NullableIntOutlinedTextFieldRow(
             label = stringResource(R.string.rounds),
             number = uiState.game.objective.rounds,
             onValueChange = { rounds: Int? -> onEvent(GameSetupUiEvent.SetObjectiveRounds(rounds)) },
-            readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
     }
@@ -407,14 +380,12 @@ private fun RoundObjectiveCard(
             label = stringResource(R.string.goal),
             number = uiState.game.roundObjective.goal,
             onValueChange = { value -> onEvent(GameSetupUiEvent.SetRoundObjectiveGoal(value)) },
-            readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
         NullableStringOutlinedTextFieldRow(
             label = stringResource(R.string.display_value),
             value = uiState.game.roundObjective.displayValue,
             onValueChange = { value -> onEvent(GameSetupUiEvent.SetRoundObjectiveDisplayValue(value)) },
-            readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
         ColorTypeDropMenu(
@@ -427,7 +398,6 @@ private fun RoundObjectiveCard(
                     )
                 )
             },
-            readOnly = uiState.mode == GameSetupUiState.Mode.VIEW,
             modifier = modifier
         )
     }
@@ -438,7 +408,6 @@ private fun NullableStringOutlinedTextFieldRow(
     label: String,
     value: String?,
     onValueChange: (String?) -> Unit,
-    readOnly: Boolean,
     modifier: Modifier
 ) {
     GameSectionRow(modifier = modifier) {
@@ -446,7 +415,6 @@ private fun NullableStringOutlinedTextFieldRow(
             label = label,
             value = value,
             onValueChange = onValueChange,
-            readOnly = readOnly,
             modifier = modifier
         )
     }
@@ -457,7 +425,6 @@ private fun NullableStringOutlinedTextField(
     label: String,
     value: String?,
     onValueChange: (String?) -> Unit,
-    readOnly: Boolean,
     modifier: Modifier
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -477,7 +444,6 @@ private fun NullableStringOutlinedTextField(
             onDone = {
                 hideKeyboard.invoke()
             }),
-        readOnly = readOnly,
         modifier = modifier
     )
 }
@@ -487,7 +453,6 @@ private fun NullableIntOutlinedTextField(
     label: String,
     number: Int?,
     onValueChange: (Int?) -> Unit,
-    readOnly: Boolean,
     modifier: Modifier
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -513,7 +478,6 @@ private fun NullableIntOutlinedTextField(
             onDone = {
                 hideKeyboard.invoke()
             }),
-        readOnly = readOnly,
         modifier = modifier
     )
 }
@@ -523,7 +487,6 @@ private fun NullableIntOutlinedTextFieldRow(
     label: String,
     number: Int?,
     onValueChange: (Int?) -> Unit,
-    readOnly: Boolean,
     modifier: Modifier
 ) {
     GameSectionRow(
@@ -534,7 +497,6 @@ private fun NullableIntOutlinedTextFieldRow(
             label = label,
             number = number,
             onValueChange = onValueChange,
-            readOnly = readOnly,
             modifier = modifier
         )
     }
@@ -545,7 +507,6 @@ private fun SwitchWithLabel(
     label: String,
     initialState: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    readOnly: Boolean,
     modifier: Modifier
 ) {
     GameSectionRow(
@@ -559,8 +520,7 @@ private fun SwitchWithLabel(
             onCheckedChange = {
                 setCheckedState(it)
                 onCheckedChange(it)
-            },
-            enabled = !readOnly
+            }
         )
         Text(
             text = label,
@@ -575,7 +535,6 @@ private fun SwitchWithLabel(
 private fun ObjectiveTypeDropMenu(
     value: Game.Objective.Type,
     onObjectiveTypeChange: (Game.Objective.Type) -> Unit,
-    readOnly: Boolean,
     modifier: Modifier
 ) {
     GameSectionRow(
@@ -587,11 +546,7 @@ private fun ObjectiveTypeDropMenu(
 
         ExposedDropdownMenuBox(
             expanded = expanded,
-            onExpandedChange = {
-                if (!readOnly) {
-                    setExpanded(!expanded)
-                }
-            }
+            onExpandedChange = { setExpanded(!expanded) }
         ) {
             OutlinedTextField(
                 value = selectedText,
@@ -647,7 +602,6 @@ private fun ColorTypeDropMenu(
     label: String,
     value: Game.Colors.Color,
     onChange: (Game.Colors.Color) -> Unit,
-    readOnly: Boolean,
     modifier: Modifier
 ) {
     GameSectionRow(
@@ -659,11 +613,7 @@ private fun ColorTypeDropMenu(
 
         ExposedDropdownMenuBox(
             expanded = expanded,
-            onExpandedChange = {
-                if (!readOnly) {
-                    setExpanded(!expanded)
-                }
-            }
+            onExpandedChange = { setExpanded(!expanded) }
         ) {
             OutlinedTextField(
                 value = selectedText,

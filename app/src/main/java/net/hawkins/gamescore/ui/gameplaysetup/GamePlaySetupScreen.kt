@@ -177,7 +177,7 @@ private fun GameCard(
                 modifier = modifier.padding(start = 10.dp, top = 10.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.game) + ":",
+                    text = stringResource(R.string.game),
                     style = MaterialTheme.typography.labelMedium,
                     modifier = modifier.padding(end = 30.dp)
                 )
@@ -194,7 +194,7 @@ private fun GameCard(
             ) {
                 Column {
                     Text(
-                        text = stringResource(R.string.players) + ":",
+                        text = stringResource(R.string.players),
                         style = MaterialTheme.typography.labelMedium,
                         modifier = modifier.padding(top = 10.dp, end = 10.dp)
                     )

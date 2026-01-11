@@ -37,7 +37,6 @@ class GameSetupViewModel @Inject constructor(
             is GameSetupUiEvent.SetRoundObjectiveDisplayColor -> setRoundObjectiveDisplayColor(event.color)
             is GameSetupUiEvent.SetDisplayNegativeColor -> setDisplayNegative(event.color)
             is GameSetupUiEvent.SetDisplayPositiveColor -> setDisplayPositive(event.color)
-            is GameSetupUiEvent.SetScreenMode -> setMode(event.mode)
             is GameSetupUiEvent.NewGame -> newGame()
             is GameSetupUiEvent.SetGame -> setGame(event.game)
         }
@@ -189,14 +188,6 @@ class GameSetupViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(
                 game = newGame
-            )
-        }
-    }
-
-    private fun setMode(newMode: GameSetupUiState.Mode) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                mode = newMode
             )
         }
     }
