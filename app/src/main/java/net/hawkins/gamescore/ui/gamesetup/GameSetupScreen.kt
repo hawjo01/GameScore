@@ -26,6 +26,7 @@ import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
@@ -73,6 +74,7 @@ fun GameSetupScreen(
             newActions = {
                 AppBarActions(
                     onSaveGame = onSaveGame,
+                    saveEnabled = uiState.isValidName
                 )
             }
         )
@@ -87,13 +89,15 @@ fun GameSetupScreen(
 
 @Composable
 private fun AppBarActions(
-    onSaveGame: () -> Unit,
+    saveEnabled: Boolean,
+    onSaveGame: () -> Unit
 ) {
     TextButton(
         onClick = onSaveGame,
         colors = ButtonDefaults.textButtonColors(
             contentColor = Color.Blue
-        )
+        ),
+        enabled = saveEnabled
     ) {
         Text(stringResource(R.string.save), fontSize = 20.sp)
     }
@@ -172,6 +176,15 @@ private fun NameCard(
                     onDone = {
                         hideKeyboard.invoke()
                     }),
+                isError = !uiState.isValidName,
+                supportingText = {
+                    if (!uiState.isValidName) {
+                        Text(
+                            text = stringResource(R.string.required),
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                },
                 modifier = modifier
             )
         }
