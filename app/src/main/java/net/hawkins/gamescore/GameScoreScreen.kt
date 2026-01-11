@@ -30,7 +30,6 @@ import net.hawkins.gamescore.ui.gameplaysetup.GamePlaySetupUiEvent
 import net.hawkins.gamescore.ui.gameplaysetup.GamePlaySetupViewModel
 import net.hawkins.gamescore.ui.gamesetup.GameSetupScreen
 import net.hawkins.gamescore.ui.gamesetup.GameSetupUiEvent
-import net.hawkins.gamescore.ui.gamesetup.GameSetupUiState
 import net.hawkins.gamescore.ui.gamesetup.GameSetupViewModel
 import net.hawkins.gamescore.ui.managegames.GameManagementScreen
 import net.hawkins.gamescore.ui.managegames.GameManagementViewModel
@@ -136,7 +135,6 @@ fun GameScoreScreen(
                     },
                     onShowGameDetails = { game ->
                         gameSetupViewModel.onEvent(GameSetupUiEvent.SetGame(game))
-                        gameSetupViewModel.onEvent(GameSetupUiEvent.SetScreenMode(GameSetupUiState.Mode.VIEW))
                         navController.navigate(GameScoreScreen.GameSetup.name)
                     }
                 )
@@ -148,7 +146,7 @@ fun GameScoreScreen(
                     onCancel = {
                         navController.popBackStack()
                     },
-                    onSaveNewGame = {
+                    onSaveGame = {
                         val game = gameSetupViewModel.saveGame()
                         gamePlaySetupViewModel.onEvent(GamePlaySetupUiEvent.SetGame(game))
                         navController.popBackStack()
@@ -167,7 +165,6 @@ fun GameScoreScreen(
                         navController.navigate(GameScoreScreen.GameSetup.name)
                     },
                     onViewGame = { game ->
-                        gameSetupViewModel.onEvent(GameSetupUiEvent.SetScreenMode(GameSetupUiState.Mode.VIEW))
                         gameSetupViewModel.onEvent(GameSetupUiEvent.SetGame(game))
                         navController.navigate(GameScoreScreen.GameSetup.name)
                     }

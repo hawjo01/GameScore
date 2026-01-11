@@ -152,18 +152,6 @@ class GameSetupViewModelTest {
     }
 
     @Test
-    fun setMode() {
-        val uiState = viewModel.uiState
-        assertEquals(GameSetupUiState.Mode.EDIT, uiState.value.mode)
-
-        viewModel.onEvent(GameSetupUiEvent.SetScreenMode(GameSetupUiState.Mode.VIEW))
-        assertEquals(GameSetupUiState.Mode.VIEW, uiState.value.mode)
-
-        viewModel.onEvent(GameSetupUiEvent.SetScreenMode(GameSetupUiState.Mode.EDIT))
-        assertEquals(GameSetupUiState.Mode.EDIT, uiState.value.mode)
-    }
-
-    @Test
     fun setAndGetAndResetGame() {
         val game = Game(
             id = 1,
