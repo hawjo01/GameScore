@@ -23,13 +23,7 @@ class GamePlaySetupViewModel @Inject constructor(
     val uiState: StateFlow<GamePlaySetupUiState> = _uiState.asStateFlow()
 
     init {
-        _uiState.update { currentState ->
-            currentState.copy(
-                favoritePlayerNames = _playerRepository.getAll(),
-                favoriteGames = _favoriteGameRepository.getAll(),
-                savedGames = _gameRepository.getAll()
-            )
-        }
+        refreshState()
     }
 
     fun onEvent(event: GamePlaySetupUiEvent) {
@@ -93,7 +87,7 @@ class GamePlaySetupViewModel @Inject constructor(
         }
     }
 
-    private fun reloadGames() {
+    private fun refreshState() {
         val selectedGameId = _uiState.value.selectedGame.id
         val newGames = _gameRepository.getAll()
 
@@ -105,12 +99,11 @@ class GamePlaySetupViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(
                 selectedGame = selectedGame,
-                savedGames = newGames
+                savedGames = newGames,
+                favoritePlayerNames = _playerRepository.getAll(),
+                favoriteGames = _favoriteGameRepository.getAll(),
             )
         }
-    }
 
-    private fun refreshState() {
-        reloadGames()
     }
 }
