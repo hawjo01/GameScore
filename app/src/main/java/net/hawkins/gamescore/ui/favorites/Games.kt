@@ -275,6 +275,6 @@ internal fun buildFavoriteName(
     val sb = StringBuilder()
     sb.append(game.name)
     sb.append(" - ")
-    sb.append(players.map { player -> player.name }.joinToString())
+    sb.append(players.joinToString { player -> player.name })
     return sb.toString()
 }
