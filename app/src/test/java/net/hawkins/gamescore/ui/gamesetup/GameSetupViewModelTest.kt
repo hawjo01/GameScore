@@ -158,7 +158,7 @@ class GameSetupViewModelTest {
     }
 
     @Test
-    fun setAndGetAndResetGame() {
+    fun setAndResetGame() {
         val game = Game(
             id = 1,
             name = "Game Name",
@@ -184,23 +184,23 @@ class GameSetupViewModelTest {
         )
 
         viewModel.onEvent(GameSetupUiEvent.SetGame(game))
-        val storedGame = viewModel.getGame()
-        assertEquals(1, storedGame.id)
-        assertEquals("Game Name", storedGame.name)
-        assertEquals(Game.Objective.Type.LOW_SCORE, storedGame.objective.type)
-        assertEquals(500, storedGame.objective.goal)
-        assertEquals(5, storedGame.objective.rounds)
-        assertEquals(1, storedGame.roundObjective.goal)
-        assertEquals("Win", storedGame.roundObjective.displayValue)
-        assertEquals(Game.Colors.Color.GREEN, storedGame.roundObjective.displayColor)
-        assertTrue(storedGame.constraints.positiveOnly)
-        assertEquals(4, storedGame.constraints.multipleOf)
-        assertFalse(storedGame.constraints.equalHandSizes)
-        assertEquals(Game.Colors.Color.GREEN, storedGame.color.negativeScore)
-        assertEquals(Game.Colors.Color.RED, storedGame.color.positiveScore)
+        val uiState = viewModel.uiState
+        assertEquals(1, uiState.value.game.id)
+        assertEquals("Game Name", uiState.value.game.name)
+        assertEquals(Game.Objective.Type.LOW_SCORE, uiState.value.game.objective.type)
+        assertEquals(500, uiState.value.game.objective.goal)
+        assertEquals(5, uiState.value.game.objective.rounds)
+        assertEquals(1, uiState.value.game.roundObjective.goal)
+        assertEquals("Win", uiState.value.game.roundObjective.displayValue)
+        assertEquals(Game.Colors.Color.GREEN, uiState.value.game.roundObjective.displayColor)
+        assertTrue(uiState.value.game.constraints.positiveOnly)
+        assertEquals(4, uiState.value.game.constraints.multipleOf)
+        assertFalse(uiState.value.game.constraints.equalHandSizes)
+        assertEquals(Game.Colors.Color.GREEN, uiState.value.game.color.negativeScore)
+        assertEquals(Game.Colors.Color.RED, uiState.value.game.color.positiveScore)
+        assertTrue(uiState.value.isValidName)
 
         viewModel.onEvent(GameSetupUiEvent.NewGame)
-        val uiState = viewModel.uiState
         assertNull(uiState.value.game.id)
         assertEquals("", uiState.value.game.name)
         assertEquals(Game.Objective.Type.HIGH_SCORE, uiState.value.game.objective.type)
@@ -214,5 +214,6 @@ class GameSetupViewModelTest {
         assertTrue(uiState.value.game.constraints.equalHandSizes)
         assertEquals(Game.Colors.Color.DEFAULT, uiState.value.game.color.negativeScore)
         assertEquals(Game.Colors.Color.DEFAULT, uiState.value.game.color.positiveScore)
+        assertFalse(uiState.value.isValidName)
     }
 }
