@@ -20,6 +20,13 @@ class GameSetupViewModel @Inject constructor(
     val uiState: StateFlow<GameSetupUiState> = _uiState.asStateFlow()
 
     fun saveGame(): Game {
+        if (_uiState.value.game.name.isBlank()) {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    isValidName = false
+                )
+            }
+        }
         return _gameRepository.save(_uiState.value.game)
     }
 
@@ -43,11 +50,13 @@ class GameSetupViewModel @Inject constructor(
     }
 
     private fun setGameName(newName: String) {
+        val isValidName = newName.isNotBlank()
         val currentGame = _uiState.value.game
         val newGame = currentGame.copy(name = newName)
         _uiState.update { currentState ->
             currentState.copy(
-                game = newGame
+                game = newGame,
+                isValidName = isValidName
             )
         }
     }

@@ -29,9 +29,15 @@ class GameSetupViewModelTest {
     fun setGameName() {
         val uiState = viewModel.uiState
         assertEquals("", uiState.value.game.name)
+        assertFalse(uiState.value.isValidName)
 
         viewModel.onEvent(GameSetupUiEvent.SetGameName("Game Name"))
         assertEquals("Game Name", uiState.value.game.name)
+        assertTrue(uiState.value.isValidName)
+
+        viewModel.onEvent(GameSetupUiEvent.SetGameName(""))
+        assertEquals("", uiState.value.game.name)
+        assertFalse(uiState.value.isValidName)
     }
 
     @Test
