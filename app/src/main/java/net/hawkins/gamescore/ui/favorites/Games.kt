@@ -86,7 +86,10 @@ fun FavoriteGamesCard(
                             Icon(
                                 Icons.Filled.Delete,
                                 tint = DeleteRed,
-                                contentDescription = stringResource(R.string.delete_name_question, favorite.name)
+                                contentDescription = stringResource(
+                                    R.string.delete_name_question,
+                                    favorite.name
+                                )
                             )
                         }
                     }
@@ -130,7 +133,7 @@ fun SaveFavoriteGame(
                 .padding(16.dp),
             shape = RoundedCornerShape(16.dp),
         ) {
-            var favoriteName by remember { mutableStateOf("") }
+            var favoriteName by remember { mutableStateOf(buildFavoriteName(game, players)) }
             val keyboardController = LocalSoftwareKeyboardController.current
             val hideKeyboard = { keyboardController?.hide() }
 
@@ -263,4 +266,15 @@ fun SaveFavoriteGame(
             }
         }
     }
+}
+
+internal fun buildFavoriteName(
+    game: Game,
+    players: List<Player>
+): String {
+    val sb = StringBuilder()
+    sb.append(game.name)
+    sb.append(" - ")
+    sb.append(players.map { player -> player.name }.joinToString())
+    return sb.toString()
 }
