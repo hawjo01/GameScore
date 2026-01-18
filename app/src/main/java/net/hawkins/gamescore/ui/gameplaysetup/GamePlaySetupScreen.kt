@@ -231,7 +231,9 @@ private fun GameCard(
                                     onConfirmation = {
                                         onEvent(GamePlaySetupUiEvent.RemovePlayer(index))
                                         showConfirmRemovePlayer = false
-                                    })
+                                    },
+                                    modifier = modifier
+                                )
                             }
                         }
                     }
@@ -388,7 +390,9 @@ private fun PlayerSelection(
                             onConfirmation = {
                                 onEvent(GamePlaySetupUiEvent.DeleteFavoritePlayer(name))
                                 showDeleteSavedPlayer = false
-                            })
+                            },
+                            modifier = modifier
+                        )
                     }
                 }
             }
@@ -449,23 +453,30 @@ private fun PlayerSelection(
 
 @Composable
 private fun ConfirmRemovePlayer(
-    onDismissRequest: () -> Unit, onConfirmation: () -> Unit
+    onConfirmation: () -> Unit,
+    onDismissRequest: () -> Unit,
+    modifier: Modifier
 ) {
     ConfirmActionDialog(
         title = stringResource(R.string.remove_player),
         onConfirmation = onConfirmation,
-        onDismissRequest = onDismissRequest
+        onDismissRequest = onDismissRequest,
+        modifier = modifier
     )
 }
 
 @Composable
 private fun ConfirmDeleteSavedPlayer(
-    name: String, onDismissRequest: () -> Unit, onConfirmation: () -> Unit
+    name: String,
+    onConfirmation: () -> Unit,
+    onDismissRequest: () -> Unit,
+    modifier: Modifier
 ) {
     ConfirmActionDialog(
         title = stringResource(R.string.delete_saved_player, name),
         onConfirmation = onConfirmation,
-        onDismissRequest = onDismissRequest
+        onDismissRequest = onDismissRequest,
+        modifier = modifier
     )
 }
 

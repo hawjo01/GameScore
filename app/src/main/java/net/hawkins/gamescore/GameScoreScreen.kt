@@ -70,6 +70,7 @@ private fun GameScoreAppBar(
 
 @Composable
 fun GameScoreScreen(
+    modifier: Modifier = Modifier,
     gamePlaySetupViewModel: GamePlaySetupViewModel = viewModel(),
     gamePlayViewModel: GamePlayViewModel = viewModel(),
     gameSetupViewModel: GameSetupViewModel = viewModel(),
@@ -95,7 +96,8 @@ fun GameScoreScreen(
                     navController.navigate(GameScoreScreen.GamePlay.name)
                     setShowGameInProgressDialog(false)
                 },
-                onDismissRequest = { setShowGameInProgressDialog(false) }
+                onDismissRequest = { setShowGameInProgressDialog(false) },
+                modifier = modifier
             )
         }
         NavHost(
@@ -175,7 +177,8 @@ fun GameScoreScreen(
 @Composable
 private fun ResumeGameInProgress(
     onResumeGame: () -> Unit,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
+    modifier: Modifier
 ) {
     ConfirmActionDialog(
         title = stringResource(R.string.game_in_progress),
@@ -183,6 +186,7 @@ private fun ResumeGameInProgress(
         confirmLabel = stringResource(R.string.yes),
         dismissLabel = stringResource(R.string.no),
         onConfirmation = onResumeGame,
-        onDismissRequest = onDismissRequest
+        onDismissRequest = onDismissRequest,
+        modifier = modifier
     )
 }
