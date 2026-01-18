@@ -44,6 +44,7 @@ class GamePlayViewModel @Inject constructor(
             is GamePlayUiEvent.ResetGame -> resetGame()
             is GamePlayUiEvent.RefreshState -> refreshState()
             is GamePlayUiEvent.DetermineWinner -> determineWinner()
+            is GamePlayUiEvent.ShowRoundNumber -> showRoundNumber(event.showRoundNumber)
         }
     }
 
@@ -170,6 +171,14 @@ class GamePlayViewModel @Inject constructor(
                 game = game,
                 players = updatedPlayers,
                 winner = updatedWinner
+            )
+        }
+    }
+
+    private fun showRoundNumber(showRoundNumber: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                showRoundNumber = showRoundNumber
             )
         }
     }

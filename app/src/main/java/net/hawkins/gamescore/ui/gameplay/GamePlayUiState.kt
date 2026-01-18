@@ -6,7 +6,8 @@ import net.hawkins.gamescore.data.model.Game
 data class GamePlayUiState(
     val game: Game,
     val players: List<Player>,
-    val winner: String? = null
+    val winner: String? = null,
+    val showRoundNumber: Boolean = false
 ) {
     fun numberOfRounds(): Int {
         return players.maxBy { player -> player.scores.size }.scores.size
