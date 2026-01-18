@@ -43,9 +43,11 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -455,7 +457,12 @@ private fun ChangeScore(
     onDismissRequest: () -> Unit,
     modifier: Modifier
 ) {
-    val (newScore, setNewScore) = remember { mutableStateOf(currentScore.toString()) }
+    val (newScore, setNewScore) = remember { mutableStateOf(
+        TextFieldValue(
+            text = currentScore.toString(),
+            selection = TextRange(currentScore.toString().length) // Set cursor to the end
+        )
+    )}
     val (warnInvalidScore, setWarnInvalidScore) = remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val hideKeyboard = { keyboardController?.hide() }
@@ -470,7 +477,7 @@ private fun ChangeScore(
                 value = newScore,
                 onValueChange = { newValue ->
                     setNewScore(newValue)
-                    setWarnInvalidScore(!isValidScore(newValue))
+                    setWarnInvalidScore(!isValidScore(newValue.text))
                 },
                 label = {
                     Text(
@@ -500,8 +507,8 @@ private fun ChangeScore(
                     }
                 ),
                 colors = TextFieldDefaults.colors(
-                    focusedTextColor = if (newScore.isNegativeInt() || newScore == "-") Color.Red else Color.Unspecified,
-                    unfocusedTextColor = if (newScore.isNegativeInt() || newScore == "-") Color.Red else Color.Unspecified
+                    focusedTextColor = if (newScore.text.isNegativeInt() || newScore.text == "-") Color.Red else Color.Unspecified,
+                    unfocusedTextColor = if (newScore.text.isNegativeInt() || newScore.text == "-") Color.Red else Color.Unspecified
                 ),
                 modifier = modifier
                     .focusRequester(focusRequester)
@@ -515,13 +522,13 @@ private fun ChangeScore(
         confirmButton = {
             TextButton(
                 onClick = {
-                    if (isValidScore(newScore)) {
+                    if (isValidScore(newScore.text)) {
                         setWarnInvalidScore(false)
-                        onChangeScore(newScore.toInt())
+                        onChangeScore(newScore.text.toInt())
                         onDismissRequest()
                     }
                 },
-                enabled = isValidScore(newScore),
+                enabled = newScore.text != currentScore.toString() && isValidScore(newScore.text),
                 modifier = modifier.padding(8.dp),
             ) {
                 Text(stringResource(R.string.update))
