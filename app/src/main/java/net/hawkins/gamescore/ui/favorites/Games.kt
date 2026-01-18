@@ -57,8 +57,15 @@ fun FavoriteGamesCard(
         ),
         modifier = modifier.padding(all = 10.dp)
     ) {
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp)
+        ) {
+            Text(text = stringResource(R.string.favorite_games))
+        }
         if (favoriteGames.isNotEmpty()) {
-
             favoriteGames.sortedBy { game -> game.name }.forEach { favorite ->
                 var showDeleteFavoriteGame by remember { mutableStateOf(false) }
                 Row(

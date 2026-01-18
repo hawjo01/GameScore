@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -61,7 +62,7 @@ import net.hawkins.gamescore.ui.favorites.FavoriteGamesCard
 import net.hawkins.gamescore.ui.theme.GoGreen
 
 enum class GameSetupType(val labelId: Int) {
-    FAVORITE(R.string.favorite), MANUAL(R.string.manual)
+    FAVORITES(R.string.favorites), PLAYERS(R.string.players)
 }
 
 @Composable
@@ -110,7 +111,7 @@ private fun GamePlaySetupScreenContent(
 
         var selectedSetupType by remember {
             mutableStateOf(
-                if (uiState.favoriteGames.isNotEmpty()) GameSetupType.FAVORITE else GameSetupType.MANUAL
+                if (uiState.favoriteGames.isNotEmpty()) GameSetupType.FAVORITES else GameSetupType.PLAYERS
             )
         }
 
@@ -120,7 +121,7 @@ private fun GamePlaySetupScreenContent(
             Row(
                 horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()
             ) {
-                val gameSetupTypes = listOf(GameSetupType.FAVORITE, GameSetupType.MANUAL)
+                val gameSetupTypes = listOf(GameSetupType.FAVORITES, GameSetupType.PLAYERS)
 
                 SingleChoiceSegmentedButtonRow {
                     gameSetupTypes.forEachIndexed { index, gameSetupType ->
@@ -135,8 +136,17 @@ private fun GamePlaySetupScreenContent(
                     }
                 }
             }
-
-            if (selectedSetupType == GameSetupType.FAVORITE) {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp)
+            ) {
+                HorizontalDivider(
+                    modifier = modifier.padding(all = 20.dp), color = Color.Gray, thickness = 5.dp
+                )
+            }
+            if (selectedSetupType == GameSetupType.FAVORITES) {
                 FavoriteGamesCard(
                     favoriteGames = uiState.favoriteGames,
                     onEvent = onEvent,
@@ -147,8 +157,8 @@ private fun GamePlaySetupScreenContent(
                     })
             }
 
-            if (selectedSetupType == GameSetupType.MANUAL) {
-                ManualGameSelection(
+            if (selectedSetupType == GameSetupType.PLAYERS) {
+                PlayersCard(
                     favoritePlayers = uiState.favoritePlayerNames,
                     onEvent = onEvent,
                 )
@@ -306,16 +316,23 @@ private fun GameDropdownMenu(
 }
 
 @Composable
-private fun ManualGameSelection(
+private fun PlayersCard(
     favoritePlayers: List<String>,
     onEvent: (GamePlaySetupUiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    PlayerSelection(
-        favoritePlayers = favoritePlayers,
-        onEvent = onEvent,
-        modifier = modifier
-    )
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Transparent
+        ),
+        modifier = modifier.padding(all = 10.dp)
+    ) {
+        PlayerSelection(
+            favoritePlayers = favoritePlayers,
+            onEvent = onEvent,
+            modifier = modifier
+        )
+    }
 }
 
 @Composable
@@ -335,17 +352,7 @@ private fun PlayerSelection(
             .fillMaxWidth()
             .padding(top = 10.dp)
     ) {
-        HorizontalDivider(
-            modifier = modifier.padding(all = 20.dp), color = Color.Gray, thickness = 5.dp
-        )
-    }
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(top = 10.dp)
-    ) {
-        Text(text = stringResource(R.string.choose_players))
+        Text(text = stringResource(R.string.players))
     }
     Row {
         LazyColumn {

@@ -21,10 +21,9 @@
     <string name="score_for">Score for %1$s</string>
     <string name="save">Save</string>
     <string name="delete_saved_player">Delete %1$s from saved players?</string>
-    <string name="favorite">Favorite</string>
-    <string name="manual">Manual</string>
+    <string name="favorites">Favorites</string>
+    <string name="favorite_games">Favorite Games</string>
     <string name="name">Name</string>
-    <string name="choose_players">Choose Players</string>
     <string name="select_game">Select Game</string>
     <string name="delete_score">Delete Score</string>
     <string name="delete_score_for_player">Delete score %1$s for %2$s</string>
