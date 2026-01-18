@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
@@ -41,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -48,8 +50,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.hawkins.gamescore.R
@@ -88,6 +92,14 @@ fun GamePlayScreen(
                         )
                     },
                     resetGame = { viewModel.onEvent(GamePlayUiEvent.ResetGame) },
+                    showRoundNumber = uiState.showRoundNumber,
+                    onShowRoundNumber = { showRoundNumber ->
+                        viewModel.onEvent(
+                            GamePlayUiEvent.ShowRoundNumber(
+                                showRoundNumber
+                            )
+                        )
+                    },
                     modifier = modifier
                 )
             }
@@ -158,12 +170,19 @@ private fun Game(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxWidth()
     ) {
-        PlayerHeader(uiState.players, onEvent, isValidScore, modifier)
+        PlayerHeader(
+            players = uiState.players,
+            onEvent = onEvent,
+            isValidScore = isValidScore,
+            showRoundNumber = uiState.showRoundNumber,
+            modifier = modifier
+        )
         Rounds(
             players = uiState.players,
             onEvent = onEvent,
             numberOfRounds = uiState.numberOfRounds(),
             isValidScore = isValidScore,
+            showRoundNumber = uiState.showRoundNumber,
             modifier = modifier
         )
     }
@@ -174,13 +193,38 @@ private fun PlayerHeader(
     players: List<Player>,
     onEvent: (GamePlayUiEvent) -> Unit,
     isValidScore: (String) -> Boolean,
+    showRoundNumber: Boolean,
     modifier: Modifier
 ) {
     Row(
+        verticalAlignment = Alignment.Bottom,
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 10.dp)
     ) {
+        if (showRoundNumber) {
+            Column(
+                verticalArrangement = Arrangement.Bottom,
+                modifier = modifier
+            ) {
+                val textMeasurer = rememberTextMeasurer()
+                val density = LocalDensity.current
+
+                // Measure the width of two specific characters, for example "MM"
+                // to approximate a consistent width for two characters
+                val textLayoutResult = textMeasurer.measure(
+                    text = "##"
+                )
+
+                // Convert the measured pixel width to Dp
+                val twoCharWidth: Dp = with(density) { textLayoutResult.size.width.toDp() }
+
+                Text(
+                    text = "#",
+                    modifier.width(twoCharWidth)
+                )
+            }
+        }
         players.forEachIndexed { seatIndex, player ->
             var showNewScoreDialog by remember { mutableStateOf(false) }
             Column(
@@ -238,6 +282,7 @@ private fun Rounds(
     onEvent: (GamePlayUiEvent) -> Unit,
     numberOfRounds: Int,
     isValidScore: (String) -> Boolean,
+    showRoundNumber: Boolean,
     modifier: Modifier
 ) {
     val scrollState = rememberLazyListState()
@@ -255,6 +300,7 @@ private fun Rounds(
                 players = players,
                 onEvent = onEvent,
                 isValidScore = isValidScore,
+                showRoundNumber = showRoundNumber,
                 modifier = modifier
             )
         }
@@ -267,6 +313,7 @@ private fun Round(
     players: List<Player>,
     onEvent: (GamePlayUiEvent) -> Unit,
     isValidScore: (String) -> Boolean,
+    showRoundNumber: Boolean,
     modifier: Modifier
 ) {
     Row(
@@ -286,6 +333,9 @@ private fun Round(
                 }
             )
     ) {
+        if (showRoundNumber) {
+            Text(text = (round + 1).toString())
+        }
         players.forEachIndexed { seatIndex, player ->
             val score = player.scores.getOrNull(round)
             if (score != null) {
@@ -457,12 +507,14 @@ private fun ChangeScore(
     onDismissRequest: () -> Unit,
     modifier: Modifier
 ) {
-    val (newScore, setNewScore) = remember { mutableStateOf(
-        TextFieldValue(
-            text = currentScore.toString(),
-            selection = TextRange(currentScore.toString().length) // Set cursor to the end
+    val (newScore, setNewScore) = remember {
+        mutableStateOf(
+            TextFieldValue(
+                text = currentScore.toString(),
+                selection = TextRange(currentScore.toString().length) // Set cursor to the end
+            )
         )
-    )}
+    }
     val (warnInvalidScore, setWarnInvalidScore) = remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val hideKeyboard = { keyboardController?.hide() }
@@ -558,6 +610,8 @@ private fun AppBarActions(
     onStartNewGame: () -> Unit,
     saveFavoriteGame: (String) -> Unit,
     resetGame: () -> Unit,
+    showRoundNumber: Boolean,
+    onShowRoundNumber: (Boolean) -> Unit,
     modifier: Modifier
 ) {
     val (dropdownMenuExpanded, setDropdownMenuExpanded) = remember { mutableStateOf(false) }
@@ -635,6 +689,24 @@ private fun AppBarActions(
                 onShowGameDetails(game)
             }
         )
+        HorizontalDivider()
+        DropdownMenuItem(
+            text = {
+                Text(
+                    text = if (showRoundNumber) {
+                        "Hide Round"
+                    } else {
+                        "Show Round"
+                    },
+                    fontSize = 20.sp
+                )
+            },
+            onClick = {
+                setDropdownMenuExpanded(false)
+                onShowRoundNumber(!showRoundNumber)
+            }
+
+        )
     }
 
     if (confirmResetGame) {
@@ -698,7 +770,9 @@ private fun GamePlayScreenContentPreview() {
         Player("Sheldon", listOf(Score(90), Score(25))),
         Player("Leonard", listOf(Score(-20), Score(40), Score(235)))
     )
-    val uiState = GamePlayUiState(game = game, players = players)
+    val uiState = GamePlayUiState(game = game,
+        players = players,
+        showRoundNumber = true)
     GamePlayScreenContent(
         uiState = uiState,
         onEvent = { _ -> },

@@ -15,4 +15,5 @@ sealed interface GamePlayUiEvent {
     object RefreshState : GamePlayUiEvent
     object ResetGame : GamePlayUiEvent
     object DetermineWinner : GamePlayUiEvent
+    data class ShowRoundNumber(val showRoundNumber: Boolean) : GamePlayUiEvent
 }
