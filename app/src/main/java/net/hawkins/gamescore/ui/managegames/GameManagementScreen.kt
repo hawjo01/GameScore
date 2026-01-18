@@ -130,7 +130,9 @@ private fun GameManagementScreenContent(
                             onConfirmation = { gameId ->
                                 onEvent(GameManagementUiEvent.DeleteGame(gameId))
                                 showConfirmDeleteGame = false
-                            })
+                            },
+                            modifier = modifier
+                        )
                     }
                 }
             }
@@ -141,14 +143,16 @@ private fun GameManagementScreenContent(
 @Composable
 private fun ConfirmDeleteGame(
     game: Game,
+    onConfirmation: (Int) -> Unit,
     onDismissRequest: () -> Unit,
-    onConfirmation: (Int) -> Unit
+    modifier: Modifier
 ) {
     ConfirmActionDialog(
         title = stringResource(R.string.delete_game),
         description = stringResource(R.string.delete_name_question, game.name),
         onConfirmation = { onConfirmation(game.id!!) },
-        onDismissRequest = onDismissRequest
+        onDismissRequest = onDismissRequest,
+        modifier = modifier
     )
 }
 
@@ -173,7 +177,8 @@ private fun PreviewGameManagementScreenContent() {
         uiState = GameManagementUiState(
             games = listOf(
                 Game(id = 1, name = "Five Crowns"),
-                Game(id = 2, name = "2500")
+                Game(id = 2, name = "2500"),
+                Game(id = 3, name = "Scrabble")
             )
         ),
         onViewGame = { _ -> },

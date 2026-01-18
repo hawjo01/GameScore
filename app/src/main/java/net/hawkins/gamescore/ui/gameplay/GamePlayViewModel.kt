@@ -139,8 +139,8 @@ class GamePlayViewModel @Inject constructor(
     }
 
     private fun refreshState() {
-        val gameId = _uiState.value.game.id?: return
-        val game = _gameRepository.getById(gameId)?: return
+        val gameId = _uiState.value.game.id ?: return
+        val game = _gameRepository.getById(gameId) ?: return
 
         refreshState(game, _uiState.value.players)
     }
@@ -159,7 +159,11 @@ class GamePlayViewModel @Inject constructor(
             updatedPlayers.add(updatedPlayer)
         }
 
-        val updatedWinner = _gamePlayService.determineWinner(updatedPlayers)
+        val updatedWinner = if (_gamePlayService.isManualWinner()) {
+            null
+        } else {
+            _gamePlayService.determineWinner(updatedPlayers)
+        }
 
         _uiState.update { currentState ->
             currentState.copy(

@@ -110,6 +110,7 @@ fun FavoriteGamesCard(
                             showDeleteFavoriteGame = false
                         },
                         onDismissRequest = { showDeleteFavoriteGame = false },
+                        modifier = modifier
                     )
                 }
             }
