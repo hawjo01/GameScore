@@ -39,5 +39,25 @@
       "displayValue": "Win",
       "displayColor": "GREEN"
     }
+  },
+  {
+    "color": {
+      "negativeScore": "DEFAULT",
+      "positiveScore": "DEFAULT"
+    },
+    "constraints": {
+      "equalHandSizes": false,
+      "positiveOnly": false
+    },
+    "id": 5,
+    "name": "Scrabble",
+    "objective": {
+      "type": "HIGH_SCORE"
+    },
+    "roundObjective": {
+      "goal": 0,
+      "displayValue": "Pass",
+      "displayColor": "RED"
+    }
   }
 ]
