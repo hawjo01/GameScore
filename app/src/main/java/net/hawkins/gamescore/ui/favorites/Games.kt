@@ -106,7 +106,7 @@ fun FavoriteGamesCard(
                         title = stringResource(R.string.delete_favorite_game),
                         description = stringResource(R.string.delete_name_question, favorite.name),
                         onConfirmation = {
-                            onEvent(GamePlaySetupUiEvent.DeleteFavoriteGame(favorite.id!!))
+                            onEvent(GamePlaySetupUiEvent.DeleteFavoriteGame(favorite.id))
                             showDeleteFavoriteGame = false
                         },
                         onDismissRequest = { showDeleteFavoriteGame = false },

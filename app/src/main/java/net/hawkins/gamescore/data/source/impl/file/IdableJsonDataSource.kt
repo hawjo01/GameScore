@@ -41,7 +41,7 @@ abstract class IdableJsonDataSource<T : Idable>(
 
     override fun save(item: T): T {
         val existingItems = getAll()
-        val itemsToSave = if (item.id == null) {
+        val itemsToSave = if (item.id == 0) {
             item.id = generateId(existingItems)
             existingItems.plus(item)
         } else {

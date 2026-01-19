@@ -140,7 +140,7 @@ class GamePlayViewModel @Inject constructor(
     }
 
     private fun refreshState() {
-        val gameId = _uiState.value.game.id ?: return
+        val gameId = _uiState.value.game.id
         val game = _gameRepository.getById(gameId) ?: return
 
         refreshState(game, _uiState.value.players)

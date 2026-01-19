@@ -1,7 +1,7 @@
 package net.hawkins.gamescore.data.model
 
 data class Game(
-    override var id: Int? = null,
+    override var id: Int = 0,
     val name: String = "",
     val objective: Objective = Objective(),
     val roundObjective: RoundObjective = RoundObjective(),
