@@ -6,18 +6,21 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import junit.framework.TestCase.assertEquals
+import net.hawkins.gamescore.Assertions.Companion.assertEquals
 import net.hawkins.gamescore.data.FavoriteGameRepository
 import net.hawkins.gamescore.data.GameProgressRepository
 import net.hawkins.gamescore.data.GameRepository
 import net.hawkins.gamescore.data.model.FavoriteGame
 import net.hawkins.gamescore.data.model.Game
+import net.hawkins.gamescore.data.model.GameProgress
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import kotlin.test.assertNotNull
+
 
 class GamePlayViewModelTest {
 
@@ -194,5 +197,125 @@ class GamePlayViewModelTest {
         viewModel.onEvent(GamePlayUiEvent.StartGame(game = sevens, playerNames))
 
         assertTrue(viewModel.isManualWinner())
+    }
+
+    @Test
+    fun showRoundNumber() {
+        assertFalse(viewModel.uiState.value.showRoundNumber)
+
+        viewModel.onEvent(GamePlayUiEvent.ShowRoundNumber(true))
+        assertTrue(viewModel.uiState.value.showRoundNumber)
+
+        viewModel.onEvent(GamePlayUiEvent.ShowRoundNumber(false))
+        assertFalse(viewModel.uiState.value.showRoundNumber)
+    }
+
+    @Test
+    fun isGameInProgress_False() {
+        every { gameProgressRepository.getById(any()) }.answers { null }
+
+        assertFalse(viewModel.isGameInProgress())
+    }
+
+    @Test
+    fun isGameInProgress_ManualWinner_True() {
+        every { gameProgressRepository.getById(any()) }.answers {
+            GameProgress(
+                game = sevens,
+                players = listOf(
+                    Player("Sheldon", listOf(Score(0), Score(7))),
+                    Player("Leonard", listOf(Score(7), Score(21)))
+                ),
+                winner = null
+            )
+        }
+
+        assertTrue(viewModel.isGameInProgress())
+    }
+
+    @Test
+    fun loadInProgressGame_NoInProgressGame() {
+        every { gameProgressRepository.getById(any()) }.answers { null }
+
+        viewModel.loadInProgressGame()
+
+        assertTrue(viewModel.uiState.value.players.isEmpty())
+        assertEquals("", viewModel.uiState.value.game.name)
+    }
+
+    @Test
+    fun loadInProgressGame_ManualWinner() {
+        assertTrue(viewModel.uiState.value.players.isEmpty())
+        assertEquals("", viewModel.uiState.value.game.name)
+
+        val player1 = Player("Sheldon", listOf(Score(0), Score(7)))
+        val player2 = Player("Leonard", listOf(Score(7), Score(21)))
+
+        every { gameProgressRepository.getById(any()) }.answers {
+            GameProgress(
+                game = sevens,
+                players = listOf(player1, player2),
+                winner = null
+            )
+        }
+
+        viewModel.loadInProgressGame()
+
+        assertTrue(viewModel.uiState.value.players.isNotEmpty())
+        assertEquals(player1, viewModel.uiState.value.players[0])
+        assertEquals(player2, viewModel.uiState.value.players[1])
+        assertNull(viewModel.uiState.value.winner)
+    }
+
+    @Test
+    fun loadInProgressGame_WithObjectiveGoaMet() {
+        assertTrue(viewModel.uiState.value.players.isEmpty())
+        assertEquals("", viewModel.uiState.value.game.name)
+
+        val player1 = Player("Sheldon", listOf(Score(0), Score(7)))
+        val player2 = Player("Leonard", listOf(Score(7), Score(21)))
+
+        val sevensWithGoal = sevens.copy(objective = Game.Objective(goal = 28))
+
+        every { gameProgressRepository.getById(any()) }.answers {
+            GameProgress(
+                game = sevensWithGoal,
+                players = listOf(player1, player2),
+                winner = null
+            )
+        }
+
+        viewModel.loadInProgressGame()
+
+        assertTrue(viewModel.uiState.value.players.isNotEmpty())
+        assertEquals(player1, viewModel.uiState.value.players[0])
+        assertEquals(player2, viewModel.uiState.value.players[1])
+        assertEquals("Leonard", viewModel.uiState.value.winner)
+    }
+
+    @Test
+    fun loadInProgressGame_WithObjectiveGoaUnMet() {
+        assertTrue(viewModel.uiState.value.players.isEmpty())
+        assertEquals("", viewModel.uiState.value.game.name)
+
+        val player1 = Player("Sheldon", listOf(Score(0), Score(7)))
+        val player2 = Player("Leonard", listOf(Score(7), Score(21)))
+
+        val sevensWithGoal = sevens.copy(objective = Game.Objective(goal = 35))
+
+        every { gameProgressRepository.getById(any()) }.answers {
+            GameProgress(
+                game = sevensWithGoal,
+                players = listOf(player1, player2),
+                winner = null
+            )
+        }
+
+        viewModel.loadInProgressGame()
+
+        assertTrue(viewModel.uiState.value.players.isNotEmpty())
+        assertEquals(player1, viewModel.uiState.value.players[0])
+        assertEquals(player2, viewModel.uiState.value.players[1])
+        assertNull(viewModel.uiState.value.winner)
     }
 }
