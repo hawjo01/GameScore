@@ -10,10 +10,10 @@ import net.hawkins.gamescore.data.FavoriteGameRepository
 import net.hawkins.gamescore.data.FavoritePlayerRepository
 import net.hawkins.gamescore.data.GameProgressRepository
 import net.hawkins.gamescore.data.GameRepository
-import net.hawkins.gamescore.data.source.impl.FileFavoriteGameDataSource
-import net.hawkins.gamescore.data.source.impl.FileFavoritePlayerDataSource
-import net.hawkins.gamescore.data.source.impl.FileGameDataSource
-import net.hawkins.gamescore.data.source.impl.FileGameProgressDataSource
+import net.hawkins.gamescore.data.source.impl.file.FavoriteGameDataSource
+import net.hawkins.gamescore.data.source.impl.file.FavoritePlayerDataSource
+import net.hawkins.gamescore.data.source.impl.file.GameDataSource
+import net.hawkins.gamescore.data.source.impl.file.GameProgressDataSource
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -34,7 +34,7 @@ object RepositoryModule {
         val directory: File = appContext.filesDir
 
         return FavoriteGameRepository(
-            dataSource = FileFavoriteGameDataSource(
+            dataSource = FavoriteGameDataSource(
                 File(
                     directory,
                     FAVORITE_GAMES_FILENAME
@@ -48,7 +48,7 @@ object RepositoryModule {
     fun provideFavoritePlayerRepository(@ApplicationContext appContext: Context): FavoritePlayerRepository {
         val directory: File = appContext.filesDir
         return FavoritePlayerRepository(
-            FileFavoritePlayerDataSource(
+            FavoritePlayerDataSource(
                 File(
                     directory,
                     FAVORITE_PLAYERS_FILENAME
@@ -69,14 +69,14 @@ object RepositoryModule {
             )
         }
 
-        return GameRepository(dataSource = FileGameDataSource(dataFile))
+        return GameRepository(dataSource = GameDataSource(dataFile))
     }
 
     @Provides
     @Singleton
     fun provideGamePlayRepository(@ApplicationContext appContext: Context): GameProgressRepository {
         val dataFile = File(appContext.filesDir, GAME_PROGRESS_FILENAME)
-        return GameProgressRepository(dataSource = FileGameProgressDataSource(dataFile))
+        return GameProgressRepository(dataSource = GameProgressDataSource(dataFile))
     }
 
     private fun copyAssetFile(context: Context, @Suppress("SameParameterValue") assetFileName: String, destinationFile: File) {
