@@ -4,5 +4,5 @@ data class FavoriteGame(
     val name: String = "",
     val players: List<String> = emptyList(),
     val game: Game,
-    override var id: Int? = null
+    override var id: Int = 0
 ) : Idable

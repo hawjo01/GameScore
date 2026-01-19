@@ -135,7 +135,7 @@ class FavoriteGameDataSourceTest : AbstractBaseTest() {
         val savedGame = dataSource.save(favoriteGame)
         assertNotNull(savedGame.id)
 
-        val retrievedGame = dataSource.getById(savedGame.id!!)
+        val retrievedGame = dataSource.getById(savedGame.id)
         assertNotNull(retrievedGame)
     }
 
@@ -154,10 +154,10 @@ class FavoriteGameDataSourceTest : AbstractBaseTest() {
         val savedGame = dataSource.save(favoriteGame)
         assertNotNull(savedGame.id)
 
-        val retrievedGame = dataSource.getById(savedGame.id!!)
+        val retrievedGame = dataSource.getById(savedGame.id)
         assertNotNull(retrievedGame)
 
-        val newId = retrievedGame.id!! + 1
+        val newId = retrievedGame.id + 1
         val nullGame = dataSource.getById(newId)
         assertNull(nullGame)
 

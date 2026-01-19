@@ -111,9 +111,7 @@ private fun GameManagementScreenContent(
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     IconButton(onClick = {
-                        if (game.id != null) {
-                            showConfirmDeleteGame = true
-                        }
+                        showConfirmDeleteGame = true
                     }
                     ) {
                         Icon(
@@ -150,7 +148,7 @@ private fun ConfirmDeleteGame(
     ConfirmActionDialog(
         title = stringResource(R.string.delete_game),
         description = stringResource(R.string.delete_name_question, game.name),
-        onConfirmation = { onConfirmation(game.id!!) },
+        onConfirmation = { onConfirmation(game.id) },
         onDismissRequest = onDismissRequest,
         modifier = modifier
     )

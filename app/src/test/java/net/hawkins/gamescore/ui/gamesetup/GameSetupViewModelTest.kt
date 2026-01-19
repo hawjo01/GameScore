@@ -201,7 +201,7 @@ class GameSetupViewModelTest {
         assertTrue(uiState.value.isValidName)
 
         viewModel.onEvent(GameSetupUiEvent.NewGame)
-        assertNull(uiState.value.game.id)
+        assertEquals(0, uiState.value.game.id)
         assertEquals("", uiState.value.game.name)
         assertEquals(Game.Objective.Type.HIGH_SCORE, uiState.value.game.objective.type)
         assertNull(uiState.value.game.objective.goal)
