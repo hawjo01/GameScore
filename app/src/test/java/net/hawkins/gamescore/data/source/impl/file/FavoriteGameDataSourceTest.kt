@@ -1,4 +1,4 @@
-package net.hawkins.gamescore.data.source.impl
+package net.hawkins.gamescore.data.source.impl.file
 
 import net.hawkins.gamescore.AbstractBaseTest
 import net.hawkins.gamescore.data.model.FavoriteGame
@@ -11,11 +11,11 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class FileFavoriteGameDataSourceTest : AbstractBaseTest() {
+class FavoriteGameDataSourceTest : AbstractBaseTest() {
 
     @Test
     fun fileDoesNotExist() {
-        val dataSource = FileFavoriteGameDataSource(randomTempFile())
+        val dataSource = FavoriteGameDataSource(randomTempFile())
         assertTrue(dataSource.getAll().isEmpty())
     }
 
@@ -23,7 +23,7 @@ class FileFavoriteGameDataSourceTest : AbstractBaseTest() {
     fun getGames() {
         val resourceDirectory = Paths.get("src", "test", "resources")
         val file = File(resourceDirectory.toFile(), "favorite-games.json")
-        val dataSource = FileFavoriteGameDataSource(file)
+        val dataSource = FavoriteGameDataSource(file)
         val games = dataSource.getAll()
         assertEquals(2, games.size)
 
@@ -45,7 +45,7 @@ class FileFavoriteGameDataSourceTest : AbstractBaseTest() {
     @Test
     fun addAndRemove() {
         val tempFile = randomTempFile()
-        val dataSource = FileFavoriteGameDataSource(tempFile)
+        val dataSource = FavoriteGameDataSource(tempFile)
         assertTrue(dataSource.getAll().isEmpty())
 
         val favoriteGame =
@@ -56,7 +56,7 @@ class FileFavoriteGameDataSourceTest : AbstractBaseTest() {
             )
         dataSource.save(favoriteGame)
 
-        val dataSource2 = FileFavoriteGameDataSource(tempFile)
+        val dataSource2 = FavoriteGameDataSource(tempFile)
         assertEquals(1, dataSource2.getAll().size)
         assertEquals(favoriteGame.name, dataSource2.getAll()[0].name)
         assertEquals(favoriteGame.game, dataSource2.getAll()[0].game)
@@ -69,14 +69,14 @@ class FileFavoriteGameDataSourceTest : AbstractBaseTest() {
         dataSource2.deleteById(id)
         assertTrue(dataSource2.getAll().isEmpty())
 
-        val dataSource3 = FileFavoriteGameDataSource(tempFile)
+        val dataSource3 = FavoriteGameDataSource(tempFile)
         assertTrue(dataSource3.getAll().isEmpty())
     }
 
     @Test
     fun saveAndUpdate() {
         val tempFile = randomTempFile()
-        val dataSource = FileFavoriteGameDataSource(tempFile)
+        val dataSource = FavoriteGameDataSource(tempFile)
         assertTrue(dataSource.getAll().isEmpty())
 
         val favoriteGame =
@@ -87,7 +87,7 @@ class FileFavoriteGameDataSourceTest : AbstractBaseTest() {
             )
         dataSource.save(favoriteGame)
 
-        val dataSource2 = FileFavoriteGameDataSource(tempFile)
+        val dataSource2 = FavoriteGameDataSource(tempFile)
         assertEquals(1, dataSource2.getAll().size)
         val savedGame = dataSource2.getAll()[0]
         assertEquals(favoriteGame.name, savedGame.name)
@@ -100,7 +100,7 @@ class FileFavoriteGameDataSourceTest : AbstractBaseTest() {
         val modifiedGame = savedGame.copy(name = "Updated Name")
         dataSource2.save(modifiedGame)
 
-        val dataSource3 = FileFavoriteGameDataSource(tempFile)
+        val dataSource3 = FavoriteGameDataSource(tempFile)
         assertEquals(1, dataSource3.getAll().size)
         val updatedGame = dataSource3.getAll()[0]
         assertEquals("Updated Name", updatedGame.name)
@@ -114,7 +114,7 @@ class FileFavoriteGameDataSourceTest : AbstractBaseTest() {
     @Test
     fun getById_NoSavedItems() {
         val tempFile = randomTempFile()
-        val dataSource = FileFavoriteGameDataSource(tempFile)
+        val dataSource = FavoriteGameDataSource(tempFile)
         assertTrue(dataSource.getAll().isEmpty())
 
         assertNull(dataSource.getById(1))
@@ -123,7 +123,7 @@ class FileFavoriteGameDataSourceTest : AbstractBaseTest() {
     @Test
     fun getById() {
         val tempFile = randomTempFile()
-        val dataSource = FileFavoriteGameDataSource(tempFile)
+        val dataSource = FavoriteGameDataSource(tempFile)
         assertTrue(dataSource.getAll().isEmpty())
 
         val favoriteGame =
@@ -142,7 +142,7 @@ class FileFavoriteGameDataSourceTest : AbstractBaseTest() {
     @Test
     fun getById_NoItemWithId() {
         val tempFile = randomTempFile()
-        val dataSource = FileFavoriteGameDataSource(tempFile)
+        val dataSource = FavoriteGameDataSource(tempFile)
         assertTrue(dataSource.getAll().isEmpty())
 
         val favoriteGame =

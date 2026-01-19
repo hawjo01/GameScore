@@ -1,15 +1,19 @@
-package net.hawkins.gamescore.data.source.impl
+package net.hawkins.gamescore.data.source.impl.file
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import net.hawkins.gamescore.data.source.DataSource
+import net.hawkins.gamescore.data.model.Idable
+import net.hawkins.gamescore.data.source.IdableDataSource
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
 
-abstract class JsonFileDataSource<T>(protected val file: File, private val clazz: Class<T>) : DataSource<T> {
+abstract class IdableJsonDataSource<T : Idable>(
+    protected val file: File,
+    private val clazz: Class<T>
+) : IdableDataSource<T> {
 
     override fun getAll(): List<T> {
         return if (file.exists()) {
@@ -29,14 +33,38 @@ abstract class JsonFileDataSource<T>(protected val file: File, private val clazz
         }
     }
 
-    override fun save(item: T) {
+    override fun getById(id: Int): T? {
         val items = getAll()
-        saveAll(items.plus(item))
+        val item = items.firstOrNull { item -> item.id == id }
+        return item
     }
 
-    override fun delete(item: T) {
+    override fun save(item: T): T {
+        val existingItems = getAll()
+        val itemsToSave = if (item.id == null) {
+            item.id = generateId(existingItems)
+            existingItems.plus(item)
+        } else {
+            existingItems.filterNot { existingItem -> existingItem.id == item.id }.plus(item)
+        }
+
+        saveAll(itemsToSave)
+        return item
+    }
+
+    override fun deleteById(id: Int) {
         val items = getAll()
-        saveAll(items.minus(item))
+        val itemsToSave = items.filterNot { existingItem -> existingItem.id == id }
+        saveAll(itemsToSave)
+    }
+
+    private fun generateId(existingItems: List<T>): Int {
+        val existingIds = existingItems.map { existingItem -> existingItem.id }
+        var randomId: Int?
+        do {
+            randomId = (10000000..99999999).random()
+        } while (existingIds.contains(randomId))
+        return randomId
     }
 
     private fun saveAll(items: List<T>) {
