@@ -18,6 +18,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.outlined.Leaderboard
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -67,6 +68,7 @@ fun GamePlayScreen(
     viewModel: GamePlayViewModel,
     onShowGameDetails: (Game) -> Unit,
     onStartNewGame: () -> Unit,
+    onShowLeaderboard: (Game, List<Player>) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -82,6 +84,7 @@ fun GamePlayScreen(
                     determineWinner = { viewModel.onEvent(GamePlayUiEvent.DetermineWinner) },
                     onShowGameDetails = onShowGameDetails,
                     onStartNewGame = onStartNewGame,
+                    onShowLeaderboard = onShowLeaderboard,
                     game = uiState.game,
                     players = uiState.players,
                     saveFavoriteGame = { name ->
@@ -612,6 +615,7 @@ private fun AppBarActions(
     resetGame: () -> Unit,
     showRoundNumber: Boolean,
     onShowRoundNumber: (Boolean) -> Unit,
+    onShowLeaderboard: (Game, List<Player>) -> Unit,
     modifier: Modifier
 ) {
     val (dropdownMenuExpanded, setDropdownMenuExpanded) = remember { mutableStateOf(false) }
@@ -619,9 +623,14 @@ private fun AppBarActions(
     val (confirmResetGame, setConfirmResetGame) = remember { mutableStateOf(false) }
     val (confirmStartNewGame, setConfirmStartNewGame) = remember { mutableStateOf(false) }
 
+    Row {
+        IconButton(onClick = { onShowLeaderboard(game, players)}) {
+            Icon(imageVector = Icons.Outlined.Leaderboard, contentDescription = "Leaderboard")
+        }
     IconButton(onClick = { setDropdownMenuExpanded(true) }) {
         Icon(imageVector = Icons.Filled.Menu, contentDescription = stringResource(R.string.menu))
     }
+}
     DropdownMenu(
         expanded = dropdownMenuExpanded,
         onDismissRequest = { setDropdownMenuExpanded(false) }
@@ -694,9 +703,9 @@ private fun AppBarActions(
             text = {
                 Text(
                     text = if (showRoundNumber) {
-                        "Hide Round"
+                        stringResource(R.string.hide_round)
                     } else {
-                        "Show Round"
+                        stringResource(R.string.show_round)
                     },
                     fontSize = 20.sp
                 )
@@ -705,7 +714,6 @@ private fun AppBarActions(
                 setDropdownMenuExpanded(false)
                 onShowRoundNumber(!showRoundNumber)
             }
-
         )
     }
 

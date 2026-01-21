@@ -30,6 +30,9 @@ import net.hawkins.gamescore.ui.gameplaysetup.GamePlaySetupViewModel
 import net.hawkins.gamescore.ui.gamesetup.GameSetupScreen
 import net.hawkins.gamescore.ui.gamesetup.GameSetupUiEvent
 import net.hawkins.gamescore.ui.gamesetup.GameSetupViewModel
+import net.hawkins.gamescore.ui.leaderboard.LeaderboardScreen
+import net.hawkins.gamescore.ui.leaderboard.LeaderboardUiEvent
+import net.hawkins.gamescore.ui.leaderboard.LeaderboardViewModel
 import net.hawkins.gamescore.ui.managegames.GameManagementScreen
 import net.hawkins.gamescore.ui.managegames.GameManagementViewModel
 
@@ -37,7 +40,8 @@ enum class GameScoreScreen() {
     GamePlaySetup,
     GamePlay,
     GameSetup,
-    ManageGames
+    ManageGames,
+    Leaderboard
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,6 +79,7 @@ fun GameScoreScreen(
     gamePlayViewModel: GamePlayViewModel = viewModel(),
     gameSetupViewModel: GameSetupViewModel = viewModel(),
     gameManagementViewModel: GameManagementViewModel = viewModel(),
+    leaderboardViewModel: LeaderboardViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
     Scaffold(
@@ -136,6 +141,15 @@ fun GameScoreScreen(
                     onShowGameDetails = { game ->
                         gameSetupViewModel.onEvent(GameSetupUiEvent.SetGame(game))
                         navController.navigate(GameScoreScreen.GameSetup.name)
+                    },
+                    onShowLeaderboard = { game, players ->
+                        leaderboardViewModel.onEvent(
+                            LeaderboardUiEvent.RefreshLeaderboard(
+                                game,
+                                players
+                            )
+                        )
+                        navController.navigate(GameScoreScreen.Leaderboard.name)
                     }
                 )
             }
@@ -168,6 +182,16 @@ fun GameScoreScreen(
                         gameSetupViewModel.onEvent(GameSetupUiEvent.SetGame(game))
                         navController.navigate(GameScoreScreen.GameSetup.name)
                     }
+                )
+            }
+
+            composable(route = GameScoreScreen.Leaderboard.name) {
+                LeaderboardScreen(
+                    viewModel = leaderboardViewModel,
+                    onBack = {
+                        navController.popBackStack()
+                    },
+                    modifier = modifier
                 )
             }
         }
