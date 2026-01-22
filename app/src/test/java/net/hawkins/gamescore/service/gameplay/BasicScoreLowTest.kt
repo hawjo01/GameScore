@@ -1,5 +1,6 @@
 package net.hawkins.gamescore.service.gameplay
 
+import net.hawkins.gamescore.TestData
 import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.service.GamePlayService
 import org.junit.Assert.assertEquals
@@ -8,7 +9,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class BasicScoreLowTest : AbstractGamePlayTest() {
+class BasicScoreLowTest {
 
     val game = Game(
         name = "Basic Scoring - Low",
@@ -53,8 +54,8 @@ class BasicScoreLowTest : AbstractGamePlayTest() {
     @Test
     fun findWinner_differentScores() {
         val gamePlayService = GamePlayService(game)
-        val player1 = createPlayer("Howard", listOf(20))
-        val player2 = createPlayer("Rajesh")
+        val player1 = TestData.createPlayer("Howard", listOf(20))
+        val player2 = TestData.createPlayer("Rajesh")
         val players = listOf(player1, player2)
 
         val winner = gamePlayService.determineWinner(players)
@@ -64,8 +65,8 @@ class BasicScoreLowTest : AbstractGamePlayTest() {
     @Test
     fun findWinner_LowScore() {
         val gamePlayService = GamePlayService(game)
-        val player1 = createPlayer("Howard", listOf(20))
-        val player2 = createPlayer("Rajesh", listOf(50))
+        val player1 = TestData.createPlayer("Howard", listOf(20))
+        val player2 = TestData.createPlayer("Rajesh", listOf(50))
         val players = listOf(player1, player2)
 
         val winner = gamePlayService.determineWinner(players)
@@ -75,8 +76,8 @@ class BasicScoreLowTest : AbstractGamePlayTest() {
     @Test
     fun findWinner_EqualScores() {
         val gamePlayService = GamePlayService(game)
-        val player1 = createPlayer("Howard", listOf(20))
-        val player2 = createPlayer("Rajesh", listOf(20))
+        val player1 = TestData.createPlayer("Howard", listOf(20))
+        val player2 = TestData.createPlayer("Rajesh", listOf(20))
         val players = listOf(player1, player2)
 
         val winner = gamePlayService.determineWinner(players)

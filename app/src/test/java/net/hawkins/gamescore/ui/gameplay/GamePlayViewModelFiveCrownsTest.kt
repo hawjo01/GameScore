@@ -3,10 +3,10 @@ package net.hawkins.gamescore.ui.gameplay
 import androidx.compose.ui.graphics.Color
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
+import net.hawkins.gamescore.TestData
 import net.hawkins.gamescore.data.FavoriteGameRepository
 import net.hawkins.gamescore.data.GameProgressRepository
 import net.hawkins.gamescore.data.GameRepository
-import net.hawkins.gamescore.data.model.Game
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -19,35 +19,19 @@ class GamePlayViewModelFiveCrownsTest {
 
     @MockK
     lateinit var favoriteGameRepository: FavoriteGameRepository
+
     @MockK
     lateinit var gameProgressRepository: GameProgressRepository
+
     @MockK
     lateinit var gameRepository: GameRepository
     lateinit var viewModel: GamePlayViewModel
-    lateinit var fiveCrowns: Game
 
     @Before
     fun setUp() {
         favoriteGameRepository = mockk<FavoriteGameRepository>()
         gameProgressRepository = mockk<GameProgressRepository>()
         gameRepository = mockk<GameRepository>()
-
-        fiveCrowns = Game(
-            name = "Five Crowns",
-            objective = Game.Objective(
-                type = Game.Objective.Type.LOW_SCORE,
-                rounds = 11
-
-            ),
-            roundObjective = Game.RoundObjective(
-                goal = 0,
-                displayValue = "Win",
-                displayColor = Game.Colors.Color.GREEN
-            ),
-            constraints = Game.Constraints(
-                positiveOnly = true
-            )
-        )
 
         viewModel = GamePlayViewModel(
             _favoriteGameRepository = favoriteGameRepository,
@@ -59,6 +43,7 @@ class GamePlayViewModelFiveCrownsTest {
     @Test
     fun determineWinner() {
         val playerNames = listOf("Leonard", "Penny")
+        val fiveCrowns = TestData.getFiveCrowns()
         viewModel.onEvent(GamePlayUiEvent.StartGame(fiveCrowns, playerNames))
 
         val uiState = viewModel.uiState
@@ -124,6 +109,7 @@ class GamePlayViewModelFiveCrownsTest {
     @Test
     fun isManualWinner() {
         val playerNames = listOf("Rajesh", "Howard")
+        val fiveCrowns = TestData.getFiveCrowns()
         viewModel.onEvent(GamePlayUiEvent.StartGame(game = fiveCrowns, playerNames))
 
         assertFalse(viewModel.isManualWinner())
