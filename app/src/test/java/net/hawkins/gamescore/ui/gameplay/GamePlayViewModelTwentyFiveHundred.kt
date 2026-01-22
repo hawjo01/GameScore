@@ -2,10 +2,10 @@ package net.hawkins.gamescore.ui.gameplay
 
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
+import net.hawkins.gamescore.TestData
 import net.hawkins.gamescore.data.FavoriteGameRepository
 import net.hawkins.gamescore.data.GameProgressRepository
 import net.hawkins.gamescore.data.GameRepository
-import net.hawkins.gamescore.data.model.Game
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -23,25 +23,12 @@ class GamePlayViewModelTwentyFiveHundred {
     @MockK
     lateinit var gameRepository: GameRepository
     lateinit var viewModel: GamePlayViewModel
-    lateinit var twentyFiveHundred: Game
 
     @Before
     fun setUp() {
         favoriteGameRepository = mockk<FavoriteGameRepository>()
         gameProgressRepository = mockk<GameProgressRepository>()
         gameRepository = mockk<GameRepository>()
-
-        twentyFiveHundred = Game(
-            name = "2500",
-            objective = Game.Objective(
-                type = Game.Objective.Type.HIGH_SCORE,
-                goal = 2500
-
-            ),
-            constraints = Game.Constraints(
-                multipleOf = 5
-            )
-        )
 
         viewModel = GamePlayViewModel(
             _favoriteGameRepository = favoriteGameRepository,
@@ -53,6 +40,7 @@ class GamePlayViewModelTwentyFiveHundred {
     @Test
     fun determineWinner() {
         val playerNames = listOf("Leonard", "Penny")
+        val twentyFiveHundred = TestData.getTwentyFiveHundred()
         viewModel.onEvent(GamePlayUiEvent.StartGame(twentyFiveHundred, playerNames))
 
         val uiState = viewModel.uiState
@@ -101,6 +89,7 @@ class GamePlayViewModelTwentyFiveHundred {
     @Test
     fun isManualWinner() {
         val playerNames = listOf("Penny", "Amy")
+        val twentyFiveHundred = TestData.getTwentyFiveHundred()
         viewModel.onEvent(GamePlayUiEvent.StartGame(game = twentyFiveHundred, playerNames))
 
         assertFalse(viewModel.isManualWinner())

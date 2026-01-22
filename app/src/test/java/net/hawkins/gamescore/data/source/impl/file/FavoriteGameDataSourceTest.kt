@@ -3,13 +3,13 @@ package net.hawkins.gamescore.data.source.impl.file
 import net.hawkins.gamescore.AbstractBaseTest
 import net.hawkins.gamescore.data.model.FavoriteGame
 import net.hawkins.gamescore.data.model.Game
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
 import java.nio.file.Paths
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 class FavoriteGameDataSourceTest : AbstractBaseTest() {
 
@@ -157,10 +157,8 @@ class FavoriteGameDataSourceTest : AbstractBaseTest() {
         val retrievedGame = dataSource.getById(savedGame.id)
         assertNotNull(retrievedGame)
 
-        val newId = retrievedGame.id + 1
-        val nullGame = dataSource.getById(newId)
+        val doesNotExist = 0
+        val nullGame = dataSource.getById(doesNotExist)
         assertNull(nullGame)
-
-
     }
 }

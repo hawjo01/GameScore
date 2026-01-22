@@ -7,6 +7,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import net.hawkins.gamescore.Assertions.Companion.assertEquals
+import net.hawkins.gamescore.TestData
 import net.hawkins.gamescore.data.FavoriteGameRepository
 import net.hawkins.gamescore.data.GameProgressRepository
 import net.hawkins.gamescore.data.GameRepository
@@ -20,7 +21,6 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-
 
 class GamePlayViewModelTest {
 
@@ -223,8 +223,8 @@ class GamePlayViewModelTest {
             GameProgress(
                 game = sevens,
                 players = listOf(
-                    Player("Sheldon", listOf(Score(0), Score(7))),
-                    Player("Leonard", listOf(Score(7), Score(21)))
+                    TestData.createPlayer("Sheldon", listOf(0, 7)),
+                    TestData.createPlayer("Leonard", listOf(7, 21))
                 ),
                 winner = null
             )
@@ -248,8 +248,8 @@ class GamePlayViewModelTest {
         assertTrue(viewModel.uiState.value.players.isEmpty())
         assertEquals("", viewModel.uiState.value.game.name)
 
-        val player1 = Player("Sheldon", listOf(Score(0), Score(7)))
-        val player2 = Player("Leonard", listOf(Score(7), Score(21)))
+        val player1 = TestData.createPlayer("Sheldon", listOf(0, 7))
+        val player2 = TestData.createPlayer("Leonard", listOf(7, 21))
 
         every { gameProgressRepository.getById(any()) }.answers {
             GameProgress(
@@ -272,8 +272,8 @@ class GamePlayViewModelTest {
         assertTrue(viewModel.uiState.value.players.isEmpty())
         assertEquals("", viewModel.uiState.value.game.name)
 
-        val player1 = Player("Sheldon", listOf(Score(0), Score(7)))
-        val player2 = Player("Leonard", listOf(Score(7), Score(21)))
+        val player1 = TestData.createPlayer("Sheldon", listOf(0, 7))
+        val player2 = TestData.createPlayer("Leonard", listOf(7, 21))
 
         val sevensWithGoal = sevens.copy(objective = Game.Objective(goal = 28))
 
@@ -298,8 +298,8 @@ class GamePlayViewModelTest {
         assertTrue(viewModel.uiState.value.players.isEmpty())
         assertEquals("", viewModel.uiState.value.game.name)
 
-        val player1 = Player("Sheldon", listOf(Score(0), Score(7)))
-        val player2 = Player("Leonard", listOf(Score(7), Score(21)))
+        val player1 = TestData.createPlayer("Sheldon", listOf(0, 7))
+        val player2 = TestData.createPlayer("Leonard", listOf(7, 21))
 
         val sevensWithGoal = sevens.copy(objective = Game.Objective(goal = 35))
 

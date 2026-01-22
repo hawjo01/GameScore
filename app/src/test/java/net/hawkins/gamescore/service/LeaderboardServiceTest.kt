@@ -1,54 +1,19 @@
 package net.hawkins.gamescore.service
 
-import net.hawkins.gamescore.data.model.Game
+import net.hawkins.gamescore.TestData
 import net.hawkins.gamescore.ui.gameplay.Player
-import net.hawkins.gamescore.ui.gameplay.Score
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
-import org.junit.Before
 import org.junit.Test
 
 class LeaderboardServiceTest {
 
     val leaderboardService = LeaderboardService()
-    lateinit var fiveCrowns: Game
-    lateinit var twentyFiveHundred: Game
-
-    @Before
-    fun setUp() {
-        fiveCrowns = Game(
-            name = "Five Crowns",
-            objective = Game.Objective(
-                type = Game.Objective.Type.LOW_SCORE,
-                rounds = 11
-
-            ),
-            roundObjective = Game.RoundObjective(
-                goal = 0,
-                displayValue = "Win",
-                displayColor = Game.Colors.Color.GREEN
-            ),
-            constraints = Game.Constraints(
-                positiveOnly = true
-            )
-        )
-
-        twentyFiveHundred = Game(
-            name = "2500",
-            objective = Game.Objective(
-                type = Game.Objective.Type.HIGH_SCORE,
-                goal = 2500
-
-            ),
-            constraints = Game.Constraints(
-                multipleOf = 5
-            )
-        )
-    }
 
     @Test
     fun buildLeaderboard_LowScoring_TieForFirstWith3rd() {
+        val fiveCrowns = TestData.getFiveCrowns()
         var sheldon = Player("Sheldon")
         var leonard = Player("Leonard")
         var rajesh = Player("Rajesh")
@@ -66,9 +31,9 @@ class LeaderboardServiceTest {
         assertEquals(0, ranking1.score)
         assertEquals(listOf("Sheldon", "Leonard", "Rajesh"), ranking1.playerNames)
 
-        sheldon = sheldon.copy(scores = listOf(Score(5)))
-        leonard = leonard.copy(scores = listOf(Score(0)))
-        rajesh = rajesh.copy(scores = listOf(Score(0)))
+        sheldon = TestData.addScores(sheldon, 5)
+        leonard = TestData.addScores(leonard,0)
+        rajesh = TestData.addScores(rajesh,0)
         players = listOf(sheldon, leonard, rajesh)
         leaderboard = leaderboardService.buildLeaderboard(fiveCrowns, players)
         assertEquals(fiveCrowns.name, leaderboard.gameName)
@@ -89,6 +54,7 @@ class LeaderboardServiceTest {
 
     @Test
     fun buildLeaderboard_LowScoring() {
+        val fiveCrowns = TestData.getFiveCrowns()
         var sheldon = Player("Sheldon")
         var leonard = Player("Leonard")
         var players = listOf(sheldon, leonard)
@@ -105,8 +71,8 @@ class LeaderboardServiceTest {
         assertEquals(0, ranking1.score)
         assertEquals(listOf("Sheldon", "Leonard"), ranking1.playerNames)
 
-        sheldon = sheldon.copy(scores = listOf(Score(5)))
-        leonard = leonard.copy(scores = listOf(Score(0)))
+        sheldon = TestData.addScores(sheldon,5)
+        leonard = TestData.addScores(leonard,0)
         players = listOf(sheldon, leonard)
         leaderboard = leaderboardService.buildLeaderboard(fiveCrowns, players)
         assertEquals(fiveCrowns.name, leaderboard.gameName)
@@ -127,6 +93,7 @@ class LeaderboardServiceTest {
 
     @Test
     fun buildLeaderboard_HighScoring() {
+        val twentyFiveHundred = TestData.getTwentyFiveHundred()
         var sheldon = Player("Sheldon")
         var leonard = Player("Leonard")
         var players = listOf(sheldon, leonard)
@@ -143,8 +110,8 @@ class LeaderboardServiceTest {
         assertEquals(0, ranking1.score)
         assertEquals(listOf("Sheldon", "Leonard"), ranking1.playerNames)
 
-        sheldon = sheldon.copy(scores = listOf(Score(5)))
-        leonard = leonard.copy(scores = listOf(Score(0)))
+        sheldon = TestData.addScores(sheldon, 5)
+        leonard = TestData.addScores(leonard, 0)
         players = listOf(sheldon, leonard)
         leaderboard = leaderboardService.buildLeaderboard(twentyFiveHundred, players)
         assertEquals(twentyFiveHundred.name, leaderboard.gameName)
@@ -165,6 +132,7 @@ class LeaderboardServiceTest {
 
     @Test
     fun buildLeaderboard_HighScoring_TieForFirstWith3rd() {
+        val twentyFiveHundred = TestData.getTwentyFiveHundred()
         var sheldon = Player("Sheldon")
         var leonard = Player("Leonard")
         var howard = Player("Howard")
@@ -182,9 +150,9 @@ class LeaderboardServiceTest {
         assertEquals(0, ranking1.score)
         assertEquals(listOf("Sheldon", "Leonard", "Howard"), ranking1.playerNames)
 
-        sheldon = sheldon.copy(scores = listOf(Score(5)))
-        leonard = leonard.copy(scores = listOf(Score(0)))
-        howard = howard.copy(scores = listOf(Score(5)))
+        sheldon = TestData.addScores(sheldon, 5)
+        leonard = TestData.addScores(leonard,0)
+        howard = TestData.addScores(howard,5)
         players = listOf(sheldon, leonard, howard)
         leaderboard = leaderboardService.buildLeaderboard(twentyFiveHundred, players)
         assertEquals(twentyFiveHundred.name, leaderboard.gameName)
