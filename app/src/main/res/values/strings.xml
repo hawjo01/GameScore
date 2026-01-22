@@ -62,4 +62,9 @@
     <string name="no_favorite_games">No Favorite Games</string>
     <string name="required">Required</string>
     <string name="new_score">New Score</string>
+    <string name="leaderboard">Leaderboard</string>
+    <string name="rank">Rank</string>
+    <string name="score">Score</string>
+    <string name="hide_round">Hide Round</string>
+    <string name="show_round">Show Round</string>
 </resources>
