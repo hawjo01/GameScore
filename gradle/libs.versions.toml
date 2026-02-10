@@ -14,7 +14,7 @@ navigationRuntimeKtx = "2.9.6"
 navigationCompose = "2.9.7"
 hilt = "2.59"
 ksp = "2.3.5"
-animation = "1.10.1"
+animation = "1.10.2"
 material3 = "1.4.0"
 foundationLayout = "1.10.2"
 
