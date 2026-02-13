@@ -12,7 +12,7 @@ data class TopAppBar(
     val actions: @Composable (RowScope.() -> Unit)? = null
 )
 
-abstract class AbstractViewModel() : ViewModel() {
+abstract class AbstractViewModel : ViewModel() {
     companion object {
         private val _topAppBar = mutableStateOf(TopAppBar())
     }
