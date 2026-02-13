@@ -27,31 +27,9 @@ class TestData {
             )
         }
 
-        fun getTwentyFiveHundred(): Game {
-            return Game(
-                name = "2500",
-                objective = Game.Objective(
-                    type = Game.Objective.Type.HIGH_SCORE,
-                    goal = 2500
-
-                ),
-                constraints = Game.Constraints(
-                    multipleOf = 5
-                )
-            )
-        }
-
         fun createPlayer(name: String, values: List<Int> = emptyList()): Player {
             val scores = values.map { value -> Score(value = value) }
             return Player(name, scores)
-        }
-
-        fun addScores(player: Player, vararg scores: Int): Player {
-            var newScores = player.scores
-            for (score in scores) {
-                newScores = newScores.plus(Score(score))
-            }
-            return player.copy(scores = newScores)
         }
     }
 }

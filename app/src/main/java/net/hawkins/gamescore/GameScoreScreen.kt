@@ -36,7 +36,7 @@ import net.hawkins.gamescore.ui.leaderboard.LeaderboardViewModel
 import net.hawkins.gamescore.ui.managegames.GameManagementScreen
 import net.hawkins.gamescore.ui.managegames.GameManagementViewModel
 
-enum class GameScoreScreen() {
+enum class GameScoreScreen {
     GamePlaySetup,
     GamePlay,
     GameSetup,
