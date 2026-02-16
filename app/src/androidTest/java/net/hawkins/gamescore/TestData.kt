@@ -3,7 +3,6 @@ package net.hawkins.gamescore
 import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.ui.gameplay.Player
 import net.hawkins.gamescore.ui.gameplay.Score
-import kotlin.collections.plus
 
 class TestData {
     companion object {
