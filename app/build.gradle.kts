@@ -8,12 +8,24 @@ plugins {
 val signingKeystore = file("signing_keystore.jks")
 
 configurations.all {
-    resolutionStrategy {
+    resolutionStrategy.force(
         // Because CVE-2024-7254
-        force("com.google.protobuf:protobuf-kotlin:3.25.5")
+        "com.google.protobuf:protobuf-kotlin:3.25.5",
         // Because CVE-2024-7254
-        force("com.google.protobug:protobuf-java:3.25.5")
-    }
+        "com.google.protobug:protobuf-java:3.25.5",
+        // Because Netty has multiple CVE's
+        "io.netty:netty-buffer:4.1.129.Final",
+        "io.netty:netty-codec-http2:4.1.129.Final",
+        "io.netty:netty-code-http:4.1.129.Final",
+        "io.netty:netty-code-socks:4.1.129.Final",
+        "io.netty:netty-code:4.1.129.Final",
+        "io.netty:netty-common:4.1.129.Final",
+        "io.netty:netty-handler-proxy:4.1.129.Final",
+        "io.netty:netty-handler:4.1.129.Final",
+        "io.netty:netty-resolver:4.1.129.Final",
+        "io.netty:netty-transport-native-unix-common:4.1.129.Final",
+        "io.netty:netty-transport:4.1.129.Final"
+    )
 }
 
 android {
