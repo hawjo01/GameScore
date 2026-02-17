@@ -7,6 +7,15 @@ plugins {
 
 val signingKeystore = file("signing_keystore.jks")
 
+configurations.all {
+    resolutionStrategy {
+        // Because CVE-2024-7254
+        force("com.google.protobuf:protobuf-kotlin:3.25.5")
+        // Because CVE-2024-7254
+        force("com.google.protobug:protobuf-java:3.25.5")
+    }
+}
+
 android {
     namespace = "net.hawkins.gamescore"
     compileSdk = 36
