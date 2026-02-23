@@ -14,17 +14,17 @@ configurations.all {
         // Because CVE-2024-7254
         "com.google.protobug:protobuf-java:3.25.5",
         // Because Netty has multiple CVE's
-        "io.netty:netty-buffer:4.1.129.Final",
-        "io.netty:netty-codec-http2:4.1.129.Final",
-        "io.netty:netty-code-http:4.1.129.Final",
-        "io.netty:netty-code-socks:4.1.129.Final",
-        "io.netty:netty-code:4.1.129.Final",
-        "io.netty:netty-common:4.1.129.Final",
-        "io.netty:netty-handler-proxy:4.1.129.Final",
-        "io.netty:netty-handler:4.1.129.Final",
-        "io.netty:netty-resolver:4.1.129.Final",
-        "io.netty:netty-transport-native-unix-common:4.1.129.Final",
-        "io.netty:netty-transport:4.1.129.Final"
+        "io.netty:netty-buffer:4.2.10.Final",
+        "io.netty:netty-codec-http2:4.2.10.Final",
+        "io.netty:netty-code-http:4.2.10.Final",
+        "io.netty:netty-code-socks:4.2.10.Final",
+        "io.netty:netty-code:4.2.10.Final",
+        "io.netty:netty-common:4.2.10.Final",
+        "io.netty:netty-handler-proxy:4.2.10.Final",
+        "io.netty:netty-handler:4.2.10.Final",
+        "io.netty:netty-resolver:4.2.10.Final",
+        "io.netty:netty-transport-native-unix-common:4.2.10.Final",
+        "io.netty:netty-transport:4.2.10.Final"
     )
 }
 
