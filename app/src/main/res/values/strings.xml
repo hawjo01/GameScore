@@ -9,6 +9,7 @@
     <string name="delete_name_question">Delete \'%1$s\'?</string>
     <string name="find_winner">Find Winner</string>
     <string name="start_game">Start Game</string>
+    <string name="player">Player</string>
     <string name="players">Players</string>
     <string name="player_name">Player Name</string>
     <string name="remove_player">Remove Player?</string>

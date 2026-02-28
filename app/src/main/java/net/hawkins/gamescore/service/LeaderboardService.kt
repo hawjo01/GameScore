@@ -25,6 +25,9 @@ class LeaderboardService {
             nextRank += players.size
         }
 
-        return Leaderboard(gameName = game.name, rankings = rankings)
+        val gamePlayService = GamePlayService(game)
+        val winner = gamePlayService.determineWinner(players)
+
+        return Leaderboard(gameName = game.name, rankings = rankings, winner = winner)
     }
 }
