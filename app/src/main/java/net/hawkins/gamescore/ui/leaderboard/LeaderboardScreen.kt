@@ -12,17 +12,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -31,6 +37,11 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.data.model.Leaderboard
 import net.hawkins.gamescore.data.model.toDataList
@@ -87,6 +98,7 @@ private fun LeaderboardScreenContent(
                     stringResource(R.string.score)
                 ),
                 data = uiState.leaderboard.toDataList(),
+                hasWinner = winner != null,
                 modifier = modifier
             )
         }
@@ -97,12 +109,13 @@ private fun LeaderboardScreenContent(
 private fun LeaderboardTable(
     headers: List<String>,
     data: List<List<String>>,
+    hasWinner: Boolean,
     modifier: Modifier
 ) {
     val columnWidths = findColumnWidths(headers = headers, data = data)
     val (numberOfColumns, setNumberOfColumns) = remember { mutableIntStateOf(1) }
 
-    // BoxWithConstraints provides the maximum space the Column can occupy
+    val (displayFireworks, setDisplayFireworks) = remember { mutableStateOf(hasWinner) }
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val maxHeightInPx = constraints.maxHeight
 
@@ -155,8 +168,52 @@ private fun LeaderboardTable(
                 }
             }
         }
+
+        if (displayFireworks) {
+            FireworksOverlay(
+                onHideFireworks = {
+                    setDisplayFireworks(false)
+                },
+                modifier = modifier
+            )
+        }
     }
 }
+
+@Composable
+private fun FireworksOverlay(
+    onHideFireworks: () -> Unit,
+    modifier: Modifier
+) {
+
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.fireworks))
+    val progress by animateLottieCompositionAsState(
+        composition,
+        iterations = LottieConstants.IterateForever
+    )
+
+    LottieAnimation(
+        composition = composition,
+        progress = { progress },
+        modifier = Modifier.fillMaxSize(),
+        contentScale = ContentScale.Crop
+    )
+
+    Box(modifier = modifier.fillMaxSize()) {
+        FloatingActionButton(
+            onClick = {
+                onHideFireworks()
+            },
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            modifier = modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.close))
+        }
+    }
+}
+
 
 @Composable
 private fun LeaderboardColumn(

@@ -1,10 +1,15 @@
 package net.hawkins.gamescore.ui.gameplay
 
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import net.hawkins.gamescore.data.FavoriteGameRepository
 import net.hawkins.gamescore.data.GameProgressRepository
 import net.hawkins.gamescore.data.GameRepository
@@ -13,6 +18,7 @@ import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.service.GamePlayService
 import net.hawkins.gamescore.service.GameProgressService
 import net.hawkins.gamescore.ui.AbstractViewModel
+import net.hawkins.gamescore.ui.NavigationEvent
 import net.hawkins.gamescore.utils.removeElementAtIndex
 import net.hawkins.gamescore.utils.replaceElementAtIndex
 import javax.inject.Inject
@@ -26,9 +32,14 @@ class GamePlayViewModel @Inject constructor(
 ) : AbstractViewModel() {
     private val _uiState = MutableStateFlow(GamePlayUiState(Game(name = ""), emptyList()))
     val uiState: StateFlow<GamePlayUiState> = _uiState.asStateFlow()
+
+    private val _navigationEvents = MutableSharedFlow<NavigationEvent>()
+    val navigationEvents: SharedFlow<NavigationEvent> = _navigationEvents.asSharedFlow()
+
     private val _gameProgressService: GameProgressService =
         GameProgressService(gameProgressRepository)
     private var _gamePlayService = GamePlayService(Game(name = ""))
+
 
     fun onEvent(event: GamePlayUiEvent) {
         when (event) {
@@ -110,9 +121,16 @@ class GamePlayViewModel @Inject constructor(
     }
 
     private fun determineWinner() {
+        val currentWinner = uiState.value.winner
         val winner = _gamePlayService.determineWinner(_uiState.value.players)
         _uiState.update { currentState ->
             currentState.copy(winner = winner)
+        }
+
+        if (winner != null && winner != currentWinner) {
+            viewModelScope.launch {
+                _navigationEvents.emit(NavigationEvent.NavigateToLeaderboard)
+            }
         }
     }
 
