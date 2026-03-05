@@ -120,7 +120,6 @@ fun GamePlayScreen(
             is NavigationEvent.NavigateToLeaderboard -> {
                 onShowLeaderboard(uiState.game, uiState.players)
             }
-
             else -> {}
         }
     }
