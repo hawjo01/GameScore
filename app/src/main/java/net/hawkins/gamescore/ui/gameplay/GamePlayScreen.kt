@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.data.model.Game
+import net.hawkins.gamescore.ui.NavigationEvent
 import net.hawkins.gamescore.ui.component.ConfirmActionDialog
 import net.hawkins.gamescore.ui.favorites.SaveFavoriteGame
 import net.hawkins.gamescore.utils.isNegativeInt
@@ -110,6 +111,18 @@ fun GamePlayScreen(
     }
     LaunchedEffect(uiState) {
         viewModel.saveGameProgress()
+    }
+
+    val navigationEvent by viewModel.navigationEvents.collectAsState(initial = null)
+
+    LaunchedEffect(navigationEvent) {
+        when (navigationEvent) {
+            is NavigationEvent.NavigateToLeaderboard -> {
+                onShowLeaderboard(uiState.game, uiState.players)
+            }
+
+            else -> {}
+        }
     }
 
     GamePlayScreenContent(
@@ -624,13 +637,16 @@ private fun AppBarActions(
     val (confirmStartNewGame, setConfirmStartNewGame) = remember { mutableStateOf(false) }
 
     Row {
-        IconButton(onClick = { onShowLeaderboard(game, players)}) {
+        IconButton(onClick = { onShowLeaderboard(game, players) }) {
             Icon(imageVector = Icons.Outlined.Leaderboard, contentDescription = "Leaderboard")
         }
-    IconButton(onClick = { setDropdownMenuExpanded(true) }) {
-        Icon(imageVector = Icons.Filled.Menu, contentDescription = stringResource(R.string.menu))
+        IconButton(onClick = { setDropdownMenuExpanded(true) }) {
+            Icon(
+                imageVector = Icons.Filled.Menu,
+                contentDescription = stringResource(R.string.menu)
+            )
+        }
     }
-}
     DropdownMenu(
         expanded = dropdownMenuExpanded,
         onDismissRequest = { setDropdownMenuExpanded(false) }
@@ -778,9 +794,11 @@ private fun GamePlayScreenContentPreview() {
         Player("Sheldon", listOf(Score(90), Score(25))),
         Player("Leonard", listOf(Score(-20), Score(40), Score(235)))
     )
-    val uiState = GamePlayUiState(game = game,
+    val uiState = GamePlayUiState(
+        game = game,
         players = players,
-        showRoundNumber = true)
+        showRoundNumber = true
+    )
     GamePlayScreenContent(
         uiState = uiState,
         onEvent = { _ -> },
