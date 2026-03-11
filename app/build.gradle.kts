@@ -7,6 +7,11 @@ plugins {
 
 val signingKeystore = file("signing_keystore.jks")
 
+val nettyVersion = "4.1.129.Final"
+val joseVersion = "0.9.6"
+val commonsLang3Version = "3.18.0"
+val httpClientVersion = "4.5.13"
+
 configurations.all {
     resolutionStrategy.force(
         // Because CVE-2024-7254
@@ -14,17 +19,20 @@ configurations.all {
         // Because CVE-2024-7254
         "com.google.protobug:protobuf-java:3.25.5",
         // Because Netty has multiple CVE's
-        "io.netty:netty-buffer:4.1.129.Final",
-        "io.netty:netty-codec-http2:4.1.129.Final",
-        "io.netty:netty-code-http:4.1.129.Final",
-        "io.netty:netty-code-socks:4.1.129.Final",
-        "io.netty:netty-code:4.1.129.Final",
-        "io.netty:netty-common:4.1.129.Final",
-        "io.netty:netty-handler-proxy:4.1.129.Final",
-        "io.netty:netty-handler:4.1.129.Final",
-        "io.netty:netty-resolver:4.1.129.Final",
-        "io.netty:netty-transport-native-unix-common:4.1.129.Final",
-        "io.netty:netty-transport:4.1.129.Final"
+        "io.netty:netty-buffer:$nettyVersion",
+        "io.netty:netty-codec-http2:$nettyVersion",
+        "io.netty:netty-code-http:$nettyVersion",
+        "io.netty:netty-code-socks:$nettyVersion",
+        "io.netty:netty-code:$nettyVersion",
+        "io.netty:netty-common:$nettyVersion",
+        "io.netty:netty-handler-proxy:$nettyVersion",
+        "io.netty:netty-handler:$nettyVersion",
+        "io.netty:netty-resolver:$nettyVersion",
+        "io.netty:netty-transport-native-unix-common:$nettyVersion",
+        "io.netty:netty-transport:$nettyVersion",
+        "org.bitbucket.b_c:jose:$joseVersion",
+        "org.apache.commons:commons-lang3:$commonsLang3Version",
+        "org.apache.httpcomponents:httpclient:$httpClientVersion"
     )
 }
 
