@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
@@ -23,34 +23,39 @@ fun ShimmeringGoldText(
     text: String,
     modifier: Modifier = Modifier
 ) {
-    val transition = rememberInfiniteTransition()
-    val translateAnim by transition.animateFloat(
-        initialValue = 0f, targetValue = 1000f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = 3000, // slower = smoother
-                easing = LinearEasing // smoother easing
-            ),
-            repeatMode = RepeatMode.Reverse
-        )
+    val goldColors = listOf(
+        Color(0xFF8B4513), // Darker Gold/Bronze
+        Color(0xFFFFD700), // Gold
+        Color(0xFFFFECB3), // Lighter Gold
+        Color(0xFFFFD700), // Gold
+        Color(0xFF8B4513)  // Darker Gold/Bronze
     )
 
-    val goldColors = listOf(
-        Color(0xFFF9A825), // Darker Gold
-        Color(0xFFFFEB3B), // Bright Gold
-        Color(0xFFF9A825)  // Darker Gold
+    val infiniteTransition = rememberInfiniteTransition(label = "shimmer")
+    val translateAnim by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1000f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 5000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "translate"
     )
+
     val brush = Brush.linearGradient(
         colors = goldColors,
         start = Offset(translateAnim, translateAnim),
-        end = Offset(translateAnim + 600f, translateAnim + 600f)
+        end = Offset(translateAnim + 200f, translateAnim + 200f),
+        tileMode = TileMode.Mirror
     )
 
-    @OptIn(ExperimentalTextApi::class)
     Text(
         text = text,
-        style = TextStyle(brush = brush, fontSize = 40.sp),
-        fontWeight = FontWeight.ExtraBold,
+        style = TextStyle(
+            brush = brush,
+            fontSize = 40.sp,
+            fontWeight = FontWeight.ExtraBold
+        ),
         modifier = modifier
     )
 }
