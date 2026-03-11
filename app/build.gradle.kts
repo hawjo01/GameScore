@@ -30,7 +30,7 @@ configurations.all {
         "io.netty:netty-resolver:$nettyVersion",
         "io.netty:netty-transport-native-unix-common:$nettyVersion",
         "io.netty:netty-transport:$nettyVersion",
-        "org.bitbucket.b_c:jose:$joseVersion",
+        "org.bitbucket.b_c:jose4j:$joseVersion",
         "org.apache.commons:commons-lang3:$commonsLang3Version",
         "org.apache.httpcomponents:httpclient:$httpClientVersion"
     )
