@@ -41,8 +41,8 @@ class TestData {
         }
 
         fun createPlayer(name: String, values: List<Int> = emptyList()): Player {
-            val scores = values.map { value -> Score(value = value)}
-            return Player(name, scores)
+            val scores = values.map { value -> Score(value = value) }
+            return Player(name = name, scores = scores)
         }
 
         fun addScores(player: Player, vararg scores: Int): Player {
