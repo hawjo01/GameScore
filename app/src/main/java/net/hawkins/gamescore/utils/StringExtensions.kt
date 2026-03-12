@@ -9,3 +9,8 @@ fun String.trimToNull(): String? {
     val trimmed = this.trim()
     return trimmed.ifEmpty { null }
 }
+
+fun String?.removeAllWhitespace(): String {
+    val trimmed = (this ?: "").trim()
+    return trimmed.replace(Regex("\\s*"), "")
+}
