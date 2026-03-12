@@ -790,8 +790,8 @@ private fun GamePlayScreenContentPreview() {
         )
     )
     val players = listOf(
-        Player("Sheldon", listOf(Score(90), Score(25))),
-        Player("Leonard", listOf(Score(-20), Score(40), Score(235)))
+        Player(name = "Sheldon", scores = listOf(Score(90), Score(25))),
+        Player(name = "Leonard", scores = listOf(Score(-20), Score(40), Score(235)))
     )
     val uiState = GamePlayUiState(
         game = game,

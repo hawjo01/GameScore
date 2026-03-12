@@ -30,7 +30,7 @@ class GamePlayViewModel @Inject constructor(
     private val _gameRepository: GameRepository,
     gameProgressRepository: GameProgressRepository,
 ) : AbstractViewModel() {
-    private val _uiState = MutableStateFlow(GamePlayUiState(Game(name = ""), emptyList()))
+    private val _uiState = MutableStateFlow(GamePlayUiState(game = Game(name = ""), players = emptyList()))
     val uiState: StateFlow<GamePlayUiState> = _uiState.asStateFlow()
 
     private val _navigationEvents = MutableSharedFlow<NavigationEvent>()
@@ -90,7 +90,7 @@ class GamePlayViewModel @Inject constructor(
         val player = _uiState.value.players[seatIndex]
         val newScore = _gamePlayService.buildScore(score)
         val updatedScores = player.scores.plus(newScore)
-        val updatedPlayer = Player(player.name, updatedScores)
+        val updatedPlayer = player.copy(scores = updatedScores)
         updatePlayer(seatIndex, updatedPlayer)
     }
 
@@ -98,14 +98,14 @@ class GamePlayViewModel @Inject constructor(
         val player = _uiState.value.players[seatIndex]
         val updatedScore = _gamePlayService.buildScore(newScore)
         val updatedScores = player.scores.replaceElementAtIndex(roundNumber, updatedScore)
-        val updatedPlayer = Player(player.name, updatedScores)
+        val updatedPlayer = player.copy(scores = updatedScores)
         updatePlayer(seatIndex, updatedPlayer)
     }
 
     private fun deleteScore(seatIndex: Int, roundNumber: Int) {
         val player = _uiState.value.players[seatIndex]
         val updatedScores = player.scores.removeElementAtIndex(roundNumber)
-        val updatedPlayer = Player(player.name, updatedScores)
+        val updatedPlayer = player.copy(scores = updatedScores)
         updatePlayer(seatIndex, updatedPlayer)
     }
 
@@ -174,7 +174,7 @@ class GamePlayViewModel @Inject constructor(
                 val updatedScore = _gamePlayService.buildScore(score.value)
                 updatedScores.add(updatedScore)
             }
-            val updatedPlayer = Player(player.name, updatedScores)
+            val updatedPlayer = player.copy(scores = updatedScores)
             updatedPlayers.add(updatedPlayer)
         }
 
