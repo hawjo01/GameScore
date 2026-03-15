@@ -343,7 +343,7 @@ fun measureTextHeight(text: String, style: TextStyle): Dp {
 
 @Composable
 fun ScoreInputField(
-    initialValue: String,
+    initialValue: String?,
     onAddScore: (Int) -> Unit,
     isValidScore: (String) -> Boolean,
     modifier: Modifier
@@ -362,11 +362,15 @@ fun ScoreInputField(
         val height = measureTextHeight(newScore, textStyle) + 4.dp
         BasicTextField(
             value = newScore,
-            onValueChange = { newScore = getNewScoreText(it) },
+            onValueChange = { newValue ->
+                val processedValue =
+                    newValue.replace("..", "-").replace(".", "-").replace("--", "-")
+                newScore = getNewScoreText(processedValue)
+            },
             modifier = modifier
                 .height(height)
                 .width(IntrinsicSize.Min),
-            textStyle = textStyle.plus(TextStyle(color = if (newScore.isNegativeInt() || newScore == "-") Color.Red else MaterialTheme.colorScheme.onSurface)),
+            textStyle = textStyle.copy(color = if (newScore.isNegativeInt() || newScore == "-") Color.Red else MaterialTheme.colorScheme.onSurface),
             decorationBox = { innerTextField ->
                 OutlinedTextFieldDefaults.DecorationBox(
                     value = newScore,
@@ -411,7 +415,7 @@ fun ScoreInputField(
     }
 }
 
-private fun getNewScoreText(value: String): String {
+private fun getNewScoreText(value: String?): String {
     val trimmed = value.removeAllWhitespace()
     val text = if (trimmed == "") {
         "   " // 3 spaces so the input text field has some length
@@ -502,6 +506,8 @@ private fun Round(
             } else {
                 if (player.scores.size == round) {
                     ScoreInputField(
+                        initialValue = null,
+                        isValidScore = isValidScore,
                         onAddScore = { score: Int ->
                             onEvent(
                                 GamePlayUiEvent.AddScore(
@@ -510,8 +516,6 @@ private fun Round(
                                 )
                             )
                         },
-                        isValidScore = isValidScore,
-                        initialValue = "",
                         modifier = modifier.weight(1f)
                     )
                 } else {
