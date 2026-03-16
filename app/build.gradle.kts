@@ -10,7 +10,7 @@ val signingKeystore = file("signing_keystore.jks")
 val nettyVersion = "4.1.129.Final"
 val joseVersion = "0.9.6"
 val commonsLang3Version = "3.18.0"
-val httpClientVersion = "4.5.13"
+val httpClientVersion = "4.5.14"
 
 configurations.all {
     resolutionStrategy.force(
