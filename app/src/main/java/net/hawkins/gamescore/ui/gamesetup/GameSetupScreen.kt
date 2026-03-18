@@ -20,11 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuAnchorType
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.shapes
@@ -54,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import net.hawkins.gamescore.R
 import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.ui.component.BackNavigationIcon
+import net.hawkins.gamescore.ui.component.Dropdown
 import net.hawkins.gamescore.ui.theme.Typography
 import net.hawkins.gamescore.utils.trimToNull
 
@@ -202,7 +198,7 @@ private fun DisplayColorsCard(
         modifier = modifier
     )
     {
-        ColorTypeDropMenu(
+        ColorTypeDropdown(
             label = stringResource(R.string.positive_score),
             value = uiState.game.color.positiveScore,
             onChange = { color: Game.Colors.Color ->
@@ -214,7 +210,7 @@ private fun DisplayColorsCard(
             },
             modifier = modifier
         )
-        ColorTypeDropMenu(
+        ColorTypeDropdown(
             label = stringResource(R.string.negative_score),
             value = uiState.game.color.negativeScore,
             onChange = { color: Game.Colors.Color ->
@@ -271,7 +267,6 @@ private fun ConstraintCard(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun GameSectionCard(
     title: String = "",
@@ -352,7 +347,7 @@ private fun ObjectiveCard(
         title = stringResource(R.string.game_objective),
         modifier = modifier
     ) {
-        ObjectiveTypeDropMenu(
+        ObjectiveTypeDropdown(
             value = uiState.game.objective.type,
             onObjectiveTypeChange = { type: Game.Objective.Type ->
                 onEvent(
@@ -401,7 +396,7 @@ private fun RoundObjectiveCard(
             onValueChange = { value -> onEvent(GameSetupUiEvent.SetRoundObjectiveDisplayValue(value)) },
             modifier = modifier
         )
-        ColorTypeDropMenu(
+        ColorTypeDropdown(
             label = stringResource(R.string.display_color),
             value = uiState.game.roundObjective.displayColor,
             onChange = { color: Game.Colors.Color ->
@@ -530,9 +525,9 @@ private fun SwitchWithLabel(
 
         Switch(
             checked = checkedState,
-            onCheckedChange = {
-                setCheckedState(it)
-                onCheckedChange(it)
+            onCheckedChange = { checked ->
+                setCheckedState(checked)
+                onCheckedChange(checked)
             }
         )
         Text(
@@ -543,9 +538,25 @@ private fun SwitchWithLabel(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ObjectiveTypeDropMenu(
+private fun Game.Objective.Type.toDisplayName(): String {
+    return when (this) {
+        Game.Objective.Type.HIGH_SCORE -> stringResource(R.string.high_score)
+        Game.Objective.Type.LOW_SCORE -> stringResource(R.string.low_score)
+    }
+}
+
+@Composable
+private fun Game.Colors.Color.toDisplayName(): String {
+    return when (this) {
+        Game.Colors.Color.DEFAULT -> stringResource(R.string.normal)
+        Game.Colors.Color.RED -> stringResource(R.string.red)
+        Game.Colors.Color.GREEN -> stringResource(R.string.green)
+    }
+}
+
+@Composable
+private fun ObjectiveTypeDropdown(
     value: Game.Objective.Type,
     onObjectiveTypeChange: (Game.Objective.Type) -> Unit,
     modifier: Modifier
@@ -554,64 +565,24 @@ private fun ObjectiveTypeDropMenu(
         modifier = modifier
     )
     {
-        val (expanded, setExpanded) = remember { mutableStateOf(false) }
-        val selectedText = toDisplayName(value)
-
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { setExpanded(!expanded) }
-        ) {
-            OutlinedTextField(
-                value = selectedText,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text(text = stringResource(R.string.type)) },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                },
-                modifier = Modifier
-                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                    .padding(bottom = 5.dp)
-            )
-
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { setExpanded(false) }
-            ) {
-                Game.Objective.Type.entries.forEach { selectionOption ->
-                    DropdownMenuItem(
-                        text = { Text(toDisplayName(selectionOption)) },
-                        onClick = {
-                            onObjectiveTypeChange(selectionOption)
-                            setExpanded(false)
-                        }
-                    )
-                }
-            }
+        val options = Game.Objective.Type.entries.map { color ->
+            val displayName = color.toDisplayName()
+            Pair(color, displayName)
         }
+        val selected = Pair(value, value.toDisplayName())
+
+        GameDropdown(
+            label = stringResource(R.string.type),
+            selected = selected,
+            options = options,
+            onChange = onObjectiveTypeChange,
+            modifier = modifier
+        )
     }
 }
 
 @Composable
-private fun toDisplayName(type: Game.Objective.Type): String {
-    return when (type) {
-        Game.Objective.Type.HIGH_SCORE -> stringResource(R.string.high_score)
-        Game.Objective.Type.LOW_SCORE -> stringResource(R.string.low_score)
-    }
-}
-
-@Composable
-private fun toDisplayName(color: Game.Colors.Color): String {
-    return when (color) {
-        Game.Colors.Color.DEFAULT -> stringResource(R.string.normal)
-        Game.Colors.Color.RED -> stringResource(R.string.red)
-        Game.Colors.Color.GREEN -> stringResource(R.string.green)
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun ColorTypeDropMenu(
+private fun ColorTypeDropdown(
     label: String,
     value: Game.Colors.Color,
     onChange: (Game.Colors.Color) -> Unit,
@@ -621,41 +592,41 @@ private fun ColorTypeDropMenu(
         modifier = modifier
     )
     {
-        val (expanded, setExpanded) = remember { mutableStateOf(false) }
-        val selectedText = toDisplayName(value)
-
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { setExpanded(!expanded) }
-        ) {
-            OutlinedTextField(
-                value = selectedText,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text(text = label) },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                },
-                modifier = Modifier
-                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                    .padding(bottom = 5.dp)
-            )
-
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { setExpanded(false) }
-            ) {
-                Game.Colors.Color.entries.forEach { selectionOption ->
-                    DropdownMenuItem(
-                        text = { Text(toDisplayName(selectionOption)) },
-                        onClick = {
-                            onChange(selectionOption)
-                            setExpanded(false)
-                        }
-                    )
-                }
-            }
+        val options = Game.Colors.Color.entries.map { color ->
+            val displayName = color.toDisplayName()
+            Pair(color, displayName)
         }
+        val selected = Pair(value, value.toDisplayName())
+
+        GameDropdown(
+            label = label,
+            selected = selected,
+            options = options,
+            onChange = onChange,
+            modifier = modifier
+        )
+    }
+}
+
+@Composable
+private fun <T> GameDropdown(
+    label: String,
+    selected: Pair<T, String>,
+    options: List<Pair<T, String>>,
+    onChange: (T) -> Unit,
+    modifier: Modifier
+) {
+    GameSectionRow(
+        modifier = modifier
+    )
+    {
+        Dropdown(
+            label = label,
+            selected = selected,
+            options = options,
+            onChange = onChange,
+            modifier = modifier
+        )
     }
 }
 
