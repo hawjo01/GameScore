@@ -158,7 +158,7 @@ private fun NameCard(
             val hideKeyboard = { keyboardController?.hide() }
 
             OutlinedTextField(
-                value = uiState.game.name,
+                value = uiState.gameName,
                 onValueChange = { newName -> onEvent(GameSetupUiEvent.SetGameName(newName)) },
                 label = { Text(text = stringResource(R.string.name)) },
                 singleLine = true,
@@ -200,7 +200,7 @@ private fun DisplayColorsCard(
     {
         ColorTypeDropdown(
             label = stringResource(R.string.positive_score),
-            value = uiState.game.color.positiveScore,
+            value = uiState.gameColorsPositiveScore,
             onChange = { color: Game.Colors.Color ->
                 onEvent(
                     GameSetupUiEvent.SetDisplayPositiveColor(
@@ -212,7 +212,7 @@ private fun DisplayColorsCard(
         )
         ColorTypeDropdown(
             label = stringResource(R.string.negative_score),
-            value = uiState.game.color.negativeScore,
+            value = uiState.gameColorsNegativeScore,
             onChange = { color: Game.Colors.Color ->
                 onEvent(
                     GameSetupUiEvent.SetDisplayNegativeColor(
@@ -237,7 +237,7 @@ private fun ConstraintCard(
     ) {
         SwitchWithLabel(
             label = stringResource(R.string.only_positive),
-            initialState = uiState.game.constraints.positiveOnly,
+            initialState = uiState.gameConstraintPositiveOnly,
             onCheckedChange =
                 { newCheckedState ->
                     onEvent(GameSetupUiEvent.SetConstraintPositiveOnlyScores(newCheckedState))
@@ -246,7 +246,7 @@ private fun ConstraintCard(
         )
         SwitchWithLabel(
             label = "Require Equal Hand Sizes",
-            initialState = uiState.game.constraints.equalHandSizes,
+            initialState = uiState.gameConstraintEqualHandSizes,
             onCheckedChange = { newCheckedState ->
                 onEvent(GameSetupUiEvent.SetConstraintEqualHandSizes(newCheckedState))
             },
@@ -254,7 +254,7 @@ private fun ConstraintCard(
         )
         NullableIntOutlinedTextFieldRow(
             label = stringResource(R.string.multiple_of),
-            number = uiState.game.constraints.multipleOf,
+            number = uiState.gameConstraintScoreModulus,
             onValueChange = { newValue ->
                 onEvent(
                     GameSetupUiEvent.SetConstraintScoreModulus(
@@ -348,7 +348,7 @@ private fun ObjectiveCard(
         modifier = modifier
     ) {
         ObjectiveTypeDropdown(
-            value = uiState.game.objective.type,
+            value = uiState.gameObjectiveType,
             onObjectiveTypeChange = { type: Game.Objective.Type ->
                 onEvent(
                     GameSetupUiEvent.SetObjectiveType(
@@ -360,13 +360,13 @@ private fun ObjectiveCard(
         )
         NullableIntOutlinedTextFieldRow(
             label = stringResource(R.string.goal),
-            number = uiState.game.objective.goal,
+            number = uiState.gameObjectiveGoal,
             onValueChange = { goal: Int? -> onEvent(GameSetupUiEvent.SetObjectiveGoal(goal)) },
             modifier = modifier
         )
         NullableIntOutlinedTextFieldRow(
             label = stringResource(R.string.rounds),
-            number = uiState.game.objective.rounds,
+            number = uiState.gameObjectiveRounds,
             onValueChange = { rounds: Int? -> onEvent(GameSetupUiEvent.SetObjectiveRounds(rounds)) },
             modifier = modifier
         )
@@ -381,24 +381,24 @@ private fun RoundObjectiveCard(
 ) {
     GameSectionCard(
         title = stringResource(R.string.round_objective),
-        initialExpanded = uiState.game.roundObjective.goal != null,
+        initialExpanded = uiState.gameRoundObjectiveGoal != null,
         modifier = modifier
     ) {
         NullableIntOutlinedTextFieldRow(
             label = stringResource(R.string.goal),
-            number = uiState.game.roundObjective.goal,
+            number = uiState.gameRoundObjectiveGoal,
             onValueChange = { value -> onEvent(GameSetupUiEvent.SetRoundObjectiveGoal(value)) },
             modifier = modifier
         )
         NullableStringOutlinedTextFieldRow(
             label = stringResource(R.string.display_value),
-            value = uiState.game.roundObjective.displayValue,
+            value = uiState.gameRoundObjectiveDisplayValue,
             onValueChange = { value -> onEvent(GameSetupUiEvent.SetRoundObjectiveDisplayValue(value)) },
             modifier = modifier
         )
         ColorTypeDropdown(
             label = stringResource(R.string.display_color),
-            value = uiState.game.roundObjective.displayColor,
+            value = uiState.gameRoundObjectiveDisplayColor,
             onChange = { color: Game.Colors.Color ->
                 onEvent(
                     GameSetupUiEvent.SetRoundObjectiveDisplayColor(
@@ -630,24 +630,15 @@ private fun <T> GameDropdown(
     }
 }
 
-
 @Preview
 @Composable
 private fun GameSetupContentPreview() {
     GameSetupScreenContent(
         uiState = GameSetupUiState(
-            Game(
-                name = "2500",
-                objective = Game.Objective(
-                    goal = 2500
-                ),
-                constraints = Game.Constraints(
-                    multipleOf = 5
-                ),
-                color = Game.Colors(
-                    negativeScore = Game.Colors.Color.RED
-                )
-            )
+            gameName = "2500",
+            gameObjectiveGoal = 2500,
+            gameConstraintScoreModulus = 5,
+            gameColorsNegativeScore = Game.Colors.Color.RED
         ),
         onEvent = { _ -> },
         modifier = Modifier
