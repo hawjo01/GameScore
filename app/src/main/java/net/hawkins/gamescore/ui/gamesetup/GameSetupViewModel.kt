@@ -20,7 +20,7 @@ class GameSetupViewModel @Inject constructor(
     val uiState: StateFlow<GameSetupUiState> = _uiState.asStateFlow()
 
     fun saveGame(): Boolean {
-        if (_uiState.value.game.name.isBlank()) {
+        if (isNameValid(_uiState.value.gameName)) {
             _uiState.update { currentState ->
                 currentState.copy(
                     isValidName = false
@@ -28,135 +28,138 @@ class GameSetupViewModel @Inject constructor(
             }
             return false
         }
-        _gameRepository.save(_uiState.value.game)
+        val savedGame = _gameRepository.save(_uiState.value.toGame())
+        _uiState.value = savedGame.toGameSetupUiState(isNameValid(savedGame.name))
         return true
     }
 
     fun onEvent(event: GameSetupUiEvent) {
         when (event) {
-            is GameSetupUiEvent.SetGameName -> setGameName(event.name)
-            is GameSetupUiEvent.SetConstraintPositiveOnlyScores -> setConstraintAllowNegative(event.positiveOnly)
-            is GameSetupUiEvent.SetConstraintEqualHandSizes -> setConstraintEqualHandSizes(event.requireEqualHandSizes)
-            is GameSetupUiEvent.SetConstraintScoreModulus -> setConstraintModulus(event.modulus)
-            is GameSetupUiEvent.SetObjectiveGoal -> setObjectiveGoal(event.goal)
-            is GameSetupUiEvent.SetObjectiveType -> setObjectiveType(event.type)
-            is GameSetupUiEvent.SetObjectiveRounds -> setObjectiveRounds(event.rounds)
-            is GameSetupUiEvent.SetRoundObjectiveGoal -> setRoundObjectiveGoal(event.goal)
-            is GameSetupUiEvent.SetRoundObjectiveDisplayValue -> setRoundObjectiveDisplayValue(event.value)
-            is GameSetupUiEvent.SetRoundObjectiveDisplayColor -> setRoundObjectiveDisplayColor(event.color)
-            is GameSetupUiEvent.SetDisplayNegativeColor -> setDisplayNegative(event.color)
-            is GameSetupUiEvent.SetDisplayPositiveColor -> setDisplayPositive(event.color)
-            is GameSetupUiEvent.NewGame -> newGame()
-            is GameSetupUiEvent.SetGame -> updateUiState(event.game)
+            is GameSetupUiEvent.SetGameName -> onChangeGameName(event.name)
+            is GameSetupUiEvent.SetConstraintPositiveOnlyScores -> onChangeConstraintPositiveOnly(event.positiveOnly)
+            is GameSetupUiEvent.SetConstraintEqualHandSizes -> onChangeConstraintEqualHandSizes(event.requireEqualHandSizes)
+            is GameSetupUiEvent.SetConstraintScoreModulus -> onChangeConstraintScoreModulus(event.modulus)
+            is GameSetupUiEvent.SetObjectiveGoal -> onChangeObjectiveGoal(event.goal)
+            is GameSetupUiEvent.SetObjectiveType -> onChangeObjectiveType(event.type)
+            is GameSetupUiEvent.SetObjectiveRounds -> onChangeObjectiveRounds(event.rounds)
+            is GameSetupUiEvent.SetRoundObjectiveGoal -> onChangeRoundObjectiveGoal(event.goal)
+            is GameSetupUiEvent.SetRoundObjectiveDisplayValue -> onChangeRoundObjectiveDisplayValue(event.value)
+            is GameSetupUiEvent.SetRoundObjectiveDisplayColor -> onChangeRoundObjectiveDisplayColor(event.color)
+            is GameSetupUiEvent.SetDisplayNegativeColor -> onChangeColorDisplayNegative(event.color)
+            is GameSetupUiEvent.SetDisplayPositiveColor -> onChangeColorDisplayPositive(event.color)
+            is GameSetupUiEvent.NewGame -> onClearGame()
+            is GameSetupUiEvent.SetGame -> onChangeGame(event.game)
         }
     }
 
-    private fun setGameName(newName: String) {
-        val currentGame = _uiState.value.game
-        val newGame = currentGame.copy(name = newName)
-        updateUiState(newGame)
-    }
-
-    private fun setConstraintAllowNegative(state: Boolean) {
-        val currentGame = _uiState.value.game
-        val currentConstraints = currentGame.constraints
-        val newConstraints = currentConstraints.copy(positiveOnly = state)
-        val newGame = currentGame.copy(constraints = newConstraints)
-        updateUiState(newGame)
-    }
-
-    private fun setConstraintEqualHandSizes(state: Boolean) {
-        val currentGame = _uiState.value.game
-        val currentConstraints = currentGame.constraints
-        val newConstraints = currentConstraints.copy(equalHandSizes = state)
-        val newGame = currentGame.copy(constraints = newConstraints)
-        updateUiState(newGame)
-    }
-
-    private fun setConstraintModulus(newMultipleOf: Int?) {
-        val currentGame = _uiState.value.game
-        val currentConstraints = currentGame.constraints
-        val newConstraints = currentConstraints.copy(multipleOf = newMultipleOf)
-        val newGame = currentGame.copy(constraints = newConstraints)
-        updateUiState(newGame)
-    }
-
-    private fun setObjectiveType(newType: Game.Objective.Type) {
-        val currentGame = _uiState.value.game
-        val currentObjective = currentGame.objective
-        val newObjective = currentObjective.copy(type = newType)
-        val newGame = currentGame.copy(objective = newObjective)
-        updateUiState(newGame)
-    }
-
-    private fun setObjectiveRounds(rounds: Int?) {
-        val currentGame = _uiState.value.game
-        val currentObjective = currentGame.objective
-        val newObjective = currentObjective.copy(rounds = rounds)
-        val newGame = currentGame.copy(objective = newObjective)
-        updateUiState(newGame)
-    }
-
-    private fun setObjectiveGoal(newGoal: Int?) {
-        val currentGame = _uiState.value.game
-        val currentObjective = currentGame.objective
-        val newObjective = currentObjective.copy(goal = newGoal)
-        val newGame = currentGame.copy(objective = newObjective)
-        updateUiState(newGame)
-    }
-
-    private fun setRoundObjectiveGoal(goal: Int?) {
-        val currentGame = _uiState.value.game
-        val currentRoundObjective = currentGame.roundObjective
-        val newRoundObjective = currentRoundObjective.copy(goal = goal)
-        val newGame = currentGame.copy(roundObjective = newRoundObjective)
-        updateUiState(newGame)
-    }
-
-    private fun setRoundObjectiveDisplayValue(displayValue: String?) {
-        val currentGame = _uiState.value.game
-        val currentRoundObjective = currentGame.roundObjective
-        val newRoundObjective =
-            currentRoundObjective.copy(displayValue = displayValue?.trimToNull())
-        val newGame = currentGame.copy(roundObjective = newRoundObjective)
-        updateUiState(newGame)
-    }
-
-    private fun setRoundObjectiveDisplayColor(newColor: Game.Colors.Color) {
-        val currentGame = _uiState.value.game
-        val currentRoundObjective = currentGame.roundObjective
-        val newRoundObjective = currentRoundObjective.copy(displayColor = newColor)
-        val newGame = currentGame.copy(roundObjective = newRoundObjective)
-        updateUiState(newGame)
-    }
-
-    private fun setDisplayNegative(newColor: Game.Colors.Color) {
-        val currentGame = _uiState.value.game
-        val currentColors = currentGame.color
-        val newColors = currentColors.copy(negativeScore = newColor)
-        val newGame = currentGame.copy(color = newColors)
-        updateUiState(newGame)
-    }
-
-    private fun setDisplayPositive(newColor: Game.Colors.Color) {
-        val currentGame = _uiState.value.game
-        val currentColors = currentGame.color
-        val newColors = currentColors.copy(positiveScore = newColor)
-        val newGame = currentGame.copy(color = newColors)
-        updateUiState(newGame)
-    }
-
-    private fun updateUiState(newGame: Game) {
-        val isValidName = newGame.name.isNotBlank()
+    private fun onChangeGameName(newName: String) {
+        val isNameValid = isNameValid(newName)
         _uiState.update { currentState ->
             currentState.copy(
-                game = newGame,
-                isValidName = isValidName
+                gameName = newName,
+                isValidName = isNameValid
             )
         }
     }
 
-    private fun newGame() {
+    private fun onChangeConstraintPositiveOnly(newState: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                gameConstraintPositiveOnly = newState
+            )
+        }
+    }
+
+    private fun onChangeConstraintEqualHandSizes(newState: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                gameConstraintEqualHandSizes = newState
+            )
+        }
+    }
+
+    private fun onChangeConstraintScoreModulus(newModulus: Int?) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                gameConstraintScoreModulus = newModulus
+            )
+        }
+    }
+
+    private fun onChangeObjectiveType(newType: Game.Objective.Type) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                gameObjectiveType = newType
+            )
+        }
+    }
+
+    private fun onChangeObjectiveRounds(newRounds: Int?) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                gameObjectiveRounds = newRounds
+            )
+        }
+    }
+
+    private fun onChangeObjectiveGoal(newGoal: Int?) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                gameObjectiveGoal = newGoal
+            )
+        }
+    }
+
+    private fun onChangeRoundObjectiveGoal(newGoal: Int?) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                gameRoundObjectiveGoal = newGoal
+            )
+        }
+    }
+
+    private fun onChangeRoundObjectiveDisplayValue(newDisplayValue: String?) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                gameRoundObjectiveDisplayValue = newDisplayValue?.trimToNull()
+            )
+        }
+    }
+
+    private fun onChangeRoundObjectiveDisplayColor(newColor: Game.Colors.Color) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                gameRoundObjectiveDisplayColor = newColor
+            )
+        }
+    }
+
+    private fun onChangeColorDisplayNegative(newColor: Game.Colors.Color) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                gameColorsNegativeScore = newColor
+            )
+        }
+    }
+
+    private fun onChangeColorDisplayPositive(newColor: Game.Colors.Color) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                gameColorsPositiveScore = newColor
+            )
+        }
+    }
+
+    private fun onChangeGame(newGame: Game) {
+        val isValidName = isNameValid(newGame.name)
+        _uiState.value = newGame.toGameSetupUiState(isNameValid = isValidName)
+    }
+
+    private fun onClearGame() {
         _uiState.value = GameSetupUiState()
+    }
+
+    private fun isNameValid(name: String): Boolean {
+        return name.isNotBlank()
     }
 }
