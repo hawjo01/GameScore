@@ -1,9 +1,9 @@
 package net.hawkins.gamescore.ui.gamesetup
 
-import junit.framework.Assert.assertEquals
-import junit.framework.Assert.assertFalse
-import junit.framework.Assert.assertNull
-import junit.framework.Assert.assertTrue
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import net.hawkins.gamescore.data.model.Game
 import org.junit.Test
 
