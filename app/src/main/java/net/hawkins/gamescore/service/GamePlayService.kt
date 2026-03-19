@@ -61,8 +61,8 @@ class GamePlayService(val game: Game) {
         }
     }
 
-    fun isValidScore(score: String): Boolean {
-        val int = score.toIntOrNull() ?: return false
+    fun isValidScore(score: CharSequence): Boolean {
+        val int = score.toString().toIntOrNull() ?: return false
 
         if (game.constraints.positiveOnly && int < 0) {
             return false

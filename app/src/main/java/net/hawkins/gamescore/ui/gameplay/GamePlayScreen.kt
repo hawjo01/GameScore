@@ -21,6 +21,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.OutputTransformation
+import androidx.compose.foundation.text.input.insert
+import androidx.compose.foundation.text.input.placeCursorAtEnd
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Leaderboard
@@ -34,8 +38,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.OutlinedTextFieldDefaults.FocusedBorderThickness
-import androidx.compose.material3.OutlinedTextFieldDefaults.UnfocusedBorderThickness
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
@@ -71,9 +73,10 @@ import net.hawkins.gamescore.R
 import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.ui.NavigationEvent
 import net.hawkins.gamescore.ui.component.ConfirmActionDialog
+import net.hawkins.gamescore.ui.ext.isNegativeNumber
 import net.hawkins.gamescore.ui.favorites.SaveFavoriteGame
 import net.hawkins.gamescore.utils.isNegativeInt
-import net.hawkins.gamescore.utils.removeAllWhitespace
+import net.hawkins.gamescore.utils.toInt
 
 
 @Composable
@@ -150,7 +153,7 @@ fun GamePlayScreen(
 private fun GamePlayScreenContent(
     uiState: GamePlayUiState,
     onEvent: (GamePlayUiEvent) -> Unit,
-    isValidScore: (String) -> Boolean,
+    isValidScore: (CharSequence) -> Boolean,
     modifier: Modifier
 ) {
     Column(
@@ -192,7 +195,7 @@ private fun Winner(winner: String?) {
 private fun Game(
     uiState: GamePlayUiState,
     onEvent: (GamePlayUiEvent) -> Unit,
-    isValidScore: (String) -> Boolean,
+    isValidScore: (CharSequence) -> Boolean,
     modifier: Modifier
 ) {
     Column(
@@ -289,7 +292,7 @@ private fun Rounds(
     players: List<Player>,
     onEvent: (GamePlayUiEvent) -> Unit,
     numberOfRounds: Int,
-    isValidScore: (String) -> Boolean,
+    isValidScore: (CharSequence) -> Boolean,
     showRoundNumber: Boolean,
     modifier: Modifier
 ) {
@@ -341,15 +344,15 @@ fun measureTextHeight(text: String, style: TextStyle): Dp {
     }
 }
 
+
 @Composable
 fun ScoreInputField(
-    initialValue: String?,
+    initialValue: String,
     onAddScore: (Int) -> Unit,
-    isValidScore: (String) -> Boolean,
+    isValidScore: (CharSequence) -> Boolean,
     modifier: Modifier
 ) {
-    val initialText = getNewScoreText(initialValue)
-    var newScore by remember { mutableStateOf(initialText) }
+    val newScoreState = rememberTextFieldState(initialValue)
     val (warnInvalidScore, setWarnInvalidScore) = remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val hideKeyboard = { keyboardController?.hide() }
@@ -359,21 +362,22 @@ fun ScoreInputField(
         contentAlignment = Alignment.Center
     ) {
         val textStyle = MaterialTheme.typography.displayMedium
-        val height = measureTextHeight(newScore, textStyle) + 4.dp
+        val height = measureTextHeight("999", textStyle) + 4.dp
         BasicTextField(
-            value = newScore,
-            onValueChange = { newValue ->
-                val processedValue =
-                    newValue.replace("..", "-").replace(".", "-").replace("--", "-")
-                newScore = getNewScoreText(processedValue)
+            state = newScoreState,
+            outputTransformation = OutputTransformation {
+                while (length < 4) {
+                    insert(0, " ")
+                }
+                placeCursorAtEnd()
             },
             modifier = modifier
                 .height(height)
                 .width(IntrinsicSize.Min),
-            textStyle = textStyle.copy(color = if (newScore.isNegativeInt() || newScore == "-") Color.Red else MaterialTheme.colorScheme.onSurface),
-            decorationBox = { innerTextField ->
+            textStyle = textStyle.copy(color = if (newScoreState.isNegativeNumber()) Color.Red else MaterialTheme.colorScheme.onSurface),
+            decorator = { innerTextField ->
                 OutlinedTextFieldDefaults.DecorationBox(
-                    value = newScore,
+                    value = newScoreState.text.toString(),
                     innerTextField = innerTextField,
                     enabled = true,
                     singleLine = true,
@@ -385,10 +389,6 @@ fun ScoreInputField(
                             enabled = true,
                             isError = warnInvalidScore,
                             interactionSource = remember { MutableInteractionSource() },
-                            colors = OutlinedTextFieldDefaults.colors(),
-                            shape = OutlinedTextFieldDefaults.shape,
-                            focusedBorderThickness = FocusedBorderThickness,
-                            unfocusedBorderThickness = UnfocusedBorderThickness,
                         )
                     }
                 )
@@ -397,32 +397,20 @@ fun ScoreInputField(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
             ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    if (isValidScore(newScore)) {
-                        setWarnInvalidScore(false)
-                        onAddScore(newScore.removeAllWhitespace().toInt())
-                        hideKeyboard.invoke()
-                    } else if (newScore.removeAllWhitespace() == "") {
-                        setWarnInvalidScore(false)
-                        hideKeyboard.invoke()
-                    } else {
-                        setWarnInvalidScore(true)
-                    }
+            onKeyboardAction = {
+                if (isValidScore(newScoreState.text)) {
+                    setWarnInvalidScore(false)
+                    onAddScore(newScoreState.text.toInt())
+                    hideKeyboard.invoke()
+                } else if (newScoreState.text == "") {
+                    setWarnInvalidScore(false)
+                    hideKeyboard.invoke()
+                } else {
+                    setWarnInvalidScore(true)
                 }
-            )
+            }
         )
     }
-}
-
-private fun getNewScoreText(value: String?): String {
-    val trimmed = value.removeAllWhitespace()
-    val text = if (trimmed == "") {
-        "   " // 3 spaces so the input text field has some length
-    } else {
-        trimmed
-    }
-    return text
 }
 
 @Composable
@@ -430,7 +418,7 @@ private fun Round(
     round: Int,
     players: List<Player>,
     onEvent: (GamePlayUiEvent) -> Unit,
-    isValidScore: (String) -> Boolean,
+    isValidScore: (CharSequence) -> Boolean,
     showRoundNumber: Boolean,
     modifier: Modifier
 ) {
@@ -506,7 +494,7 @@ private fun Round(
             } else {
                 if (player.scores.size == round) {
                     ScoreInputField(
-                        initialValue = null,
+                        initialValue = "",
                         isValidScore = isValidScore,
                         onAddScore = { score: Int ->
                             onEvent(
