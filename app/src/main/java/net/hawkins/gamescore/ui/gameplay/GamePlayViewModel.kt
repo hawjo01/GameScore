@@ -134,7 +134,7 @@ class GamePlayViewModel @Inject constructor(
         }
     }
 
-    fun isValidScore(possibleScore: String): Boolean {
+    fun isValidScore(possibleScore: CharSequence): Boolean {
         return _gamePlayService.isValidScore(possibleScore)
     }
 
