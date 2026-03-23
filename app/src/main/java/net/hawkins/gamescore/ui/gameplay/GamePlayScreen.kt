@@ -2,7 +2,6 @@ package net.hawkins.gamescore.ui.gameplay
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,49 +19,38 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.OutputTransformation
+import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.insert
 import androidx.compose.foundation.text.input.placeCursorAtEnd
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Leaderboard
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MaterialTheme.shapes
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -73,9 +62,9 @@ import net.hawkins.gamescore.R
 import net.hawkins.gamescore.data.model.Game
 import net.hawkins.gamescore.ui.NavigationEvent
 import net.hawkins.gamescore.ui.component.ConfirmActionDialog
+import net.hawkins.gamescore.ui.component.MinimalDecorationBox
 import net.hawkins.gamescore.ui.ext.isNegativeNumber
 import net.hawkins.gamescore.ui.favorites.SaveFavoriteGame
-import net.hawkins.gamescore.utils.isNegativeInt
 import net.hawkins.gamescore.utils.toInt
 
 
@@ -308,7 +297,7 @@ private fun Rounds(
     ) {
         items(numberOfRounds) { round ->
             Round(
-                round = round,
+                roundIndex = round,
                 players = players,
                 onEvent = onEvent,
                 isValidScore = isValidScore,
@@ -318,7 +307,7 @@ private fun Rounds(
         }
         item {
             Round(
-                round = numberOfRounds,
+                roundIndex = numberOfRounds,
                 players = players,
                 onEvent = onEvent,
                 isValidScore = isValidScore,
@@ -344,12 +333,13 @@ fun measureTextHeight(text: String, style: TextStyle): Dp {
     }
 }
 
-
 @Composable
-fun ScoreInputField(
+fun RowScope.ScoreInputField(
     initialValue: String,
     onAddScore: (Int) -> Unit,
+    onChangeScore: (Int) -> Unit,
     isValidScore: (CharSequence) -> Boolean,
+    onSetEditable: (Boolean) -> Unit,
     modifier: Modifier
 ) {
     val newScoreState = rememberTextFieldState(initialValue)
@@ -358,7 +348,7 @@ fun ScoreInputField(
     val hideKeyboard = { keyboardController?.hide() }
 
     Box(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.weight(1f).fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
         val textStyle = MaterialTheme.typography.displayMedium
@@ -371,28 +361,18 @@ fun ScoreInputField(
                 }
                 placeCursorAtEnd()
             },
+            lineLimits = TextFieldLineLimits.SingleLine,
             modifier = modifier
                 .height(height)
                 .width(IntrinsicSize.Min),
+//                .onFocusChanged{focusState ->
+//                    if (!focusState.isFocused) {
+//                        onSetEditable(false)
+//                    }
+//
+//    },
             textStyle = textStyle.copy(color = if (newScoreState.isNegativeNumber()) Color.Red else MaterialTheme.colorScheme.onSurface),
-            decorator = { innerTextField ->
-                OutlinedTextFieldDefaults.DecorationBox(
-                    value = newScoreState.text.toString(),
-                    innerTextField = innerTextField,
-                    enabled = true,
-                    singleLine = true,
-                    visualTransformation = VisualTransformation.None,
-                    interactionSource = remember { MutableInteractionSource() },
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
-                    container = {
-                        OutlinedTextFieldDefaults.Container(
-                            enabled = true,
-                            isError = warnInvalidScore,
-                            interactionSource = remember { MutableInteractionSource() },
-                        )
-                    }
-                )
-            },
+            decorator = MinimalDecorationBox(warnInvalidScore, newScoreState.text.toString()),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
@@ -400,7 +380,11 @@ fun ScoreInputField(
             onKeyboardAction = {
                 if (isValidScore(newScoreState.text)) {
                     setWarnInvalidScore(false)
-                    onAddScore(newScoreState.text.toInt())
+                    if (initialValue == "") {
+                        onAddScore(newScoreState.text.toInt())
+                    } else {
+                        onChangeScore(newScoreState.text.toInt())
+                    }
                     hideKeyboard.invoke()
                 } else if (newScoreState.text == "") {
                     setWarnInvalidScore(false)
@@ -415,7 +399,7 @@ fun ScoreInputField(
 
 @Composable
 private fun Round(
-    round: Int,
+    roundIndex: Int,
     players: List<Player>,
     onEvent: (GamePlayUiEvent) -> Unit,
     isValidScore: (CharSequence) -> Boolean,
@@ -429,7 +413,7 @@ private fun Round(
             .fillMaxWidth()
             .padding(horizontal = 10.dp)
             .background(
-                if (round % 2 != 0) {
+                if (roundIndex % 2 != 0) {
                     if (isSystemInDarkTheme()) {
                         Color.DarkGray
                     } else {
@@ -441,60 +425,31 @@ private fun Round(
             )
     ) {
         if (showRoundNumber) {
-            Text(text = (round + 1).toString())
+            Text(text = (roundIndex + 1).toString())
         }
         players.forEachIndexed { seatIndex, player ->
-            val score = player.scores.getOrNull(round)
-            if (score != null) {
-                var showChangeScoreDialog by remember { mutableStateOf(false) }
-                var showDeleteScoreDialog by remember { mutableStateOf(false) }
-
-                val scoreText =
-                    score.displayValue ?: score.value.toString()
-                        .padStart(player.totalScore().toString().length, ' ')
-
-                Text(
-                    text = scoreText,
-                    style = MaterialTheme.typography.displayMedium,
-                    textAlign = TextAlign.Center,
-                    color = score.color,
+            val score = player.scores.getOrNull(roundIndex)
+            val (editable, setEditable) = remember { mutableStateOf(score == null) }
+            if (score != null && !editable) {
+                ScoreTextCell(
+                    player = player,
+                    score = score,
+                    roundIndex = roundIndex,
+                    seatIndex = seatIndex,
+                    onEvent = onEvent,
+                    setChange = { setEditable(true) },
                     modifier = modifier
-                        .weight(1f)
-                        .combinedClickable(onLongClick = {
-                            showDeleteScoreDialog = true
-                        }, onClick = {
-                            showChangeScoreDialog = true
-                        })
                 )
-
-                if (showChangeScoreDialog) {
-                    ChangeScore(
-                        playerName = player.name,
-                        currentScore = score.value,
-                        onChangeScore = { newScore ->
-                            onEvent(GamePlayUiEvent.ChangeScore(seatIndex, round, newScore))
-                        },
-                        isValidScore = isValidScore,
-                        onDismissRequest = { showChangeScoreDialog = false },
-                        modifier = modifier
-                    )
-                }
-
-                if (showDeleteScoreDialog) {
-                    DeleteScore(
-                        playerName = player.name,
-                        score = score.value,
-                        onDeleteScore = {
-                            onEvent(GamePlayUiEvent.DeleteScore(seatIndex, round))
-                        },
-                        onDismissRequest = { showDeleteScoreDialog = false },
-                        modifier = modifier
-                    )
-                }
             } else {
-                if (player.scores.size == round) {
+                if (player.scores.size >= roundIndex) {
+                    val initialValue = if (score == null) {
+                        ""
+                    } else {
+                        score.value.toString()
+                    }
+
                     ScoreInputField(
-                        initialValue = "",
+                        initialValue = initialValue,
                         isValidScore = isValidScore,
                         onAddScore = { score: Int ->
                             onEvent(
@@ -504,7 +459,19 @@ private fun Round(
                                 )
                             )
                         },
-                        modifier = modifier.weight(1f)
+                        onChangeScore = { score: Int ->
+                            onEvent(
+                                GamePlayUiEvent.ChangeScore(
+                                    seatIndex = seatIndex,
+                                    roundIndex = roundIndex,
+                                    newScore = score
+                                )
+                            )
+                            setEditable(false)
+                        },
+                        onSetEditable = setEditable
+                        ,
+                        modifier = modifier
                     )
                 } else {
                     Spacer(modifier = modifier.weight(1f))
@@ -512,6 +479,49 @@ private fun Round(
             }
         }
 
+    }
+}
+
+@Composable
+private fun RowScope.ScoreTextCell(
+    player: Player,
+    score: Score,
+    roundIndex: Int,
+    seatIndex: Int,
+    onEvent: (GamePlayUiEvent) -> Unit,
+    setChange: () -> Unit,
+    modifier: Modifier
+) {
+    val (showDeleteScoreDialog, setShowDeleteScoreDialog) = remember { mutableStateOf(false) }
+
+    val scoreText =
+        score.displayValue ?: score.value.toString()
+            .padStart(player.totalScore().toString().length, ' ')
+
+    Text(
+        text = scoreText,
+        style = MaterialTheme.typography.displayMedium,
+        textAlign = TextAlign.Center,
+        color = score.color,
+        modifier = modifier
+            .weight(1f)
+            .combinedClickable(onLongClick = {
+                setShowDeleteScoreDialog(true)
+            }, onClick = {
+                setChange()
+            })
+    )
+
+    if (showDeleteScoreDialog) {
+        DeleteScore(
+            playerName = player.name,
+            score = score.value,
+            onDeleteScore = {
+                onEvent(GamePlayUiEvent.DeleteScore(seatIndex, roundIndex))
+            },
+            onDismissRequest = { setShowDeleteScoreDialog(false) },
+            modifier = modifier
+        )
     }
 }
 
@@ -537,113 +547,6 @@ private fun DeleteScore(
         onDismissRequest = onDismissRequest,
         modifier = modifier
     )
-}
-
-@Composable
-private fun ChangeScore(
-    playerName: String,
-    currentScore: Int,
-    isValidScore: (String) -> Boolean,
-    onChangeScore: (Int) -> Unit,
-    onDismissRequest: () -> Unit,
-    modifier: Modifier
-) {
-    val (newScore, setNewScore) = remember {
-        mutableStateOf(
-            TextFieldValue(
-                text = currentScore.toString(),
-                selection = TextRange(currentScore.toString().length) // Set cursor to the end
-            )
-        )
-    }
-    val (warnInvalidScore, setWarnInvalidScore) = remember { mutableStateOf(false) }
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val hideKeyboard = { keyboardController?.hide() }
-    val focusRequester = remember { FocusRequester() }
-
-    AlertDialog(
-        title = {
-            Text(text = stringResource(R.string.change_score))
-        },
-        text = {
-            OutlinedTextField(
-                value = newScore,
-                onValueChange = { newValue ->
-                    setNewScore(newValue)
-                    setWarnInvalidScore(!isValidScore(newValue.text))
-                },
-                label = {
-                    Text(
-                        text = stringResource(R.string.score_for, playerName),
-                        style = MaterialTheme.typography.labelSmall
-                    )
-                },
-                isError = warnInvalidScore,
-                supportingText = {
-                    if (warnInvalidScore) {
-                        Text(
-                            text = stringResource(R.string.not_a_valid_score),
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
-                },
-                textStyle = MaterialTheme.typography.labelSmall.plus(TextStyle(textAlign = TextAlign.Center)),
-                singleLine = true,
-                shape = shapes.small,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done,
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        if (isValidScore(newScore.text)) {
-                            setWarnInvalidScore(false)
-                            onChangeScore(newScore.text.toInt())
-                            onDismissRequest()
-                            hideKeyboard.invoke()
-                        }
-                    }
-                ),
-                colors = TextFieldDefaults.colors(
-                    focusedTextColor = if (newScore.text.isNegativeInt() || newScore.text == "-") Color.Red else Color.Unspecified,
-                    unfocusedTextColor = if (newScore.text.isNegativeInt() || newScore.text == "-") Color.Red else Color.Unspecified
-                ),
-                modifier = modifier
-                    .focusRequester(focusRequester)
-                    .padding(vertical = 20.dp)
-            )
-        },
-        onDismissRequest = {
-            setWarnInvalidScore(false)
-            onDismissRequest()
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    if (isValidScore(newScore.text)) {
-                        setWarnInvalidScore(false)
-                        onChangeScore(newScore.text.toInt())
-                        onDismissRequest()
-                    }
-                },
-                enabled = newScore.text != currentScore.toString() && isValidScore(newScore.text),
-                modifier = modifier.padding(8.dp),
-            ) {
-                Text(stringResource(R.string.update))
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = { onDismissRequest() },
-                modifier = modifier.padding(8.dp),
-            ) {
-                Text(stringResource(R.string.cancel))
-            }
-        }
-    )
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
 }
 
 @Composable
