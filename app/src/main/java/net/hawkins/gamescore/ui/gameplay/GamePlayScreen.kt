@@ -22,6 +22,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.OutputTransformation
+import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.insert
 import androidx.compose.foundation.text.input.placeCursorAtEnd
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -35,7 +36,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -88,6 +88,8 @@ fun GamePlayScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val (showSaveFavoriteGame, setShowSaveFavoriteGame) = remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
 
         viewModel.onEvent(GamePlayUiEvent.RefreshState)
@@ -97,20 +99,12 @@ fun GamePlayScreen(
             newActions = {
                 AppBarActions(
                     showFindWinner = viewModel.isManualWinner(),
-                    determineWinner = { viewModel.onEvent(GamePlayUiEvent.DetermineWinner) },
-                    onShowGameDetails = onShowGameDetails,
+                    onShowFindWinner = { viewModel.onEvent(GamePlayUiEvent.DetermineWinner) },
+                    onShowGameDetails = { onShowGameDetails(uiState.game) },
                     onStartNewGame = onStartNewGame,
-                    onShowLeaderboard = onShowLeaderboard,
-                    game = uiState.game,
-                    players = uiState.players,
-                    saveFavoriteGame = { name ->
-                        viewModel.onEvent(
-                            GamePlayUiEvent.SaveFavoriteGame(
-                                name
-                            )
-                        )
-                    },
-                    resetGame = { viewModel.onEvent(GamePlayUiEvent.ResetGame) },
+                    onShowLeaderboard = { onShowLeaderboard(uiState.game, uiState.players) },
+                    onSaveFavoriteGame = { setShowSaveFavoriteGame(true) },
+                    onResetGame = { viewModel.onEvent(GamePlayUiEvent.ResetGame) },
                     showRoundNumber = uiState.showRoundNumber,
                     onShowRoundNumber = { showRoundNumber ->
                         viewModel.onEvent(
@@ -124,12 +118,24 @@ fun GamePlayScreen(
             }
         )
     }
+
+    if (showSaveFavoriteGame) {
+        SaveFavoriteGame(
+            uiState.game,
+            uiState.players,
+            onDismissRequest = { setShowSaveFavoriteGame(false) },
+            onConfirmation = { name ->
+                viewModel.onEvent(GamePlayUiEvent.SaveFavoriteGame(name))
+                setShowSaveFavoriteGame(false)
+            }
+        )
+    }
+
     LaunchedEffect(uiState) {
         viewModel.saveGameProgress()
     }
 
     val navigationEvent by viewModel.navigationEvents.collectAsState(initial = null)
-
     LaunchedEffect(navigationEvent) {
         when (navigationEvent) {
             is NavigationEvent.NavigateToLeaderboard -> onShowLeaderboard(
@@ -143,8 +149,8 @@ fun GamePlayScreen(
 
     GamePlayScreenContent(
         uiState = uiState,
-        onEvent = { event: GamePlayUiEvent -> viewModel.onEvent(event) },
-        isValidScore = { possibleScore -> viewModel.isValidScore(possibleScore) },
+        onEvent = viewModel::onEvent,
+        isValidScore = viewModel::isValidScore,
         modifier = modifier
     )
 }
@@ -161,14 +167,13 @@ private fun GamePlayScreenContent(
     ) {
         Row(
             modifier = modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-
-            ) {
+            horizontalArrangement = Arrangement.Center
+        ) {
             Winner(uiState.winner)
         }
         Row(
             modifier = modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
+            horizontalArrangement = Arrangement.Center
         ) {
             Game(
                 uiState = uiState,
@@ -192,33 +197,6 @@ private fun Winner(winner: String?) {
 }
 
 @Composable
-private fun Game(
-    uiState: GamePlayUiState,
-    onEvent: (GamePlayUiEvent) -> Unit,
-    isValidScore: (CharSequence) -> Boolean,
-    modifier: Modifier
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxWidth()
-    ) {
-        PlayerHeader(
-            players = uiState.players,
-            showRoundNumber = uiState.showRoundNumber,
-            modifier = modifier
-        )
-        Rounds(
-            players = uiState.players,
-            onEvent = onEvent,
-            numberOfRounds = uiState.numberOfRounds(),
-            isValidScore = isValidScore,
-            showRoundNumber = uiState.showRoundNumber,
-            modifier = modifier
-        )
-    }
-}
-
-@Composable
 private fun PlayerHeader(
     players: List<Player>,
     showRoundNumber: Boolean,
@@ -229,6 +207,7 @@ private fun PlayerHeader(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 10.dp)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         if (showRoundNumber) {
             Column(
@@ -288,17 +267,19 @@ private fun PlayerHeader(
 }
 
 @Composable
-private fun Rounds(
-    players: List<Player>,
+private fun Game(
+    uiState: GamePlayUiState,
     onEvent: (GamePlayUiEvent) -> Unit,
-    numberOfRounds: Int,
     isValidScore: (CharSequence) -> Boolean,
-    showRoundNumber: Boolean,
     modifier: Modifier
 ) {
+    val numberOfRounds = uiState.numberOfRounds()
+    val players = uiState.players
+    val showRoundNumber = uiState.showRoundNumber
+
     val scrollState = rememberLazyListState()
     LaunchedEffect(numberOfRounds) {
-        if (numberOfRounds != 0) scrollState.scrollToItem(numberOfRounds - 1)
+        if (numberOfRounds != 0) scrollState.scrollToItem(numberOfRounds + 1)
     }
     LazyColumn(
         state = scrollState,
@@ -306,7 +287,14 @@ private fun Rounds(
         contentPadding = PaddingValues(bottom = 20.dp),
         modifier = modifier.fillMaxWidth()
     ) {
-        items(numberOfRounds) { round ->
+        stickyHeader {
+            PlayerHeader(
+                players,
+                showRoundNumber,
+                modifier
+            )
+        }
+        items(numberOfRounds + 1) { round ->
             Round(
                 round = round,
                 players = players,
@@ -316,43 +304,16 @@ private fun Rounds(
                 modifier = modifier
             )
         }
-        item {
-            Round(
-                round = numberOfRounds,
-                players = players,
-                onEvent = onEvent,
-                isValidScore = isValidScore,
-                showRoundNumber = showRoundNumber,
-                modifier = modifier
-            )
-        }
     }
 }
 
 @Composable
-fun measureTextHeight(text: String, style: TextStyle): Dp {
-    val textMeasurer = rememberTextMeasurer()
-    val density = LocalDensity.current
-
-    val textLayoutResult = textMeasurer.measure(
-        text = text,
-        style = style,
-    )
-
-    return with(density) {
-        textLayoutResult.size.height.toDp()
-    }
-}
-
-
-@Composable
-fun ScoreInputField(
-    initialValue: String,
+private fun ScoreInputField(
     onAddScore: (Int) -> Unit,
     isValidScore: (CharSequence) -> Boolean,
     modifier: Modifier
 ) {
-    val newScoreState = rememberTextFieldState(initialValue)
+    val newScoreState = rememberTextFieldState()
     val (warnInvalidScore, setWarnInvalidScore) = remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val hideKeyboard = { keyboardController?.hide() }
@@ -362,9 +323,9 @@ fun ScoreInputField(
         contentAlignment = Alignment.Center
     ) {
         val textStyle = MaterialTheme.typography.displayMedium
-        val height = measureTextHeight("999", textStyle) + 4.dp
         BasicTextField(
             state = newScoreState,
+            lineLimits = TextFieldLineLimits.SingleLine,
             outputTransformation = OutputTransformation {
                 while (length < 4) {
                     insert(0, " ")
@@ -372,7 +333,7 @@ fun ScoreInputField(
                 placeCursorAtEnd()
             },
             modifier = modifier
-                .height(height)
+                .height(IntrinsicSize.Min)
                 .width(IntrinsicSize.Min),
             textStyle = textStyle.copy(color = if (newScoreState.isNegativeNumber()) Color.Red else MaterialTheme.colorScheme.onSurface),
             decorator = { innerTextField ->
@@ -436,7 +397,7 @@ private fun Round(
                         Color.LightGray
                     }
                 } else {
-                    Color.Transparent
+                    MaterialTheme.colorScheme.background
                 }
             )
     ) {
@@ -494,7 +455,6 @@ private fun Round(
             } else {
                 if (player.scores.size == round) {
                     ScoreInputField(
-                        initialValue = "",
                         isValidScore = isValidScore,
                         onAddScore = { score: Int ->
                             onEvent(
@@ -511,7 +471,6 @@ private fun Round(
                 }
             }
         }
-
     }
 }
 
@@ -589,7 +548,6 @@ private fun ChangeScore(
                 },
                 textStyle = MaterialTheme.typography.labelSmall.plus(TextStyle(textAlign = TextAlign.Center)),
                 singleLine = true,
-                shape = shapes.small,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Done,
@@ -647,27 +605,40 @@ private fun ChangeScore(
 }
 
 @Composable
+private fun MenuItem(
+    text: String,
+    onClick: () -> Unit,
+) {
+    DropdownMenuItem(
+        text = {
+            Text(
+                text = text,
+                fontSize = 20.sp
+            )
+        },
+        onClick = onClick
+    )
+}
+
+@Composable
 private fun AppBarActions(
     showFindWinner: Boolean,
-    determineWinner: () -> Unit,
-    game: Game,
-    players: List<Player>,
-    onShowGameDetails: (Game) -> Unit,
+    onShowFindWinner: () -> Unit,
+    onShowGameDetails: () -> Unit,
     onStartNewGame: () -> Unit,
-    saveFavoriteGame: (String) -> Unit,
-    resetGame: () -> Unit,
+    onSaveFavoriteGame: () -> Unit,
+    onResetGame: () -> Unit,
     showRoundNumber: Boolean,
     onShowRoundNumber: (Boolean) -> Unit,
-    onShowLeaderboard: (Game, List<Player>) -> Unit,
+    onShowLeaderboard: () -> Unit,
     modifier: Modifier
 ) {
     val (dropdownMenuExpanded, setDropdownMenuExpanded) = remember { mutableStateOf(false) }
-    val (showSaveFavoriteGame, setShowSaveFavoriteGame) = remember { mutableStateOf(false) }
     val (confirmResetGame, setConfirmResetGame) = remember { mutableStateOf(false) }
     val (confirmStartNewGame, setConfirmStartNewGame) = remember { mutableStateOf(false) }
 
     Row {
-        IconButton(onClick = { onShowLeaderboard(game, players) }) {
+        IconButton(onClick = { onShowLeaderboard() }) {
             Icon(imageVector = Icons.Outlined.Leaderboard, contentDescription = "Leaderboard")
         }
         IconButton(onClick = { setDropdownMenuExpanded(true) }) {
@@ -682,79 +653,49 @@ private fun AppBarActions(
         onDismissRequest = { setDropdownMenuExpanded(false) }
     ) {
         if (showFindWinner) {
-            DropdownMenuItem(
-                text = {
-                    Text(
-                        text = stringResource(R.string.find_winner),
-                        fontSize = 20.sp
-                    )
-                },
+            MenuItem(
+                text = stringResource(R.string.find_winner),
                 onClick = {
                     setDropdownMenuExpanded(false)
-                    determineWinner()
+                    onShowFindWinner()
                 }
             )
         }
-        DropdownMenuItem(
-            text = {
-                Text(
-                    text = stringResource(R.string.reset_game),
-                    fontSize = 20.sp
-                )
-            },
+        MenuItem(
+            text = stringResource(R.string.reset_game),
             onClick = {
                 setConfirmResetGame(true)
                 setDropdownMenuExpanded(false)
             }
         )
-        DropdownMenuItem(
-            text = {
-                Text(
-                    text = stringResource(R.string.new_game),
-                    fontSize = 20.sp
-                )
-            },
+        MenuItem(
+            text = stringResource(R.string.new_game),
             onClick = {
                 setConfirmStartNewGame(true)
                 setDropdownMenuExpanded(false)
             }
         )
         HorizontalDivider()
-        DropdownMenuItem(
-            text = {
-                Text(
-                    text = stringResource(R.string.save_favorite_game),
-                    fontSize = 20.sp
-                )
-            },
+        MenuItem(
+            text = stringResource(R.string.save_favorite_game),
             onClick = {
-                setShowSaveFavoriteGame(true)
                 setDropdownMenuExpanded(false)
+                onSaveFavoriteGame()
             }
         )
-        DropdownMenuItem(
-            text = {
-                Text(
-                    text = stringResource(R.string.game_details),
-                    fontSize = 20.sp
-                )
-            },
+        MenuItem(
+            text = stringResource(R.string.game_details),
             onClick = {
                 setDropdownMenuExpanded(false)
-                onShowGameDetails(game)
+                onShowGameDetails()
             }
         )
         HorizontalDivider()
-        DropdownMenuItem(
-            text = {
-                Text(
-                    text = if (showRoundNumber) {
-                        stringResource(R.string.hide_round)
-                    } else {
-                        stringResource(R.string.show_round)
-                    },
-                    fontSize = 20.sp
-                )
+        MenuItem(
+            text = if (showRoundNumber) {
+                stringResource(R.string.hide_round)
+            } else {
+                stringResource(R.string.show_round)
             },
             onClick = {
                 setDropdownMenuExpanded(false)
@@ -770,7 +711,7 @@ private fun AppBarActions(
             onDismissRequest = { setConfirmResetGame(false) },
             onConfirmation = {
                 setConfirmResetGame(false)
-                resetGame()
+                onResetGame()
             },
             modifier = modifier
         )
@@ -788,18 +729,6 @@ private fun AppBarActions(
                 onStartNewGame()
             },
             modifier = modifier
-        )
-    }
-
-    if (showSaveFavoriteGame) {
-        SaveFavoriteGame(
-            game,
-            players,
-            onDismissRequest = { setShowSaveFavoriteGame(false) },
-            onConfirmation = { name ->
-                saveFavoriteGame(name)
-                setShowSaveFavoriteGame(false)
-            }
         )
     }
 }
