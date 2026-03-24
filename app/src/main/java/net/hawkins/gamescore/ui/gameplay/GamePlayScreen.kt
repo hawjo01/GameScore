@@ -306,19 +306,9 @@ private fun Rounds(
         contentPadding = PaddingValues(bottom = 20.dp),
         modifier = modifier.fillMaxWidth()
     ) {
-        items(numberOfRounds) { round ->
+        items(numberOfRounds + 1) { round ->
             Round(
                 round = round,
-                players = players,
-                onEvent = onEvent,
-                isValidScore = isValidScore,
-                showRoundNumber = showRoundNumber,
-                modifier = modifier
-            )
-        }
-        item {
-            Round(
-                round = numberOfRounds,
                 players = players,
                 onEvent = onEvent,
                 isValidScore = isValidScore,
