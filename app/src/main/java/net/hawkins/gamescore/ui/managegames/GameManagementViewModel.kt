@@ -28,7 +28,7 @@ class GameManagementViewModel @Inject constructor(
         }
     }
 
-    private fun deleteGame(id: Int) {
+    private fun deleteGame(id: Long) {
         _gameRepository.deleteById(id)
         refreshState()
     }

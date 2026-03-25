@@ -157,7 +157,7 @@ class FavoriteGameDataSourceTest : AbstractBaseTest() {
         val retrievedGame = dataSource.getById(savedGame.id)
         assertNotNull(retrievedGame)
 
-        val doesNotExist = 0
+        val doesNotExist = 0L
         val nullGame = dataSource.getById(doesNotExist)
         assertNull(nullGame)
     }

@@ -141,7 +141,7 @@ private fun GameManagementScreenContent(
 @Composable
 private fun ConfirmDeleteGame(
     game: Game,
-    onConfirmation: (Int) -> Unit,
+    onConfirmation: (Long) -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier
 ) {
