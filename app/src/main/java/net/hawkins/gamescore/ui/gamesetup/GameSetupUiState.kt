@@ -3,7 +3,7 @@ package net.hawkins.gamescore.ui.gamesetup
 import net.hawkins.gamescore.data.model.Game
 
 data class GameSetupUiState(
-    val gameId: Int = 0,
+    val gameId: Long = 0,
     val gameName: String = "",
     val gameObjectiveGoal: Int? = null,
     val gameObjectiveRounds: Int? = null,

@@ -33,7 +33,7 @@ abstract class IdableJsonDataSource<T : Idable>(
         }
     }
 
-    override fun getById(id: Int): T? {
+    override fun getById(id: Long): T? {
         val items = getAll()
         val item = items.firstOrNull { item -> item.id == id }
         return item
@@ -41,7 +41,7 @@ abstract class IdableJsonDataSource<T : Idable>(
 
     override fun save(item: T): T {
         val existingItems = getAll()
-        val itemsToSave = if (item.id == 0) {
+        val itemsToSave = if (item.id == 0L) {
             item.id = generateId(existingItems)
             existingItems.plus(item)
         } else {
@@ -52,17 +52,17 @@ abstract class IdableJsonDataSource<T : Idable>(
         return item
     }
 
-    override fun deleteById(id: Int) {
+    override fun deleteById(id: Long) {
         val items = getAll()
         val itemsToSave = items.filterNot { existingItem -> existingItem.id == id }
         saveAll(itemsToSave)
     }
 
-    private fun generateId(existingItems: List<T>): Int {
+    private fun generateId(existingItems: List<T>): Long {
         val existingIds = existingItems.map { existingItem -> existingItem.id }
-        var randomId: Int?
+        var randomId: Long?
         do {
-            randomId = (10000000..99999999).random()
+            randomId = (10000000..99999999).random().toLong()
         } while (existingIds.contains(randomId))
         return randomId
     }

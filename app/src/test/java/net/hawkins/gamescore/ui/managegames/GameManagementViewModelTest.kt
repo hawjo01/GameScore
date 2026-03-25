@@ -36,7 +36,7 @@ class GameManagementViewModelTest {
 
     @Test
     fun deleteGame() {
-        val updatedGames = games.filterNot { game -> game.id != 1 }
+        val updatedGames = games.filterNot { game -> game.id != 1L }
 
         every { gameRepository.deleteById(any()) } returns Unit
         every { gameRepository.getAll() } returns updatedGames

@@ -80,7 +80,7 @@ class GamePlaySetupViewModel @Inject constructor(
         }
     }
 
-    private fun deleteFavoriteGame(favoriteGameId: Int) {
+    private fun deleteFavoriteGame(favoriteGameId: Long) {
         _favoriteGameRepository.deleteById(favoriteGameId)
         _uiState.update { currentState ->
             currentState.copy(favoriteGames = _favoriteGameRepository.getAll())
