@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.OutputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.insert
@@ -326,6 +327,14 @@ private fun ScoreInputField(
         BasicTextField(
             state = newScoreState,
             lineLimits = TextFieldLineLimits.SingleLine,
+            inputTransformation = InputTransformation {
+                if (asCharSequence().contains('.')) {
+                    // Replace all instances of "." with "-".  Some software keyboards
+                    // don't have a dedicated "-" button and the "-" is achieved by entering
+                    // double "." Since this app uses Integers for scores, just convert the "." to a "-"
+                    replace(0, length, asCharSequence().toString().replace('.', '-'))
+                }
+            },
             outputTransformation = OutputTransformation {
                 while (length < 4) {
                     insert(0, " ")
