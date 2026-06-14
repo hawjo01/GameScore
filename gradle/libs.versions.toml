@@ -1,6 +1,6 @@
 [versions]
 agp = "9.2.1"
-kotlin = "2.4.0"
+kotlin = "2.3.21"
 kotlinx = "1.11.0"
 coreKtx = "1.19.0"
 coreTesting = "2.2.0"
