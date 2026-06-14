@@ -38,7 +38,7 @@ configurations.all {
 
 android {
     namespace = "net.hawkins.gamescore"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "net.hawkins.gamescore"
