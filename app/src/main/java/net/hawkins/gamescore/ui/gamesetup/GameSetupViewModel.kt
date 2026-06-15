@@ -20,7 +20,7 @@ class GameSetupViewModel @Inject constructor(
     val uiState: StateFlow<GameSetupUiState> = _uiState.asStateFlow()
 
     fun saveGame(): Boolean {
-        if (isNameValid(_uiState.value.gameName)) {
+        if (!isNameValid(_uiState.value.gameName)) {
             _uiState.update { currentState ->
                 currentState.copy(
                     isValidName = false
