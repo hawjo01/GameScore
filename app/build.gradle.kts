@@ -15,7 +15,7 @@ val httpClientVersion = "4.5.13"
 configurations.all {
     resolutionStrategy.force(
         // Because CVE-2024-7254
-        "com.google.protobuf:protobuf-kotlin:3.25.5",
+        "com.google.protobuf:protobuf-kotlin:4.35.1",
         // Because CVE-2024-7254
         "com.google.protobug:protobuf-java:3.25.5",
         // Because Netty has multiple CVE's
