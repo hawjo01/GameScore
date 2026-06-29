@@ -15,7 +15,7 @@ lottieCompose = "6.7.1"
 mockk = "1.14.11"
 navigationRuntimeKtx = "2.9.8"
 navigationCompose = "2.9.8"
-hilt = "2.59.2"
+hilt = "2.60"
 ksp = "2.3.9"
 
 [libraries]
