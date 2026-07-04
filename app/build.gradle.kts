@@ -8,8 +8,6 @@ plugins {
 val signingKeystore = file("signing_keystore.jks")
 
 val nettyVersion = "4.1.135.Final"
-val joseVersion = "0.9.6"
-val commonsLang3Version = "3.18.0"
 val httpClientVersion = "4.5.13"
 
 configurations.all {
@@ -30,8 +28,6 @@ configurations.all {
         "io.netty:netty-resolver:$nettyVersion",
         "io.netty:netty-transport-native-unix-common:$nettyVersion",
         "io.netty:netty-transport:$nettyVersion",
-        "org.bitbucket.b_c:jose4j:$joseVersion",
-        "org.apache.commons:commons-lang3:$commonsLang3Version",
         "org.apache.httpcomponents:httpclient:$httpClientVersion"
     )
 }
