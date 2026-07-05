@@ -100,10 +100,10 @@ private fun AppBarActions(
 }
 
 @Composable
-private fun GameSetupScreenContent(
+fun GameSetupScreenContent(
     uiState: GameSetupUiState,
     onEvent: (GameSetupUiEvent) -> Unit,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
     Column(

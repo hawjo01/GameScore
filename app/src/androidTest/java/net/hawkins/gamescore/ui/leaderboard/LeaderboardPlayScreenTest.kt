@@ -29,7 +29,7 @@ class LeaderboardPlayScreenTest {
 
         // Verify table headers are displayed
         composeTestRule.onNodeWithText("Rank").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Players").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Player").assertIsDisplayed()
         composeTestRule.onNodeWithText("Score").assertIsDisplayed()
 
         // Verify Rank 1

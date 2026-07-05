@@ -60,7 +60,6 @@ import net.hawkins.gamescore.data.model.Leaderboard
 import net.hawkins.gamescore.data.model.toDataList
 import net.hawkins.gamescore.ui.component.BackNavigationIcon
 import net.hawkins.gamescore.ui.component.ShimmeringGoldText
-import net.hawkins.gamescore.ui.theme.GameScoreTheme
 import net.hawkins.gamescore.utils.isEven
 
 @Composable
@@ -84,9 +83,9 @@ fun LeaderboardScreen(
 }
 
 @Composable
-private fun LeaderboardScreenContent(
+fun LeaderboardScreenContent(
     uiState: LeaderboardUiState,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         val winner = uiState.leaderboard.winner
@@ -257,7 +256,7 @@ private val Gold = Color(0xFFFFD700)
 private val Silver = Color(0xFFE0E0E0) // Lightened from 0xFFC0C0C0 for better visibility on dark backgrounds
 private val Bronze = Color(0xFFCD7F32)
 private val Parchment = Color(0xFFF5F5DC) // Parchment for non-podium ranks
-private val LeaderGreen = Color.Green // Green for current leader when no winner is declared
+private val LeaderGreen = Color(0xFF4CAF50) // Green for current leader when no winner is declared
 
 @Composable
 private fun getSparkleBrush(rank: String): Brush? {
@@ -317,13 +316,13 @@ private fun getRankColor(rank: String): Color {
 }
 
 @Composable
-private fun LeaderboardColumn(
+fun LeaderboardColumn(
     headers: List<String>,
     data: List<List<String>>,
     columnWidths: List<Dp>,
     hasWinner: Boolean,
     displayNegativeScoreInRed: Boolean,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     Column {
         Row(
@@ -363,7 +362,6 @@ private fun LeaderboardColumn(
                     val rankColor = getRankColor(rank[0])
                     val score = rank[2].toIntOrNull() ?: 0
                     val isNegative = displayNegativeScoreInRed && score < 0
-
                     Box(
                         modifier = modifier
                             .width(columnWidths[0])
@@ -392,7 +390,6 @@ private fun LeaderboardColumn(
                     val rankColor = getRankColor(rank[0])
                     val score = rank[2].toIntOrNull() ?: 0
                     val isNegative = displayNegativeScoreInRed && score < 0
-
                     Box(
                         modifier = modifier
                             .width(columnWidths[1])
@@ -424,7 +421,6 @@ private fun LeaderboardColumn(
                     val rankColor = getRankColor(rank[0])
                     val score = rank[2].toIntOrNull() ?: 0
                     val isNegative = displayNegativeScoreInRed && score < 0
-
                     Box(
                         modifier
                             .width(columnWidths[2])
