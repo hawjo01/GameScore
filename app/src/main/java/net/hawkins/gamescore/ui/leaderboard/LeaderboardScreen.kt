@@ -1,6 +1,12 @@
 package net.hawkins.gamescore.ui.leaderboard
 
 import android.media.MediaPlayer
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -28,12 +34,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -50,6 +60,7 @@ import net.hawkins.gamescore.data.model.Leaderboard
 import net.hawkins.gamescore.data.model.toDataList
 import net.hawkins.gamescore.ui.component.BackNavigationIcon
 import net.hawkins.gamescore.ui.component.ShimmeringGoldText
+import net.hawkins.gamescore.ui.theme.GameScoreTheme
 import net.hawkins.gamescore.utils.isEven
 
 @Composable
@@ -141,7 +152,7 @@ private fun LeaderboardTable(
                     headers = headers,
                     data = data,
                     columnWidths = columnWidths,
-                    firstPlayerColor = Color.Green,
+                    hasWinner = hasWinner,
                     modifier = modifier
                 )
             } else {
@@ -157,7 +168,7 @@ private fun LeaderboardTable(
                         headers = headers,
                         data = chunkedData[0],
                         columnWidths = columnWidths,
-                        firstPlayerColor = Color.Green,
+                        hasWinner = hasWinner,
                         modifier = modifier
                     )
                     Spacer(modifier = modifier.width(50.dp))
@@ -165,7 +176,7 @@ private fun LeaderboardTable(
                         headers = headers,
                         data = chunkedData[1],
                         columnWidths = columnWidths,
-                        firstPlayerColor = Color.Unspecified,
+                        hasWinner = hasWinner,
                         modifier = modifier
                     )
                 }
@@ -195,16 +206,21 @@ private fun FireworksOverlay(
         iterations = LottieConstants.IterateForever
     )
 
+    val isPreview = LocalInspectionMode.current
     DisposableEffect(Unit) {
-        val mediaPlayer = MediaPlayer.create(context, R.raw.firework_sound)
-        mediaPlayer?.apply {
-            isLooping = true
-            start()
-        }
-        onDispose {
+        if (isPreview) {
+            onDispose { }
+        } else {
+            val mediaPlayer = MediaPlayer.create(context, R.raw.firework_sound)
             mediaPlayer?.apply {
-                if (isPlaying) stop()
-                release()
+                isLooping = true
+                start()
+            }
+            onDispose {
+                mediaPlayer?.apply {
+                    if (isPlaying) stop()
+                    release()
+                }
             }
         }
     }
@@ -232,12 +248,74 @@ private fun FireworksOverlay(
 }
 
 
+private val Gold = Color(0xFFFFD700)
+private val Silver = Color(0xFFE0E0E0) // Lightened from 0xFFC0C0C0 for better visibility on dark backgrounds
+private val Bronze = Color(0xFFCD7F32)
+private val Parchment = Color(0xFFF5F5DC) // Parchment for non-podium ranks
+
+@Composable
+private fun getSparkleBrush(rank: String): Brush? {
+    val colors = when (rank) {
+        "1" -> listOf(
+            Color(0xFF8B4513), // Darker Gold/Bronze
+            Gold,
+            Color(0xFFFFECB3), // Lighter Gold (Sparkle)
+            Gold,
+            Color(0xFF8B4513)
+        )
+        "2" -> listOf(
+            Color(0xFF707070), // Darker Silver
+            Silver,
+            Color(0xFFF5F5F5), // Lighter Silver (Sparkle)
+            Silver,
+            Color(0xFF707070)
+        )
+        "3" -> listOf(
+            Color(0xFF804A00), // Darker Bronze
+            Bronze,
+            Color(0xFFE6BE8A), // Lighter Bronze (Sparkle)
+            Bronze,
+            Color(0xFF804A00)
+        )
+        else -> return null
+    }
+
+    val infiniteTransition = rememberInfiniteTransition(label = "sparkle")
+    val translateAnim by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1000f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 10000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "translate"
+    )
+
+    return Brush.linearGradient(
+        colors = colors,
+        start = Offset(translateAnim, translateAnim),
+        end = Offset(translateAnim + 200f, translateAnim + 200f),
+        tileMode = TileMode.Mirror
+    )
+}
+
+@Composable
+private fun getRankColor(rank: String): Color {
+    val isDarkTheme = androidx.compose.foundation.isSystemInDarkTheme()
+    return when (rank) {
+        "1" -> Gold
+        "2" -> Silver
+        "3" -> Bronze
+        else -> if (isDarkTheme) Parchment else Color.Unspecified
+    }
+}
+
 @Composable
 private fun LeaderboardColumn(
     headers: List<String>,
     data: List<List<String>>,
     columnWidths: List<Dp>,
-    firstPlayerColor: Color,
+    hasWinner: Boolean,
     modifier: Modifier
 ) {
     Column {
@@ -274,7 +352,8 @@ private fun LeaderboardColumn(
         }
         Row {
             Column {
-                data.forEachIndexed { index, rank ->
+                data.forEach { rank ->
+                    val rankColor = getRankColor(rank[0])
                     Box(
                         modifier = modifier
                             .width(columnWidths[0])
@@ -283,11 +362,7 @@ private fun LeaderboardColumn(
                         Text(
                             text = rank[0],
                             style = MaterialTheme.typography.headlineMedium,
-                            color = if (index == 0) {
-                                firstPlayerColor
-                            } else {
-                                Color.Unspecified
-                            },
+                            color = if (hasWinner) rankColor else Color.Unspecified,
                             modifier = Modifier
                                 .padding(8.dp)
                         )
@@ -297,19 +372,23 @@ private fun LeaderboardColumn(
             Column(
                 horizontalAlignment = Alignment.Start
             ) {
-                data.forEachIndexed { index, rank ->
+                data.forEach { rank ->
+                    val sparkleBrush = if (hasWinner) getSparkleBrush(rank[0]) else null
+                    val rankColor = getRankColor(rank[0])
                     Box(
                         modifier = modifier
                             .width(columnWidths[1])
                     ) {
                         Text(
                             text = rank[1],
-                            style = MaterialTheme.typography.headlineMedium,
-                            color = if (index == 0) {
-                                firstPlayerColor
+                            style = if (sparkleBrush != null) {
+                                MaterialTheme.typography.headlineMedium.copy(brush = sparkleBrush)
                             } else {
-                                Color.Unspecified
+                                MaterialTheme.typography.headlineMedium
                             },
+                            color = if (sparkleBrush == null) {
+                                if (hasWinner) rankColor else Color.Unspecified
+                            } else Color.Unspecified,
                             modifier = Modifier
                                 .padding(8.dp)
                         )
@@ -317,7 +396,8 @@ private fun LeaderboardColumn(
                 }
             }
             Column {
-                data.forEachIndexed { index, rank ->
+                data.forEach { rank ->
+                    val rankColor = getRankColor(rank[0])
                     Box(
                         modifier
                             .width(columnWidths[2])
@@ -325,12 +405,7 @@ private fun LeaderboardColumn(
                         Text(
                             text = rank[2],
                             style = MaterialTheme.typography.headlineMedium,
-                            color = if (index == 0) {
-                                firstPlayerColor
-                            } else {
-                                Color.Unspecified
-                            },
-
+                            color = if (hasWinner) rankColor else Color.Unspecified,
                             modifier = Modifier
                                 .padding(8.dp)
                         )
