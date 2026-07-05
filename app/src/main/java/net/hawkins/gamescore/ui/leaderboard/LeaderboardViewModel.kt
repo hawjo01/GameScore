@@ -23,8 +23,14 @@ class LeaderboardViewModel : AbstractViewModel() {
 
     private fun updateLeaderboard(game: Game, players: List<Player>) {
         val leaderboard = leaderboardService.buildLeaderboard(game, players)
+        val displayNegativeScoreInRed =
+            game.objective.type == Game.Objective.Type.HIGH_SCORE && !game.constraints.positiveOnly
+
         _uiState.update { currentState ->
-            currentState.copy(leaderboard = leaderboard)
+            currentState.copy(
+                leaderboard = leaderboard,
+                displayNegativeScoreInRed = displayNegativeScoreInRed
+            )
         }
     }
 }

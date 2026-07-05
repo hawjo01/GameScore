@@ -113,6 +113,7 @@ private fun LeaderboardScreenContent(
                 ),
                 data = uiState.leaderboard.toDataList(),
                 hasWinner = winner != null,
+                displayNegativeScoreInRed = uiState.displayNegativeScoreInRed,
                 modifier = modifier
             )
         }
@@ -124,6 +125,7 @@ private fun LeaderboardTable(
     headers: List<String>,
     data: List<List<String>>,
     hasWinner: Boolean,
+    displayNegativeScoreInRed: Boolean,
     modifier: Modifier
 ) {
     val columnWidths = findColumnWidths(headers = headers, data = data)
@@ -153,6 +155,7 @@ private fun LeaderboardTable(
                     data = data,
                     columnWidths = columnWidths,
                     hasWinner = hasWinner,
+                    displayNegativeScoreInRed = displayNegativeScoreInRed,
                     modifier = modifier
                 )
             } else {
@@ -169,6 +172,7 @@ private fun LeaderboardTable(
                         data = chunkedData[0],
                         columnWidths = columnWidths,
                         hasWinner = hasWinner,
+                        displayNegativeScoreInRed = displayNegativeScoreInRed,
                         modifier = modifier
                     )
                     Spacer(modifier = modifier.width(50.dp))
@@ -177,6 +181,7 @@ private fun LeaderboardTable(
                         data = chunkedData[1],
                         columnWidths = columnWidths,
                         hasWinner = hasWinner,
+                        displayNegativeScoreInRed = displayNegativeScoreInRed,
                         modifier = modifier
                     )
                 }
@@ -252,6 +257,7 @@ private val Gold = Color(0xFFFFD700)
 private val Silver = Color(0xFFE0E0E0) // Lightened from 0xFFC0C0C0 for better visibility on dark backgrounds
 private val Bronze = Color(0xFFCD7F32)
 private val Parchment = Color(0xFFF5F5DC) // Parchment for non-podium ranks
+private val LeaderGreen = Color.Green // Green for current leader when no winner is declared
 
 @Composable
 private fun getSparkleBrush(rank: String): Brush? {
@@ -316,6 +322,7 @@ private fun LeaderboardColumn(
     data: List<List<String>>,
     columnWidths: List<Dp>,
     hasWinner: Boolean,
+    displayNegativeScoreInRed: Boolean,
     modifier: Modifier
 ) {
     Column {
@@ -352,8 +359,11 @@ private fun LeaderboardColumn(
         }
         Row {
             Column {
-                data.forEach { rank ->
+                data.forEachIndexed { index, rank ->
                     val rankColor = getRankColor(rank[0])
+                    val score = rank[2].toIntOrNull() ?: 0
+                    val isNegative = displayNegativeScoreInRed && score < 0
+
                     Box(
                         modifier = modifier
                             .width(columnWidths[0])
@@ -362,7 +372,12 @@ private fun LeaderboardColumn(
                         Text(
                             text = rank[0],
                             style = MaterialTheme.typography.headlineMedium,
-                            color = if (hasWinner) rankColor else Color.Unspecified,
+                            color = when {
+                                isNegative -> Color.Red
+                                hasWinner -> rankColor
+                                index == 0 -> LeaderGreen
+                                else -> Color.Unspecified
+                            },
                             modifier = Modifier
                                 .padding(8.dp)
                         )
@@ -372,22 +387,31 @@ private fun LeaderboardColumn(
             Column(
                 horizontalAlignment = Alignment.Start
             ) {
-                data.forEach { rank ->
+                data.forEachIndexed { index, rank ->
                     val sparkleBrush = if (hasWinner) getSparkleBrush(rank[0]) else null
                     val rankColor = getRankColor(rank[0])
+                    val score = rank[2].toIntOrNull() ?: 0
+                    val isNegative = displayNegativeScoreInRed && score < 0
+
                     Box(
                         modifier = modifier
                             .width(columnWidths[1])
                     ) {
                         Text(
                             text = rank[1],
-                            style = if (sparkleBrush != null) {
+                            style = if (sparkleBrush != null && !isNegative) {
                                 MaterialTheme.typography.headlineMedium.copy(brush = sparkleBrush)
                             } else {
                                 MaterialTheme.typography.headlineMedium
                             },
-                            color = if (sparkleBrush == null) {
-                                if (hasWinner) rankColor else Color.Unspecified
+                            color = if (isNegative) {
+                                Color.Red
+                            } else if (sparkleBrush == null) {
+                                when {
+                                    hasWinner -> rankColor
+                                    index == 0 -> LeaderGreen
+                                    else -> Color.Unspecified
+                                }
                             } else Color.Unspecified,
                             modifier = Modifier
                                 .padding(8.dp)
@@ -396,8 +420,11 @@ private fun LeaderboardColumn(
                 }
             }
             Column {
-                data.forEach { rank ->
+                data.forEachIndexed { index, rank ->
                     val rankColor = getRankColor(rank[0])
+                    val score = rank[2].toIntOrNull() ?: 0
+                    val isNegative = displayNegativeScoreInRed && score < 0
+
                     Box(
                         modifier
                             .width(columnWidths[2])
@@ -405,7 +432,12 @@ private fun LeaderboardColumn(
                         Text(
                             text = rank[2],
                             style = MaterialTheme.typography.headlineMedium,
-                            color = if (hasWinner) rankColor else Color.Unspecified,
+                            color = when {
+                                isNegative -> Color.Red
+                                hasWinner -> rankColor
+                                index == 0 -> LeaderGreen
+                                else -> Color.Unspecified
+                            },
                             modifier = Modifier
                                 .padding(8.dp)
                         )
