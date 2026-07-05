@@ -157,11 +157,11 @@ fun GamePlayScreen(
 }
 
 @Composable
-private fun GamePlayScreenContent(
+fun GamePlayScreenContent(
     uiState: GamePlayUiState,
     onEvent: (GamePlayUiEvent) -> Unit,
     isValidScore: (CharSequence) -> Boolean,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier.fillMaxHeight()
@@ -187,7 +187,7 @@ private fun GamePlayScreenContent(
 }
 
 @Composable
-private fun Winner(winner: String?) {
+fun Winner(winner: String?) {
     if (winner != null) {
         Text(
             text = stringResource(R.string.player_wins, winner),
