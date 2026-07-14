@@ -16,7 +16,7 @@ mockk = "1.14.11"
 navigationRuntimeKtx = "2.9.8"
 navigationCompose = "2.9.8"
 hilt = "2.60"
-ksp = "2.3.9"
+ksp = "2.3.10"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
