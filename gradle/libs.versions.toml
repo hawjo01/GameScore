@@ -17,6 +17,10 @@ navigationRuntimeKtx = "2.9.8"
 navigationCompose = "2.9.8"
 hilt = "2.60.1"
 ksp = "2.3.11"
+commons-lang3 = "3.20.0"
+jose4j = "0.9.6"
+bouncycastle = "1.85.2"
+bouncycastle-pkix = "1.85"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -48,6 +52,10 @@ google-dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-androi
 kotlin-metadata-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-metadata-jvm", version.ref = "kotlin" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+apache-commons-lang3 = { group = "org.apache.commons", name = "commons-lang3", version.ref = "commons-lang3" }
+bitbucket-jose4j = { group = "org.bitbucket.b_c", name = "jose4j", version.ref = "jose4j" }
+bouncycastle-bcprov = { group = "org.bouncycastle", name = "bcprov-jdk18on", version.ref = "bouncycastle" }
+bouncycastle-bcpkix = { group = "org.bouncycastle", name = "bcpkix-jdk18on", version.ref = "bouncycastle-pkix" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

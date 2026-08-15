@@ -15,7 +15,7 @@ configurations.all {
         // Because CVE-2024-7254
         "com.google.protobuf:protobuf-kotlin:3.25.5",
         // Because CVE-2024-7254
-        "com.google.protobug:protobuf-java:3.25.5",
+        "com.google.protobuf:protobuf-java:3.25.5",
         // Because Netty has multiple CVE's
         "io.netty:netty-buffer:$nettyVersion",
         "io.netty:netty-codec-http2:$nettyVersion",
@@ -28,7 +28,10 @@ configurations.all {
         "io.netty:netty-resolver:$nettyVersion",
         "io.netty:netty-transport-native-unix-common:$nettyVersion",
         "io.netty:netty-transport:$nettyVersion",
-        "org.apache.httpcomponents:httpclient:$httpClientVersion"
+        "org.apache.httpcomponents:httpclient:$httpClientVersion",
+        // Security Overrides
+        libs.bouncycastle.bcprov,
+        libs.bouncycastle.bcpkix
     )
 }
 
