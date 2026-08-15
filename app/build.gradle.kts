@@ -7,7 +7,7 @@ plugins {
 
 val signingKeystore = file("signing_keystore.jks")
 
-val nettyVersion = "4.1.135.Final"
+val nettyVersion = "4.1.137.Final"
 val httpClientVersion = "4.5.13"
 
 configurations.all {
