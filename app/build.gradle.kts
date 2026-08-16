@@ -5,6 +5,16 @@ plugins {
     alias(libs.plugins.google.devtools.ksp)
 }
 
+buildscript {
+    configurations.all {
+        resolutionStrategy {
+            force("org.apache.commons:commons-lang3:3.20.0")
+            force("org.bitbucket.b_c:jose4j:0.9.6")
+            force("io.netty:netty-all:4.1.137.Final")
+        }
+    }
+}
+
 val signingKeystore = file("signing_keystore.jks")
 
 val nettyVersion = "4.1.137.Final"
@@ -30,6 +40,8 @@ configurations.all {
         "io.netty:netty-transport:$nettyVersion",
         "org.apache.httpcomponents:httpclient:$httpClientVersion",
         // Security Overrides
+        libs.apache.commons.lang3,
+        libs.bitbucket.jose4j,
         libs.bouncycastle.bcprov,
         libs.bouncycastle.bcpkix
     )
