@@ -23,13 +23,13 @@ buildscript {
             force("org.bitbucket.b_c:jose4j:0.9.6")
             force("org.bouncycastle:bcpkix-jdk18on:1.85")
             force("org.bouncycastle:bcprov-jdk18on:1.85.2")
-            force("io.netty:netty-all:4.1.137.Final")
-            force("io.netty:netty-common:4.1.137.Final")
-            force("io.netty:netty-handler:4.1.137.Final")
-            force("io.netty:netty-transport:4.1.137.Final")
-            force("io.netty:netty-buffer:4.1.137.Final")
-            force("io.netty:netty-codec:4.1.137.Final")
-            force("io.netty:netty-resolver:4.1.137.Final")
+            force("io.netty:netty-all:4.2.17.Final")
+            force("io.netty:netty-common:4.2.17.Final")
+            force("io.netty:netty-handler:4.2.17.Final")
+            force("io.netty:netty-transport:4.2.17.Final")
+            force("io.netty:netty-buffer:4.2.17.Final")
+            force("io.netty:netty-codec:4.2.17.Final")
+            force("io.netty:netty-resolver:4.2.17.Final")
         }
     }
     dependencies {
@@ -38,7 +38,7 @@ buildscript {
         classpath("org.bitbucket.b_c:jose4j:0.9.6")
         classpath("org.bouncycastle:bcpkix-jdk18on:1.85")
         classpath("org.bouncycastle:bcprov-jdk18on:1.85.2")
-        classpath("io.netty:netty-all:4.1.137.Final")
+        classpath("io.netty:netty-all:4.2.17.Final")
     }
 }
 
