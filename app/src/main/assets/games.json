@@ -9,6 +9,26 @@
       "multipleOf": 5,
       "positiveOnly": false
     },
+    "id": 1,
+    "name": "1500",
+    "objective": {
+      "goal": 1500,
+      "type": "HIGH_SCORE"
+    },
+    "roundObjective": {
+      "displayColor" : "DEFAULT"
+    }
+  },
+  {
+    "color": {
+      "negativeScore": "RED",
+      "positiveScore": "DEFAULT"
+    },
+    "constraints": {
+      "equalHandSizes": true,
+      "multipleOf": 5,
+      "positiveOnly": false
+    },
     "id": 2,
     "name": "2500",
     "objective": {
