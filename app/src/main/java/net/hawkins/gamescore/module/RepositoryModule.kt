@@ -21,6 +21,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
+@Suppress("unused")
 object RepositoryModule {
 
     const val FAVORITE_PLAYERS_FILENAME = "favorite-players.json"
