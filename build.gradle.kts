@@ -16,11 +16,11 @@ buildscript {
     }
     dependencies {
         // Override plugin transitive dependencies to resolve Dependabot alerts
-        classpath("org.apache.commons:commons-lang3:3.20.0")
-        classpath("org.bitbucket.b_c:jose4j:0.9.6")
-        classpath("org.bouncycastle:bcpkix-jdk18on:1.85")
-        classpath("org.bouncycastle:bcprov-jdk18on:1.85.2")
-        classpath("io.netty:netty-all:4.1.137.Final")
+        classpath("org.apache.commons:commons-lang3:3.21.0")
+        classpath("org.bitbucket.b_c:jose4j:0.9.7")
+        classpath("org.bouncycastle:bcpkix-jdk18on:1.86")
+        classpath("org.bouncycastle:bcprov-jdk18on:1.86")
+        classpath(libs.netty.all)
     }
 }
 
