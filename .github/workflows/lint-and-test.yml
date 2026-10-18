@@ -1,4 +1,4 @@
-name: Pull Request - Lint and Test
+name: Lint and Test
 
 permissions:
   contents: read
@@ -9,6 +9,8 @@ env:
   main_project_module: app
 
 on:
+  push:
+    branches: [ main ]
   pull_request:
     types: [ opened, edited, reopened, review_requested, synchronize ]
     branches: [ main ]
