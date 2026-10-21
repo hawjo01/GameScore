@@ -9,7 +9,7 @@ buildscript {
     configurations.all {
         resolutionStrategy {
             force("org.apache.commons:commons-lang3:3.21.0")
-            force("org.bitbucket.b_c:jose4j:0.9.6")
+            force("org.bitbucket.b_c:jose4j:0.9.7")
             force("io.netty:netty-all:4.1.137.Final")
         }
     }
