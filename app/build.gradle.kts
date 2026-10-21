@@ -29,9 +29,9 @@ configurations.all {
         // Because Netty has multiple CVE's
         "io.netty:netty-buffer:$nettyVersion",
         "io.netty:netty-codec-http2:$nettyVersion",
-        "io.netty:netty-code-http:$nettyVersion",
-        "io.netty:netty-code-socks:$nettyVersion",
-        "io.netty:netty-code:$nettyVersion",
+        "io.netty:netty-codec-http:$nettyVersion",
+        "io.netty:netty-codec-socks:$nettyVersion",
+        "io.netty:netty-codec:$nettyVersion",
         "io.netty:netty-common:$nettyVersion",
         "io.netty:netty-handler-proxy:$nettyVersion",
         "io.netty:netty-handler:$nettyVersion",
