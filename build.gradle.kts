@@ -5,7 +5,7 @@ buildscript {
             force("org.bitbucket.b_c:jose4j:0.9.7")
             force("org.bouncycastle:bcpkix-jdk18on:1.86")
             force("org.bouncycastle:bcprov-jdk18on:1.86")
-            force("io.netty:netty-all:4.1.137.Final")
+            force("io.netty:netty-all:4.2.20.Final")
             force("io.netty:netty-common:4.1.137.Final")
             force("io.netty:netty-handler:4.1.137.Final")
             force("io.netty:netty-transport:4.1.137.Final")
