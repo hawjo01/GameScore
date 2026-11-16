@@ -19,7 +19,7 @@ hilt = "2.60.1"
 ksp = "2.3.13"
 commons-lang3 = "3.21.0"
 jose4j = "0.9.7"
-bouncycastle = "1.86"
+bouncycastle = "1.87"
 bouncycastle-pkix = "1.86"
 nettyAll = "4.1.137.Final"
 
