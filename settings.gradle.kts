@@ -21,7 +21,7 @@ buildscript {
         resolutionStrategy {
             force("org.apache.commons:commons-lang3:3.21.0")
             force("org.bitbucket.b_c:jose4j:0.9.7")
-            force("org.bouncycastle:bcpkix-jdk18on:1.86")
+            force("org.bouncycastle:bcpkix-jdk18on:1.87")
             force("org.bouncycastle:bcprov-jdk18on:1.87")
             force("io.netty:netty-all:4.1.137.Final")
             force("io.netty:netty-common:4.1.137.Final")
@@ -36,7 +36,7 @@ buildscript {
         // Override plugin transitive dependencies to resolve Dependabot alerts
         classpath("org.apache.commons:commons-lang3:3.21.0")
         classpath("org.bitbucket.b_c:jose4j:0.9.7")
-        classpath("org.bouncycastle:bcpkix-jdk18on:1.86")
+        classpath("org.bouncycastle:bcpkix-jdk18on:1.87")
         classpath("org.bouncycastle:bcprov-jdk18on:1.87")
         classpath("io.netty:netty-all:4.1.137.Final")
     }
