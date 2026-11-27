@@ -50,6 +50,7 @@ configurations.all {
 android {
     namespace = "net.hawkins.gamescore"
     compileSdk = 37
+    compileSdkExtension = 2
 
     defaultConfig {
         applicationId = "net.hawkins.gamescore"
@@ -119,6 +120,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(platform(libs.androidx.compose.bom))
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     ksp(libs.google.dagger.hilt.compiler)
